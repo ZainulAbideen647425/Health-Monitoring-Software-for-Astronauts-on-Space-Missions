@@ -42,3 +42,35 @@ class DeviceKind(StrEnum):
     GLUCOSE_METER = "glucose_meter"
     THERMOMETER = "thermometer"
     SLEEP_TRACKER = "sleep_tracker"
+
+
+class HealthStatus(StrEnum):
+    """How a reading compares with the expected range. Ordered from best to worst."""
+
+    NORMAL = "normal"
+    CAUTION = "caution"
+    CRITICAL = "critical"
+
+
+class ValueDirection(StrEnum):
+    """Where a value lies relative to the expected range."""
+
+    BELOW_EXPECTED_RANGE = "below_expected_range"
+    WITHIN_EXPECTED_RANGE = "within_expected_range"
+    ABOVE_EXPECTED_RANGE = "above_expected_range"
+
+
+class TrendDirection(StrEnum):
+    """Direction in which recent readings are moving."""
+
+    RISING = "rising"
+    FALLING = "falling"
+    STABLE = "stable"
+
+
+class BatchItemOutcome(StrEnum):
+    """What happened to one measurement in a synchronization batch."""
+
+    CREATED = "created"
+    DUPLICATE = "duplicate"
+    REJECTED = "rejected"

@@ -16,6 +16,7 @@ from astronaut_health_monitor.domain.exceptions import (
     DeviceNotFoundError,
     ImplausibleMeasurementError,
     InvalidMeasurementTimeError,
+    MeasurementNotFoundError,
     MissionNotFoundError,
 )
 
@@ -42,6 +43,7 @@ def create_application(database_url: str | None = None) -> FastAPI:
     application.include_router(router)
 
     @application.exception_handler(MissionNotFoundError)
+    @application.exception_handler(MeasurementNotFoundError)
     @application.exception_handler(AstronautNotFoundError)
     @application.exception_handler(DeviceNotFoundError)
     async def handle_not_found(_: Request, error: Exception) -> JSONResponse:

@@ -69,6 +69,7 @@ class MeasurementRecord(DatabaseBase):
     measurement_source: Mapped[str] = mapped_column(String(30))
     device_id: Mapped[int | None] = mapped_column(ForeignKey("devices.id"), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    client_reference: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
     recorded_at: Mapped[datetime] = mapped_column(UtcDateTime, default=_current_utc_time)
 
     astronaut: Mapped[AstronautRecord] = relationship(back_populates="measurements")

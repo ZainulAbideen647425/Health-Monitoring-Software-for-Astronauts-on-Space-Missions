@@ -6,6 +6,7 @@ from astronaut_health_monitor.domain.enumerations import HealthIndicatorType, Me
 from astronaut_health_monitor.domain.exceptions import (
     AstronautNotFoundError,
     DeviceNotFoundError,
+    DuplicateMeasurementReferenceError,
     ImplausibleMeasurementError,
     InvalidMeasurementTimeError,
 )
@@ -39,7 +40,42 @@ class MeasurementService:
         measurement_source: MeasurementSource,
         device_id: int | None = None,
         notes: str | None = None,
+        client_reference: str | None = None,
     ) -> MeasurementRecord:
+        """Validate and store a measurement. Repeating a known client reference returns the stored record."""
+        record, _ = self.record_measurement_idempotently(
+            astronaut_id,
+            indicator_type,
+            measured_value,
+            measured_at,
+            measurement_source,
+            device_id,
+            notes,
+            client_reference,
+        )
+        return record
+
+    def record_measurement_idempotently(
+        self,
+        astronaut_id: int,
+        indicator_type: HealthIndicatorType,
+        measured_value: float,
+        measured_at: datetime,
+        measurement_source: MeasurementSource,
+        device_id: int | None = None,
+        notes: str | None = None,
+        client_reference: str | None = None,
+    ) -> tuple[MeasurementRecord, bool]:
+        """Like record_measurement, but also says whether a new record was created.
+
+        A client reference is a unique id created by the device that took the measurement. Sending the same
+        reference again (for example after a failed network call) never creates a second record.
+        """
+        if client_reference is not None:
+            existing_record = self._measurement_repository.get_measurement_by_client_reference(client_reference)
+            if existing_record is not None:
+                return existing_record, False
+
         if self._astronaut_repository.get_astronaut_by_id(astronaut_id) is None:
             raise AstronautNotFoundError(f"Astronaut {astronaut_id} does not exist.")
         if device_id is not None and self._device_repository.get_device_by_id(device_id) is None:
@@ -56,16 +92,25 @@ class MeasurementService:
         if measured_at > datetime.now(UTC) + ALLOWED_CLOCK_DRIFT:
             raise InvalidMeasurementTimeError("Measurement time is in the future.")
 
-        return self._measurement_repository.add_measurement(
-            astronaut_id=astronaut_id,
-            indicator_type=indicator_type.value,
-            measured_value=measured_value,
-            measurement_unit=reference.unit,
-            measured_at=measured_at,
-            measurement_source=measurement_source.value,
-            device_id=device_id,
-            notes=notes,
-        )
+        try:
+            new_record = self._measurement_repository.add_measurement(
+                astronaut_id=astronaut_id,
+                indicator_type=indicator_type.value,
+                measured_value=measured_value,
+                measurement_unit=reference.unit,
+                measured_at=measured_at,
+                measurement_source=measurement_source.value,
+                device_id=device_id,
+                notes=notes,
+                client_reference=client_reference,
+            )
+        except DuplicateMeasurementReferenceError:
+            # Another request stored the same reference between our check and our insert.
+            assert client_reference is not None
+            winner = self._measurement_repository.get_measurement_by_client_reference(client_reference)
+            assert winner is not None
+            return winner, False
+        return new_record, True
 
     def list_measurements(
         self, astronaut_id: int, indicator_type: HealthIndicatorType | None = None, limit: int = 100
