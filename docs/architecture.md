@@ -1,4 +1,4 @@
-# Architecture (Phase 1)
+# Architecture (phases 1 and 2)
 
 ```
 HTTP client
@@ -12,7 +12,10 @@ services/ (business rules: existence checks, plausibility, timestamp checks)
    v
 repositories/ (queries) --> SQLite database (offline, single file)
 
-domain/ (indicator types, reference data, exceptions) is used by all layers and depends on nothing.
+domain/ (indicator types, reference data, status rules, guidance, baseline math, exceptions)
+        is used by all layers and depends on nothing.
+
+offline_synchronization/ (local queue file) sits beside the API: it sends batches to POST /measurements/batch.
 ```
 
 ## Key decisions
@@ -31,8 +34,18 @@ domain/ (indicator types, reference data, exceptions) is used by all layers and 
 - `devices`: name, device kind
 - `measurements`: astronaut, indicator, value, unit, time, source, optional device, notes
 
-## Known limits in Phase 1
+## Phase 2 additions
+
+- **Rules are data, not code paths:** each indicator has a `HealthStatusRule` (ranges, critical limits, sources) and
+  one shared evaluation method. Adding an indicator means adding one rule and its guidance, not new logic.
+- **Assessment = rule + personal baseline + trend:** see docs/health_status_rules.md.
+- **Idempotent writes:** a `client_reference` column (unique) makes retries safe. See docs/offline_synchronization.md.
+- **Assessments are computed on demand, not stored,** so changing a rule immediately changes every judgement
+  and there is no stale data to migrate.
+
+## Known limits
 
 - No authentication or encryption at rest (Phase 4).
 - No endpoints to create devices yet (the table and repository exist).
-- No health status evaluation yet (Phase 2).
+- No user interface yet (Phase 3).
+- No database migration tool: changing a table currently means recreating the local database file.

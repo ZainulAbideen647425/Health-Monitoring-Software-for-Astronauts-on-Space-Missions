@@ -2,28 +2,43 @@
 
 import logging
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query, Request, Response
+from pydantic import ValidationError
 from sqlalchemy import text
 
 from astronaut_health_monitor import __version__
 from astronaut_health_monitor.api.dependencies import (
     AstronautServiceDependency,
     DatabaseSession,
+    HealthAssessmentServiceDependency,
+    MeasurementBatchServiceDependency,
     MeasurementServiceDependency,
     MissionServiceDependency,
 )
 from astronaut_health_monitor.api.schemas import (
     ApplicationHealthResponse,
     AstronautCreateRequest,
+    AstronautHealthSummaryResponse,
     AstronautResponse,
+    HealthAssessmentResponse,
     HealthIndicatorReferenceResponse,
+    HealthStatusRuleResponse,
+    MeasurementBatchItemResponse,
+    MeasurementBatchRequest,
+    MeasurementBatchResponse,
     MeasurementCreateRequest,
     MeasurementResponse,
     MissionCreateRequest,
     MissionResponse,
+    QueuedMeasurementItem,
 )
-from astronaut_health_monitor.domain.enumerations import HealthIndicatorType
+from astronaut_health_monitor.domain.enumerations import BatchItemOutcome, HealthIndicatorType
 from astronaut_health_monitor.domain.health_indicator_reference import HEALTH_INDICATOR_REFERENCES
+from astronaut_health_monitor.domain.health_status_rules import HEALTH_STATUS_RULES
+from astronaut_health_monitor.services.measurement_batch_service import (
+    BatchMeasurementInput,
+    InvalidBatchItem,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -86,8 +101,11 @@ def list_astronauts(service: AstronautServiceDependency) -> list[AstronautRespon
 
 
 @router.post("/measurements", response_model=MeasurementResponse, status_code=201, tags=["measurements"])
-def record_measurement(request: MeasurementCreateRequest, service: MeasurementServiceDependency) -> MeasurementResponse:
-    measurement = service.record_measurement(
+def record_measurement(
+    request: MeasurementCreateRequest, response: Response, service: MeasurementServiceDependency
+) -> MeasurementResponse:
+    """Record one measurement. Returns 201 when stored, or 200 if the client reference was already stored."""
+    measurement, was_created = service.record_measurement_idempotently(
         astronaut_id=request.astronaut_id,
         indicator_type=request.indicator_type,
         measured_value=request.measured_value,
@@ -95,8 +113,57 @@ def record_measurement(request: MeasurementCreateRequest, service: MeasurementSe
         measurement_source=request.measurement_source,
         device_id=request.device_id,
         notes=request.notes,
+        client_reference=request.client_reference,
     )
+    if not was_created:
+        response.status_code = 200
     return MeasurementResponse.model_validate(measurement)
+
+
+@router.post("/measurements/batch", response_model=MeasurementBatchResponse, tags=["offline synchronization"])
+def record_measurement_batch(
+    request: MeasurementBatchRequest, service: MeasurementBatchServiceDependency
+) -> MeasurementBatchResponse:
+    """Store measurements collected while offline. Each item succeeds or fails on its own."""
+    items: list[BatchMeasurementInput | InvalidBatchItem] = []
+    for raw_item in request.measurements:
+        raw_reference = raw_item.get("client_reference")
+        known_reference = raw_reference if isinstance(raw_reference, str) else None
+        try:
+            parsed = QueuedMeasurementItem.model_validate(raw_item)
+        except ValidationError as error:
+            first_problem = error.errors()[0]
+            location = ".".join(str(part) for part in first_problem["loc"])
+            items.append(InvalidBatchItem(known_reference, f"Invalid field '{location}': {first_problem['msg']}"))
+            continue
+        items.append(
+            BatchMeasurementInput(
+                astronaut_id=parsed.astronaut_id,
+                indicator_type=parsed.indicator_type,
+                measured_value=parsed.measured_value,
+                measured_at=parsed.measured_at,
+                measurement_source=parsed.measurement_source,
+                device_id=parsed.device_id,
+                notes=parsed.notes,
+                client_reference=parsed.client_reference,
+            )
+        )
+    results = service.record_batch(items)
+    return MeasurementBatchResponse(
+        created_count=sum(1 for r in results if r.outcome is BatchItemOutcome.CREATED),
+        duplicate_count=sum(1 for r in results if r.outcome is BatchItemOutcome.DUPLICATE),
+        rejected_count=sum(1 for r in results if r.outcome is BatchItemOutcome.REJECTED),
+        results=[
+            MeasurementBatchItemResponse(
+                index=r.index,
+                client_reference=r.client_reference,
+                outcome=r.outcome,
+                measurement_id=r.measurement_id,
+                rejection_reason=r.rejection_reason,
+            )
+            for r in results
+        ],
+    )
 
 
 @router.get("/measurements", response_model=list[MeasurementResponse], tags=["measurements"])
@@ -109,3 +176,39 @@ def list_measurements(
     """Newest measurements first."""
     records = service.list_measurements(astronaut_id, indicator_type, limit)
     return [MeasurementResponse.model_validate(record) for record in records]
+
+
+@router.get("/health-status-rules", response_model=list[HealthStatusRuleResponse], tags=["reference"])
+def list_health_status_rules() -> list[HealthStatusRuleResponse]:
+    """The expected ranges, critical limits and sources used to judge each indicator."""
+    return [
+        HealthStatusRuleResponse(
+            indicator_type=rule.indicator_type,
+            unit=HEALTH_INDICATOR_REFERENCES[rule.indicator_type].unit,
+            normal_minimum=rule.normal_minimum,
+            normal_maximum=rule.normal_maximum,
+            critical_below=rule.critical_below,
+            critical_above=rule.critical_above,
+            minimum_meaningful_change=rule.minimum_meaningful_change,
+            measurement_conditions=rule.measurement_conditions,
+            source_notes=rule.source_notes,
+            source_urls=list(rule.source_urls),
+        )
+        for rule in HEALTH_STATUS_RULES.values()
+    ]
+
+
+@router.get("/measurements/{measurement_id}/assessment", response_model=HealthAssessmentResponse, tags=["assessment"])
+def assess_measurement(measurement_id: int, service: HealthAssessmentServiceDependency) -> HealthAssessmentResponse:
+    """Judge one stored measurement: status, personal baseline, trend and guidance."""
+    return HealthAssessmentResponse.model_validate(service.assess_measurement(measurement_id))
+
+
+@router.get(
+    "/astronauts/{astronaut_id}/health-summary", response_model=AstronautHealthSummaryResponse, tags=["assessment"]
+)
+def summarize_astronaut_health(
+    astronaut_id: int, service: HealthAssessmentServiceDependency
+) -> AstronautHealthSummaryResponse:
+    """Latest assessment of every indicator, with an overall status for the astronaut."""
+    return AstronautHealthSummaryResponse.model_validate(service.summarize_astronaut_health(astronaut_id))

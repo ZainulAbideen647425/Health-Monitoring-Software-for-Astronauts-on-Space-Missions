@@ -14,14 +14,14 @@ their status at a glance and suggests actions.
 
 | Phase | Content | Status |
 |---|---|---|
-| 1 | Foundation: data model, ingestion API, reference data, tests | **Done** (CI workflow pending) | |
-| 2 | Offline queue, health status rules, personal baselines | Planned |
+| 1 | Foundation: data model, ingestion API, reference data, tests, CI | **Done** |
+| 2 | Health status rules, personal baselines, guidance, offline queue | **Done** |
 | 3 | Dashboard and interactive body map | Planned |
 | 4 | Security: local authentication, audit log, encryption at rest | Planned |
 | 5 | Resilience tests and full documentation | Planned |
 | 6 | Release and submission package | Planned |
 
-## What Phase 1 provides
+## What phases 1 and 2 provide
 
 - Data model for **missions**, **astronauts**, **measuring devices** and **health measurements**.
 - Seven health indicators with units, "how to measure" instructions and "why it matters in spaceflight"
@@ -30,6 +30,13 @@ their status at a glance and suggests actions.
 - Input validation that rejects impossible values (for example a heart rate of 7000) and future timestamps.
 - REST API with automatic interactive documentation.
 - Offline-capable storage (SQLite, no internet needed).
+- **Health status rules** (normal, caution, critical) for every indicator, with documented sources.
+- **Personal baselines and trend detection**: a reading is also judged against the astronaut's own recent history,
+  so a slow drift is flagged even while values are still in the normal range.
+- **Guidance** for every out-of-range reading: explanation, likely causes, recommended actions, warning signs,
+  and a clear "contact the flight surgeon" trigger for critical readings.
+- **Offline queue and safe synchronization**: measurements taken without a connection are stored durably and sent
+  later; unique client references guarantee that retries never create duplicates.
 
 ## Quick start
 
@@ -54,6 +61,10 @@ Open http://127.0.0.1:8000/docs for the interactive API documentation.
 | `POST /astronauts`, `GET /astronauts` | Register and list astronauts |
 | `POST /measurements` | Record one measurement |
 | `GET /measurements?astronaut_id=1` | List measurements, newest first (optional `indicator_type`, `limit`) |
+| `POST /measurements/batch` | Store up to 500 queued measurements; every item gets its own result |
+| `GET /measurements/{id}/assessment` | Judge one measurement: status, personal baseline, trend, guidance |
+| `GET /astronauts/{id}/health-summary` | Latest assessment of every indicator and an overall status |
+| `GET /health-status-rules` | The ranges, critical limits and sources used for judging |
 
 Example:
 
@@ -65,6 +76,11 @@ curl -X POST http://127.0.0.1:8000/measurements -H "Content-Type: application/js
   "measured_at": "2026-11-05T08:30:00+00:00"
 }'
 ```
+
+### Upgrading from Phase 1
+
+Phase 2 adds a column (`client_reference`) to the measurements table. There is no migration tool yet, so delete
+the old `astronaut_health_monitor.db` file once; it is recreated automatically on the next start.
 
 ## Development
 
@@ -84,11 +100,12 @@ src/astronaut_health_monitor/
   repositories/   database access and table definitions
   domain/         indicator vocabulary, reference data, errors
   core/           configuration and database setup
+  offline_synchronization/   local queue that stores measurements until a connection exists
 tests/            unit and integration tests
 docs/             architecture documentation
 ```
 
-See [docs/architecture.md](docs/architecture.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [docs/architecture.md](docs/architecture.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Acknowledgements
 

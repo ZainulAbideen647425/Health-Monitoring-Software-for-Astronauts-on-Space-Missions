@@ -23,3 +23,11 @@ class ImplausibleMeasurementError(AstronautHealthMonitorError):
 
 class InvalidMeasurementTimeError(AstronautHealthMonitorError):
     """The measurement time has no timezone, or is later than the current time (beyond the clock tolerance)."""
+
+
+class MeasurementNotFoundError(AstronautHealthMonitorError):
+    """The requested measurement does not exist."""
+
+
+class DuplicateMeasurementReferenceError(AstronautHealthMonitorError):
+    """A measurement with the same client reference is already stored."""
