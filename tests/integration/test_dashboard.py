@@ -33,3 +33,12 @@ def test_dashboard_only_calls_endpoints_that_exist(api_client: TestClient) -> No
         assert f"'{called}" in page
         assert called in paths
     assert "/health-summary" in page and "/assessment" in page
+
+
+def test_dashboard_uses_plain_language_for_beginners(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element_id in ("welcome", "demoBig", "todo", "actions", "bannerTitle"):
+        assert f'id="{element_id}"' in page
+    for plain_phrase in ("What to do now", "Why, and what to do", "Get medical help now", "Everything looks good"):
+        assert plain_phrase in page
+    assert "\\u25B2 Watch" not in page.split("<script>")[0]  # symbols in the page body are real characters
