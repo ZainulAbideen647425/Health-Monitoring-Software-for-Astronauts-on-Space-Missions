@@ -1,8 +1,10 @@
 """HTTP endpoints of the Astronaut Health Monitor."""
 
 import logging
+from pathlib import Path
 
 from fastapi import APIRouter, Query, Request, Response
+from fastapi.responses import FileResponse
 from pydantic import ValidationError
 from sqlalchemy import text
 
@@ -42,6 +44,14 @@ from astronaut_health_monitor.services.measurement_batch_service import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+DASHBOARD_PAGE = Path(__file__).resolve().parent.parent / "web" / "index.html"
+
+
+@router.get("/", include_in_schema=False)
+def show_dashboard() -> FileResponse:
+    """The dashboard: one self-contained page that works without internet access."""
+    return FileResponse(DASHBOARD_PAGE, media_type="text/html")
 
 
 @router.get("/health", response_model=ApplicationHealthResponse, tags=["application"])

@@ -16,10 +16,24 @@ their status at a glance and suggests actions.
 |---|---|---|
 | 1 | Foundation: data model, ingestion API, reference data, tests, CI | **Done** |
 | 2 | Health status rules, personal baselines, guidance, offline queue | **Done** |
-| 3 | Dashboard and interactive body map | Planned |
+| 3 | Dashboard and interactive body map | **Done** (core version) |
 | 4 | Security: local authentication, audit log, encryption at rest | Planned |
 | 5 | Resilience tests and full documentation | Planned |
 | 6 | Release and submission package | Planned |
+
+## The dashboard (Phase 3)
+
+One self-contained page, served by the app itself with no internet or external libraries:
+
+- **Body map:** click head, chest, abdomen or legs to see the organ's function, the spaceflight hazard that affects it,
+  and the status of its indicators. Each region's outline is colored by its worst status.
+- **Status cards:** one per indicator with status label (text and symbol, not color alone), reasons, and actions.
+  Critical readings show a clear "contact the flight surgeon" alert.
+- **History chart:** readings over time with the expected range shaded.
+- **Measurement form:** shows how to measure the chosen indicator and judges the reading immediately.
+- **Demo crew:** one click creates a sample astronaut with 14 days of readings.
+
+Not yet included: multiple mission environments, gamification, report export, and a bone indicator for the legs.
 
 ## What phases 1 and 2 provide
 
@@ -49,7 +63,8 @@ pip install -e ".[development]"
 python -m astronaut_health_monitor
 ```
 
-Open http://127.0.0.1:8000/docs for the interactive API documentation.
+Open http://127.0.0.1:8000/ for the dashboard (click **Load demo crew** to see sample data) and
+http://127.0.0.1:8000/docs for the interactive API documentation.
 
 ## API overview
 

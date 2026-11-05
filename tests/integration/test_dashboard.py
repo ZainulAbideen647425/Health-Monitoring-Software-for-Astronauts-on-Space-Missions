@@ -1,0 +1,35 @@
+import re
+
+from fastapi.testclient import TestClient
+
+
+def test_dashboard_page_is_served_at_the_root(api_client: TestClient) -> None:
+    response = api_client.get("/")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    assert "Astronaut Health Monitor" in response.text
+
+
+def test_dashboard_contains_every_main_feature(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element_id in ("banner", "cards", "chart", "regionInfo", "demo", "record", "crew"):
+        assert f'id="{element_id}"' in page
+    for region in ("head", "chest", "abdomen", "legs"):
+        assert f'id="r-{region}"' in page
+
+
+def test_dashboard_works_offline_without_external_resources(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    external_links = re.findall(r'(?:src|href)\s*=\s*["\']https?://', page)
+    assert external_links == []
+    assert "@import" not in page
+    assert "cdn" not in page.lower()
+
+
+def test_dashboard_only_calls_endpoints_that_exist(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    paths = set(api_client.get("/openapi.json").json()["paths"])
+    for called in ("/health-indicators", "/health-status-rules", "/astronauts", "/measurements", "/measurements/batch"):
+        assert f"'{called}" in page
+        assert called in paths
+    assert "/health-summary" in page and "/assessment" in page
