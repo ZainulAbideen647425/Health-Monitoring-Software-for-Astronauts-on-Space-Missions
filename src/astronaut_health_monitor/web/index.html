@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astronaut Health Monitor</title>
+<style>
+:root{--bg:#0b1220;--panel:#141d30;--line:#26334f;--text:#e6ecf8;--muted:#93a1bd;--ok:#2fbf71;--warn:#f0b429;--bad:#ef4b5f;--accent:#4c8dff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,Segoe UI,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line)}
+h1{font-size:20px;margin:0}h2{font-size:15px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+button,select,input{font:inherit;color:var(--text);background:#1b2742;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+button{cursor:pointer;background:var(--accent);border-color:var(--accent)}button.secondary{background:#1b2742;border-color:var(--line)}
+main{display:grid;gap:16px;padding:16px 20px;grid-template-columns:minmax(260px,340px) 1fr}
+@media(max-width:820px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+#banner{padding:12px 16px;border-radius:10px;font-weight:600;margin-bottom:16px;border:1px solid var(--line)}
+.s-normal{--c:var(--ok)}.s-caution{--c:var(--warn)}.s-critical{--c:var(--bad)}.s-none{--c:var(--muted)}
+#banner,.card{border-left:6px solid var(--c)}
+#cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:#101828;border-radius:10px;padding:12px}.card b.badge{color:var(--c)}.card .v{font-size:22px;font-weight:700}
+.card ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}.alert{color:var(--bad);font-weight:700;margin-top:6px}
+svg text{fill:var(--muted);font-size:11px}.region{fill:#1e2d4d;stroke:var(--accent);stroke-width:2;cursor:pointer}
+.region:hover,.region:focus,.region.on{fill:#2b4478;outline:none}.region.s-normal{stroke:var(--ok)}.region.s-caution{stroke:var(--warn)}.region.s-critical{stroke:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}.muted{color:var(--muted)}.full{grid-column:1/-1}
+</style>
+</head>
+<body>
+<header>
+<h1>Astronaut Health Monitor</h1>
+<div class="row" style="margin:0"><label for="crew" class="muted">Astronaut</label><select id="crew"></select>
+<button id="demo" class="secondary" type="button">Load demo crew</button></div>
+</header>
+<main>
+<section class="panel"><h2>Body map</h2>
+<svg viewBox="0 0 200 330" role="group" aria-label="Clickable body map" width="100%">
+<circle id="r-head" class="region" tabindex="0" role="button" aria-label="Head" cx="100" cy="42" r="32"/>
+<rect id="r-chest" class="region" tabindex="0" role="button" aria-label="Chest" x="62" y="84" width="76" height="70" rx="18"/>
+<rect id="r-abdomen" class="region" tabindex="0" role="button" aria-label="Abdomen" x="68" y="158" width="64" height="55" rx="14"/>
+<rect id="r-legs" class="region" tabindex="0" role="button" aria-label="Legs and bones" x="70" y="218" width="60" height="105" rx="14"/>
+<text x="100" y="46" text-anchor="middle">Head</text><text x="100" y="124" text-anchor="middle">Chest</text>
+<text x="100" y="190" text-anchor="middle">Abdomen</text><text x="100" y="274" text-anchor="middle">Legs</text></svg>
+<div id="regionInfo"></div></section>
+<section><div id="banner" class="s-none">Load the demo crew to begin.</div>
+<div id="cards"></div></section>
+<section class="panel full"><h2>History</h2>
+<div class="row" style="margin:0 0 8px"><label for="chartIndicator" class="muted">Indicator</label><select id="chartIndicator"></select>
+<span class="muted">Green band = expected range</span></div><div id="chart"></div></section>
+<section class="panel full"><h2>Record a measurement</h2>
+<div class="row"><select id="formIndicator" aria-label="Indicator"></select>
+<input id="formValue" type="number" step="any" placeholder="Value" aria-label="Value"><button id="record" type="button">Record</button></div>
+<p id="help" class="muted"></p><p id="result" role="status"></p></section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const api=async(p,o)=>{const r=await fetch(p,o);const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.detail||r.status);return b};
+const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
+const ICON={normal:'\u2713 NORMAL',caution:'\u25B2 CAUTION',critical:'\u25A0 CRITICAL'};
+const REGIONS={
+head:{t:'Head: brain, sleep and body temperature',f:'The brain controls mood, alertness and sleep. Temperature is checked at the forehead or mouth.',h:'Isolation, confinement and altered light cycles disturb sleep and mood; immune changes make fever more important.',i:['mood_score','sleep_duration','body_temperature']},
+chest:{t:'Chest: heart and blood pressure',f:'The heart pumps blood; blood pressure shows how hard it works.',h:'Microgravity shifts body fluids toward the head and the heart works less against gravity, which can lead to cardiovascular deconditioning.',i:['heart_rate','systolic_blood_pressure','diastolic_blood_pressure']},
+abdomen:{t:'Abdomen: metabolism',f:'Digestion and blood sugar regulation.',h:'Stress, limited food variety and low activity can disturb blood glucose.',i:['blood_glucose']},
+legs:{t:'Legs: bones and muscles',f:'Legs carry body weight on Earth.',h:'Reduced load in low gravity causes bone and muscle loss. This prototype does not track a bone indicator yet.',i:[]}};
+const S={crew:[],ref:{},rules:{},sum:null,region:'chest'};
+const name=i=>S.ref[i]?S.ref[i].display_name:i;
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
+const cur=()=>$('#crew').value;
+async function init(){
+ const [ref,rules]=await Promise.all([api('/health-indicators'),api('/health-status-rules')]);
+ ref.forEach(r=>S.ref[r.indicator_type]=r);rules.forEach(r=>S.rules[r.indicator_type]=r);
+ for(const s of ['#chartIndicator','#formIndicator'])ref.forEach(r=>$(s).append(new Option(r.display_name,r.indicator_type)));
+ await loadCrew();}
+async function loadCrew(){
+ S.crew=await api('/astronauts');const sel=$('#crew');sel.replaceChildren();
+ S.crew.forEach(a=>sel.append(new Option(a.full_name+' ('+a.mission_role+')',a.id)));
+ await refresh();}
+async function refresh(){
+ if(!S.crew.length){$('#banner').className='s-none';$('#banner').textContent='No astronauts yet. Click "Load demo crew".';$('#cards').replaceChildren();return}
+ S.sum=await api('/astronauts/'+cur()+'/health-summary');renderBanner();renderCards();renderRegion();await renderChart();showHelp();}
+function renderBanner(){const b=$('#banner'),s=S.sum;b.className='s-'+s.overall_status;
+ b.textContent=s.assessments.length?(ICON[s.overall_status]+' overall'+(s.contact_flight_surgeon?' \u2014 CONTACT THE FLIGHT SURGEON NOW':'')):'No measurements yet.'}
+function card(a){const c=el('div','card s-'+a.final_status);
+ const h=el('div');h.append(el('b','badge',ICON[a.final_status]+' '),el('span','',a.indicator_display_name));c.append(h);
+ c.append(el('div','v',a.measured_value+' '+a.measurement_unit),el('div','',a.headline));
+ if(a.contact_flight_surgeon)c.append(el('div','alert','Contact the flight surgeon now.'));
+ const u=el('ul');a.status_reasons.concat(a.recommended_actions).forEach(t=>u.append(el('li','',t)));c.append(u);return c}
+function renderCards(){const box=$('#cards');box.replaceChildren();S.sum.assessments.forEach(a=>box.append(card(a)))}
+function worst(list){const o={normal:0,caution:1,critical:2};let w=null;list.forEach(a=>{if(!w||o[a.final_status]>o[w])w=a.final_status});return w}
+function renderRegion(){
+ for(const k in REGIONS){const e=$('#r-'+k);const w=worst(S.sum.assessments.filter(a=>REGIONS[k].i.includes(a.indicator_type)));
+  e.setAttribute('class','region'+(w?' s-'+w:'')+(k===S.region?' on':''))}
+ const r=REGIONS[S.region],box=$('#regionInfo');box.replaceChildren(el('h2','',r.t),el('p','',r.f));
+ const p=el('p','muted','Spaceflight hazard: '+r.h);box.append(p);
+ r.i.forEach(i=>{const a=S.sum.assessments.find(x=>x.indicator_type===i);box.append(el('div','',name(i)+': '+(a?ICON[a.final_status]+' ('+a.measured_value+')':'no data')))})}
+async function renderChart(){
+ const ind=$('#chartIndicator').value,box=$('#chart');
+ const rows=(await api('/measurements?astronaut_id='+cur()+'&indicator_type='+ind+'&limit=60')).reverse();
+ if(rows.length<2){box.textContent='At least two measurements are needed for a chart.';return}
+ const rule=S.rules[ind],W=640,H=220,L=44,B=24,vals=rows.map(r=>r.measured_value);
+ const lo=Math.min(...vals,rule.normal_minimum),hi=Math.max(...vals,rule.normal_maximum),pad=(hi-lo)*.1||1;
+ const y=v=>H-B-(v-lo+pad)/(hi-lo+2*pad)*(H-B-10),x=i=>L+i/(rows.length-1)*(W-L-10);
+ let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="History chart">';
+ s+='<rect x="'+L+'" y="'+y(rule.normal_maximum)+'" width="'+(W-L-10)+'" height="'+(y(rule.normal_minimum)-y(rule.normal_maximum))+'" fill="#2fbf71" opacity=".18"/>';
+ s+='<polyline fill="none" stroke="#4c8dff" stroke-width="2" points="'+rows.map((r,i)=>x(i)+','+y(r.measured_value)).join(' ')+'"/>';
+ rows.forEach((r,i)=>{const o=r.measured_value<rule.normal_minimum||r.measured_value>rule.normal_maximum;s+='<circle cx="'+x(i)+'" cy="'+y(r.measured_value)+'" r="4" fill="'+(o?'#f0b429':'#2fbf71')+'"/>'});
+ s+='<text x="4" y="'+y(rule.normal_maximum)+'">'+rule.normal_maximum+'</text><text x="4" y="'+y(rule.normal_minimum)+'">'+rule.normal_minimum+'</text>';
+ s+='<text x="'+L+'" y="'+(H-6)+'">'+rows[0].measured_at.slice(0,10)+'</text><text x="'+(W-10)+'" y="'+(H-6)+'" text-anchor="end">'+rows[rows.length-1].measured_at.slice(0,10)+'</text></svg>';
+ box.innerHTML=s}
+function showHelp(){const i=$('#formIndicator').value,r=S.ref[i],u=S.rules[i];
+ $('#help').textContent=r.display_name+' ('+r.unit+'). How: '+r.how_to_measure+' Conditions: '+u.measurement_conditions}
+async function record(){const r=$('#result'),v=parseFloat($('#formValue').value);
+ if(!S.crew.length||Number.isNaN(v)){r.textContent='Choose an astronaut and enter a number.';return}
+ try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:$('#formIndicator').value,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString()});
+  const a=await api('/measurements/'+m.id+'/assessment');r.textContent=ICON[a.final_status]+': '+a.headline+(a.contact_flight_surgeon?' \u2014 contact the flight surgeon now.':'');$('#formValue').value='';await refresh()}
+ catch(e){r.textContent='Not saved: '+e.message}}
+async function demo(){
+ const a=await post('/astronauts',{full_name:'Demo Astronaut',mission_role:'Commander'});const items=[],tag=Date.now();let n=0;
+ for(let d=14;d>=1;d--){const t=new Date(Date.now()-d*864e5-n*1000).toISOString(),k=14-d,add=(i,v)=>items.push({astronaut_id:a.id,indicator_type:i,measured_value:v,measured_at:t,client_reference:'demo-'+tag+'-'+(n++)});
+  add('heart_rate',60+(k%2)+(k>9?(k-9)*3:0));add('systolic_blood_pressure',114+k%3);add('diastolic_blood_pressure',72+k%2);add('blood_glucose',88+k%4);
+  add('body_temperature',36.6+(k%3)/10);add('sleep_duration',k>9?7.5-(k-9)*.8:7.6);add('mood_score',k>9?8-(k-9):8)}
+ await post('/measurements/batch',{measurements:items});await loadCrew();$('#crew').value=a.id;await refresh()}
+for(const k in REGIONS){const e=$('#r-'+k),go=()=>{S.region=k;if(S.sum)renderRegion()};e.addEventListener('click',go);e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}})}
+$('#crew').addEventListener('change',refresh);$('#chartIndicator').addEventListener('change',renderChart);
+$('#formIndicator').addEventListener('change',showHelp);$('#record').addEventListener('click',record);
+$('#demo').addEventListener('click',()=>demo().catch(e=>{$('#banner').textContent='Demo failed: '+e.message}));
+init().catch(e=>{$('#banner').textContent='Could not start: '+e.message});
+</script>
+</body>
+</html>

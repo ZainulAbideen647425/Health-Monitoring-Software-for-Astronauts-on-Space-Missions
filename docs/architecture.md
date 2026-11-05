@@ -47,5 +47,6 @@ offline_synchronization/ (local queue file) sits beside the API: it sends batche
 
 - No authentication or encryption at rest (Phase 4).
 - No endpoints to create devices yet (the table and repository exist).
-- No user interface yet (Phase 3).
+- The dashboard is a single page with no build step; it is not yet covered by browser-level automated tests
+  (the tests check that it is served, has its features, uses no external resources and calls only existing endpoints).
 - No database migration tool: changing a table currently means recreating the local database file.
