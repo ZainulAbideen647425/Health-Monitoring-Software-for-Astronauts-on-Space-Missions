@@ -23,17 +23,19 @@ their status at a glance and suggests actions.
 
 ## The dashboard (Phase 3)
 
-One self-contained page, served by the app itself with no internet or external libraries:
+One self-contained page, served by the app itself with no internet or external libraries. It is written for
+people who are not technical:
 
-- **Body map:** click head, chest, abdomen or legs to see the organ's function, the spaceflight hazard that affects it,
-  and the status of its indicators. Each region's outline is colored by its worst status.
-- **Status cards:** one per indicator with status label (text and symbol, not color alone), reasons, and actions.
-  Critical readings show a clear "contact the flight surgeon" alert.
-- **History chart:** readings over time with the expected range shaded.
-- **Measurement form:** shows how to measure the chosen indicator and judges the reading immediately.
-- **Demo crew:** one click creates a sample astronaut with 14 days of readings.
+- **Welcome screen** with three plain steps and one button to start with sample data.
+- **One big answer** at the top: "Everything looks good", "Some readings need attention" or "Get medical help now".
+- **What to do now:** a short list of the next steps, worst problem first.
+- **Simple cards** with the value, a plain status (Good, Watch, Urgent, always a symbol plus a word, never color alone)
+  and a "Why, and what to do" section that opens on tap.
+- **Body map:** tap a body part to learn how space affects it; outlines are colored by status.
+- **History chart** with the healthy range shaded and a one-line summary.
+- **Add a reading in three steps**, with how-to-measure help and an immediate plain-language result.
 
-Not yet included: multiple mission environments, gamification, report export, and a bone indicator for the legs.
+Not yet included: multiple mission environments, gamification, report export, and a bone reading for the legs.
 
 ## What phases 1 and 2 provide
 
