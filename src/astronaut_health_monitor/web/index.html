@@ -32,8 +32,11 @@ main{max-width:1100px;margin:0 auto;padding:18px 20px 40px;display:grid;gap:18px
 .card ul{margin:6px 0;padding-left:20px}.card .help{margin-top:8px;padding:8px 10px;border-radius:8px;background:#2a1520;color:#ffd5db}
 .card button{margin-top:10px;min-height:40px;padding:6px 12px}
 .two{display:grid;gap:18px;grid-template-columns:minmax(260px,360px) 1fr}@media(max-width:820px){.two{grid-template-columns:1fr}}
-svg text{fill:var(--muted);font-size:12px}.region{fill:#22345c;stroke:var(--c,var(--accent));stroke-width:3;cursor:pointer}
-.region:hover,.region.on{fill:#34508a}.region.on{stroke-width:5}#regionInfo p{margin:6px 0}
+svg text{fill:var(--muted);font-size:12px}.region{fill:var(--c,#5b9bff);fill-opacity:.16;stroke:var(--c,#5b9bff);stroke-width:2.5;cursor:pointer;transition:fill-opacity .2s ease,stroke-width .2s ease}
+.region:hover{fill-opacity:.34}.region.on{fill-opacity:.42;stroke-width:4}
+svg .tag{fill:#fff;font-size:15px;font-weight:700;paint-order:stroke;stroke:#06101f;stroke-width:4px;pointer-events:none}
+#regionInfo,#regionData,#safety{transition:opacity .2s ease}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}#regionInfo p{margin:6px 0}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}label{font-weight:600}
 .steps{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.steps div{display:flex;flex-direction:column;gap:6px}
 #result{margin-top:14px;padding:14px;border-radius:12px;border:2px solid var(--c,var(--line));font-size:1.05rem}
@@ -66,20 +69,23 @@ kbd{background:#1d2c4d;border:1px solid var(--line);border-radius:5px;padding:0 
 <p class="legend">&#10003; Good &nbsp; &#9650; Watch &nbsp; &#9632; Urgent. Worst first. Tap "Why, and what to do" on any card.</p>
 <div id="cards"></div></section>
 <div class="two">
-<section class="panel"><h2>Your body</h2><p class="hint">Tap or hover a body part to see its readings and safety notes. Keys <kbd>1</kbd> to <kbd>4</kbd> also work, <kbd>?</kbd> opens help.</p>
-<svg viewBox="0 0 200 330" role="group" aria-label="Body map. Tap a part, or press keys 1 to 4." width="100%" style="max-width:260px;display:block;margin:0 auto">
-<circle id="r-head" class="region" tabindex="0" role="button" aria-label="Head" cx="100" cy="42" r="32"/>
-<rect id="r-chest" class="region" tabindex="0" role="button" aria-label="Chest" x="62" y="84" width="76" height="70" rx="18"/>
-<rect id="r-abdomen" class="region" tabindex="0" role="button" aria-label="Abdomen" x="68" y="158" width="64" height="55" rx="14"/>
-<rect id="r-legs" class="region" tabindex="0" role="button" aria-label="Legs and bones" x="70" y="218" width="60" height="105" rx="14"/>
-<text x="100" y="46" text-anchor="middle">Head</text><text x="100" y="124" text-anchor="middle">Chest</text>
-<text x="100" y="190" text-anchor="middle">Abdomen</text><text x="100" y="274" text-anchor="middle">Legs</text></svg>
+<section class="panel"><h2>Your body</h2><p class="hint">Hover or tap a part for a quick reading. Tap it again (or press Enter) for the full context. Keys <kbd>1</kbd> to <kbd>5</kbd> pick a part, <kbd>Esc</kbd> closes, <kbd>?</kbd> opens help.</p>
+<svg viewBox="0 0 374 740" role="group" aria-label="Body map. Tap or hover a part, or press keys 1 to 5." width="100%" style="max-width:300px;display:block;margin:0 auto">
+<image href="/body-map.png" width="374" height="740" aria-hidden="true"/>
+<ellipse id="r-head" class="region" tabindex="0" role="button" aria-label="Head and brain" cx="187" cy="62" rx="34" ry="48"><title>Head and brain</title></ellipse>
+<rect id="r-chest" class="region" tabindex="0" role="button" aria-label="Chest: heart and lungs" x="125" y="148" width="124" height="95" rx="30"><title>Chest: heart and lungs</title></rect>
+<rect id="r-abdomen" class="region" tabindex="0" role="button" aria-label="Abdomen: stomach, liver, kidneys, intestines" x="132" y="245" width="110" height="140" rx="26"><title>Abdomen: stomach, liver, kidneys, intestines</title></rect>
+<g id="r-arms" class="region" tabindex="0" role="button" aria-label="Arms"><title>Arms</title><polygon points="128,150 100,160 82,262 60,372 72,398 96,388 116,288 136,215"/><polygon points="246,150 274,160 292,262 314,372 302,398 278,388 258,288 238,215"/></g>
+<g id="r-legs" class="region" tabindex="0" role="button" aria-label="Legs and bones"><title>Legs and bones</title><polygon points="140,392 186,392 182,520 180,640 170,718 130,718 140,610 146,490"/><polygon points="234,392 188,392 192,520 194,640 204,718 244,718 234,610 228,490"/></g>
+<text class="tag" x="187" y="70" text-anchor="middle">Head</text><text class="tag" x="187" y="200" text-anchor="middle">Chest</text>
+<text class="tag" x="187" y="320" text-anchor="middle">Abdomen</text><text class="tag" x="88" y="280" text-anchor="middle">Arms</text>
+<text class="tag" x="160" y="560" text-anchor="middle">Legs</text></svg>
 <div id="regionInfo"></div><div id="regionData" aria-live="polite"></div></section>
 <section class="panel"><h2>How it changed</h2><p class="hint" id="chartCaption"></p>
 <div class="row" style="margin-bottom:10px"><label for="chartIndicator">Show:</label><select id="chartIndicator"></select></div>
 <div id="chart"></div><p class="hint">The green band is the healthy range. Amber dots are outside it.</p></section>
 </div>
-<section class="panel" id="safety" aria-live="polite"></section>
+<section class="panel" id="safety" aria-live="polite" hidden></section>
 <section class="panel"><h2>Add a new reading</h2>
 <div class="steps"><div><label for="formIndicator">1. What did you measure?</label><select id="formIndicator"></select></div>
 <div><label for="formValue">2. What was the result? <span id="unit" class="hint"></span></label><input id="formValue" type="number" step="any" inputmode="decimal"></div>
@@ -103,8 +109,9 @@ const REGIONS={
 head:{t:'Head',pre:['Watch for headaches, dizziness or vision changes and note when they start.','Keep a regular sleep schedule. Poor sleep and low mood often go together.','Check your temperature at the same time every day.'],space:['Body fluids shift toward the head in microgravity, which can cause a feeling of pressure or congestion.','Isolation and confinement are recognised behavioural-health hazards of long missions.'],act:['Low mood or poor sleep for several days: talk to a crewmate or ground support.','Any fever: contact the flight surgeon (this app treats any fever as urgent).','Feeling hopeless or thinking about harming yourself: contact the flight surgeon or ground support immediately.'],f:'Your brain controls mood, alertness and sleep.',h:'Isolation, confinement and odd light cycles disturb sleep and mood. Immune changes make a fever more important.',i:['mood_score','sleep_duration','body_temperature']},
 chest:{t:'Chest',pre:['Rest for five minutes before measuring heart rate and blood pressure.','Use the same arm and body position for every blood pressure reading.','Report chest pain, fainting or shortness of breath at once.'],space:['Without gravity the heart works less, and long missions can lead to cardiovascular deconditioning.','Spacewalks (EVA) and hard exercise raise heart rate for a while. Measure at rest so readings can be compared.'],act:['Readings outside the range several times: repeat after resting, then tell the flight surgeon.','Any Urgent reading: contact the flight surgeon now.'],f:'Your heart pumps blood. Blood pressure shows how hard it works.',h:'In low gravity body fluids shift toward the head and the heart works less, which can weaken it over time.',i:['heart_rate','systolic_blood_pressure','diastolic_blood_pressure']},
 abdomen:{t:'Abdomen',pre:['For a fasting reading, measure after at least eight hours without food, otherwise before a meal.','Note meals, stress and activity beside each reading.'],space:['Limited food variety, stress and low activity can affect blood sugar and nutrition.'],act:['Low glucose with shakiness or confusion: eat a quick source of carbohydrate and contact the flight surgeon.','High readings that repeat: tell the flight surgeon.'],f:'Digestion and blood sugar control.',h:'Stress, limited food variety and less activity can upset blood sugar.',i:['blood_glucose']},
+arms:{t:'Arms',f:'Arms and hands do most of the work of moving and handling equipment.',h:'Low gravity reduces load on bones and muscles, and hard work during spacewalks (EVA) can tire arms and shoulders.',i:[],pre:['Do the planned strength exercises.','Report new pain, numbness or swelling in an arm or hand.'],space:['Reduced load in low gravity can weaken muscle and bone over a long mission.','EVA tasks use the arms heavily. Plan rest and note any soreness.','This prototype tracks no arm reading yet. Use the mission medical tests.'],act:['New pain or numbness that does not settle: tell the flight surgeon.','Ask about scheduled strength and bone checks.']},
 legs:{t:'Legs',pre:['Complete the planned exercise sessions. They help protect bone and muscle.','Report new bone, joint or back pain.'],space:['Low gravity reduces the load on bones and muscles, which can lead to bone density and muscle loss.','This prototype tracks no bone or muscle reading yet. Use the mission medical tests for those.'],act:['Ask the flight surgeon about scheduled bone and muscle checks.'],f:'Legs carry your weight on Earth.',h:'With little load in low gravity, bones and muscles weaken. This prototype does not track a bone reading yet.',i:[]}};
-const S={crew:[],ref:{},rules:{},sum:null,region:'chest'},ORDER={critical:0,caution:1,normal:2};
+const S={crew:[],ref:{},rules:{},sum:null,region:null,detail:'reading'},ORDER={critical:0,caution:1,normal:2};
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 const cur=()=>$('#crew').value,name=i=>S.ref[i]?S.ref[i].display_name:i;
 const tag=a=>ST[a.final_status].i+' '+ST[a.final_status].w;
@@ -147,8 +154,16 @@ function worst(list){let w=null;list.forEach(a=>{if(!w||ORDER[a.final_status]<OR
 function renderRegion(){
  for(const k in REGIONS){const e=$('#r-'+k),w=worst(S.sum.assessments.filter(a=>REGIONS[k].i.includes(a.indicator_type)));
   e.setAttribute('class','region'+(w?' s-'+w:'')+(k===S.region?' on':''))}
- const r=REGIONS[S.region],box=$('#regionInfo');box.replaceChildren(el('h2','',r.t),el('p','',r.f),el('p','hint','How space affects it: '+r.h));
- renderSafety();renderRegionData()}
+ const box=$('#regionInfo'),data=$('#regionData'),safe=$('#safety');
+ if(!S.region){box.replaceChildren(el('p','hint','Nothing selected. Hover or tap a body part to begin.'));data.replaceChildren();data.hidden=true;safe.hidden=true;return}
+ const r=REGIONS[S.region],full=S.detail==='full',list=S.sum.assessments.filter(a=>r.i.includes(a.indicator_type));
+ box.replaceChildren(el('h2','',r.t),el('p','',r.f));
+ const w=worst(list);box.append(el('p','big',list.length?'Right now: '+ST[w].i+' '+ST[w].w+' ('+list.map(a=>a.indicator_display_name+' '+a.measured_value).join(', ')+')':'Right now: no reading is tracked for this part.'));
+ const b=el('button','quiet',full?'Show less':'Show full context');b.type='button';b.setAttribute('aria-expanded',String(full));
+ b.addEventListener('click',()=>{S.detail=full?'reading':'full';renderRegion()});box.append(b);
+ data.hidden=safe.hidden=!full;
+ if(!full){data.replaceChildren();return}
+ box.append(el('p','hint','Why it matters in space: '+r.h));renderSafety();renderRegionData()}
 const SRC={manual_entry:'Entered by you',wearable_device:'Wearable sensor',medical_device:'Medical device',camera_analysis:'Camera analysis'};
 const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':(SRC[m.measurement_source]||m.measurement_source);
 let regionToken=0;
@@ -196,7 +211,7 @@ async function demo(){
   add('heart_rate',60+(k%2)+(k>9?(k-9)*3:0));add('systolic_blood_pressure',114+k%3);add('diastolic_blood_pressure',72+k%2);add('blood_glucose',88+k%4);
   add('body_temperature',36.6+(k%3)/10);add('sleep_duration',k>9?7.5-(k-9)*.8:7.6);add('mood_score',k>9?8-(k-9):8)}
  await post('/measurements/batch',{measurements:items});await loadCrew();$('#crew').value=a.id;await refresh()}
-const TOUR=[['Welcome','Tap or hover a body part to see its readings, and the safety notes for it appear below.'],['Read the symbols','\u2713 Good, \u25B2 Watch, \u25A0 Urgent. Every status has a symbol and a word, not just a color.'],['Add readings','Use "Add a new reading" at the bottom. The top of the page always tells you what to do next. Press ? any time for help.']];
+const TOUR=[['Welcome','Hover or tap a body part for a quick reading. Tap it again for the full context: data, precautions and actions.'],['Read the symbols','\u2713 Good, \u25B2 Watch, \u25A0 Urgent. Every status has a symbol and a word, not just a color.'],['Add readings','Use "Add a new reading" at the bottom. The top of the page always tells you what to do next. Press ? any time for help.']];
 let tourStep=0;
 function showTour(){const t=$('#tour');if(tourStep>=TOUR.length){t.hidden=true;try{localStorage.setItem('tourSeen','1')}catch(e){}return}
  $('#tourTitle').textContent=TOUR[tourStep][0];$('#tourText').textContent=TOUR[tourStep][1];$('#tourNext').textContent=tourStep===TOUR.length-1?'Done':'Next';t.hidden=false;$('#tourNext').focus()}
@@ -204,11 +219,14 @@ const openTour=()=>{tourStep=0;showTour()};
 $('#tourNext').addEventListener('click',()=>{tourStep++;showTour()});$('#tourSkip').addEventListener('click',()=>{tourStep=TOUR.length;showTour()});
 $('#helpBtn').addEventListener('click',openTour);
 document.addEventListener('keydown',ev=>{if(/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName))return;
- if(ev.key==='Escape'){tourStep=TOUR.length;showTour()}else if(ev.key==='?')openTour();
- else if('1234'.includes(ev.key)&&ev.key){S.region=Object.keys(REGIONS)[+ev.key-1];if(S.sum)renderRegion()}});
+ if(ev.key==='Escape'){if(!$('#tour').hidden){tourStep=TOUR.length;showTour()}else{S.region=null;S.detail='reading';if(S.sum)renderRegion()}}else if(ev.key==='?')openTour();
+ else if(/^[1-5]$/.test(ev.key)){S.region=Object.keys(REGIONS)[+ev.key-1];S.detail='reading';if(S.sum)renderRegion()}});
 window.addEventListener('offline',()=>notice('You are offline. The last data loaded is still shown, and new readings cannot be saved until you reconnect.'));
 window.addEventListener('online',()=>{notice('');if(S.crew.length)refresh().catch(()=>{})});
-for(const k in REGIONS){const e=$('#r-'+k),go=()=>{S.region=k;if(S.sum)renderRegion()};e.addEventListener('click',go);e.addEventListener('mouseenter',go);e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}})}
+for(const k in REGIONS){const e=$('#r-'+k),pick=()=>{if(S.detail==='full'&&S.region)return;S.region=k;S.detail='reading';if(S.sum)renderRegion()},
+ press=()=>{S.detail=(S.region===k&&S.detail==='reading')?'full':'reading';S.region=k;if(S.sum)renderRegion()};
+ e.addEventListener('mouseenter',pick);e.addEventListener('focus',pick);e.addEventListener('click',press);
+ e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();press()}})}
 $('#crew').addEventListener('change',refresh);$('#chartIndicator').addEventListener('change',renderChart);
 $('#formIndicator').addEventListener('change',showHelp);$('#record').addEventListener('click',record);
 $('#formValue').addEventListener('keydown',e=>{if(e.key==='Enter')record()});
