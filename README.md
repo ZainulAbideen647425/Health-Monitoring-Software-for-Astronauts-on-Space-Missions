@@ -31,11 +31,14 @@ people who are not technical:
 - **What to do now:** a short list of the next steps, worst problem first.
 - **Simple cards** with the value, a plain status (Good, Watch, Urgent, always a symbol plus a word, never color alone)
   and a "Why, and what to do" section that opens on tap.
-- **Body map:** tap a body part to learn how space affects it; outlines are colored by status.
+- **Body map:** tap, hover or press keys 1 to 4 to pick a body part. You see its readings (value, unit, healthy range,
+  source, last-updated time, and how much history backs the judgement) and a **Precautions and safety** panel
+  (precautions, spaceflight considerations, suggested actions and when to get help).
+- **First-use tour** (press ? any time) and **notices** when the connection is offline or slow; the last data stays visible.
 - **History chart** with the healthy range shaded and a one-line summary.
 - **Add a reading in three steps**, with how-to-measure help and an immediate plain-language result.
 
-Not yet included: multiple mission environments, gamification, report export, and a bone reading for the legs.
+Not yet included: login and roles (Phase 4), multiple mission environments, gamification, report export, and a bone reading for the legs. Readings come from what the user enters or from clearly labelled simulated sample data; no NASA datasets are connected.
 
 ## What phases 1 and 2 provide
 

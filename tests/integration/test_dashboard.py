@@ -42,3 +42,20 @@ def test_dashboard_uses_plain_language_for_beginners(api_client: TestClient) -> 
     for plain_phrase in ("What to do now", "Why, and what to do", "Get medical help now", "Everything looks good"):
         assert plain_phrase in page
     assert "\\u25B2 Watch" not in page.split("<script>")[0]  # symbols in the page body are real characters
+
+
+def test_dashboard_has_safety_panel_tour_and_offline_notices(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element_id in ("safety", "regionData", "notices", "tour", "helpBtn"):
+        assert f'id="{element_id}"' in page
+    for phrase in (
+        "Precautions and safety",
+        "Spaceflight considerations",
+        "Suggested actions and when to get help",
+        "Simulated sample data",
+        "You are offline",
+        "dosimeters",
+    ):
+        assert phrase in page
+    for region_name in ("Head", "Chest", "Abdomen", "Legs"):
+        assert f"{region_name}" in page
