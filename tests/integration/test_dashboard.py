@@ -59,3 +59,21 @@ def test_dashboard_has_safety_panel_tour_and_offline_notices(api_client: TestCli
         assert phrase in page
     for region_name in ("Head", "Chest", "Abdomen", "Legs"):
         assert f"{region_name}" in page
+
+
+def test_body_map_image_is_served_locally_and_used_by_the_page(api_client: TestClient) -> None:
+    image = api_client.get("/body-map.png")
+    assert image.status_code == 200
+    assert image.headers["content-type"] == "image/png"
+    assert image.content.startswith(b"\x89PNG")
+    page = api_client.get("/").text
+    assert 'href="/body-map.png"' in page
+    for region in ("head", "chest", "abdomen", "arms", "legs"):
+        assert f'id="r-{region}"' in page
+
+
+def test_dashboard_reveals_information_in_stages_and_respects_reduced_motion(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    assert "Show full context" in page
+    assert "aria-expanded" in page
+    assert "prefers-reduced-motion" in page

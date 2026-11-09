@@ -31,9 +31,12 @@ people who are not technical:
 - **What to do now:** a short list of the next steps, worst problem first.
 - **Simple cards** with the value, a plain status (Good, Watch, Urgent, always a symbol plus a word, never color alone)
   and a "Why, and what to do" section that opens on tap.
-- **Body map:** tap, hover or press keys 1 to 4 to pick a body part. You see its readings (value, unit, healthy range,
-  source, last-updated time, and how much history backs the judgement) and a **Precautions and safety** panel
-  (precautions, spaceflight considerations, suggested actions and when to get help).
+- **Anatomy body map** (an illustration with clickable hotspots on the head, chest, abdomen, arms and legs) with three
+  stages of detail: **collapsed** (nothing selected), **reading** (hover, focus or one tap: title, what the part does and
+  its current status) and **full context** (tap again or press Enter: readings with value, unit, healthy range, source,
+  last-updated time and data quality, why it matters in space, and the **Precautions and safety** panel with precautions,
+  spaceflight considerations and suggested actions). Keys 1 to 5 pick a part and Esc closes. Hotspot outlines are colored
+  by status. Parts with no tracked indicator (arms, legs) say so honestly.
 - **First-use tour** (press ? any time) and **notices** when the connection is offline or slow; the last data stays visible.
 - **History chart** with the healthy range shaded and a one-line summary.
 - **Add a reading in three steps**, with how-to-measure help and an immediate plain-language result.
@@ -128,6 +131,10 @@ docs/             architecture documentation
 See [docs/architecture.md](docs/architecture.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Acknowledgements
+
+The anatomy illustration behind the body map (`src/astronaut_health_monitor/web/body_map.png`) was supplied by the
+project author. Confirm its licence and add the required attribution here before publishing or submitting.
+
 
 Indicator selection follows the challenge brief and the five spaceflight hazards identified by NASA's
 Human Research Program: radiation, isolation and confinement, distance from Earth, gravity fields,

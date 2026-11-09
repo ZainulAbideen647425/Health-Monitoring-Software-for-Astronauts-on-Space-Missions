@@ -48,6 +48,15 @@ router = APIRouter()
 DASHBOARD_PAGE = Path(__file__).resolve().parent.parent / "web" / "index.html"
 
 
+BODY_MAP_IMAGE = DASHBOARD_PAGE.parent / "body_map.png"
+
+
+@router.get("/body-map.png", include_in_schema=False)
+def show_body_map_image() -> FileResponse:
+    """The anatomy illustration used behind the clickable body map."""
+    return FileResponse(BODY_MAP_IMAGE, media_type="image/png")
+
+
 @router.get("/", include_in_schema=False)
 def show_dashboard() -> FileResponse:
     """The dashboard: one self-contained page that works without internet access."""
