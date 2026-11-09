@@ -38,14 +38,21 @@ svg text{fill:var(--muted);font-size:12px}.region{fill:#22345c;stroke:var(--c,va
 .steps{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.steps div{display:flex;flex-direction:column;gap:6px}
 #result{margin-top:14px;padding:14px;border-radius:12px;border:2px solid var(--c,var(--line));font-size:1.05rem}
 .big{font-size:1.1rem}
+#notices .note{margin:0 0 10px;padding:10px 14px;border-radius:10px;border:2px solid var(--warn);background:#2b2410}
+#tour{position:fixed;inset:0;background:rgba(5,10,20,.85);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+#tour .box{background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:22px;max-width:460px}
+#regionData .row2{padding:8px 0;border-top:1px solid var(--line)}#regionData .meta{color:var(--muted);font-size:.85rem}
+#safety h3{margin:14px 0 4px;font-size:1.05rem;color:var(--accent)}#safety ul{margin:0;padding-left:22px}#safety li{margin-bottom:4px}
+kbd{background:#1d2c4d;border:1px solid var(--line);border-radius:5px;padding:0 6px}
 </style>
 </head>
 <body>
 <header>
 <div><h1>Astronaut Health Monitor</h1><p>Check your health during the mission. This is a prototype, not a medical device.</p></div>
-<div class="row"><label for="crew">Showing:</label><select id="crew"></select><button id="demo" class="quiet" type="button">Add sample data</button></div>
+<div class="row"><label for="crew">Showing:</label><select id="crew"></select><button id="demo" class="quiet" type="button">Add sample data</button><button id="helpBtn" class="quiet" type="button">Help</button></div>
 </header>
 <main>
+<div id="notices" role="status" aria-live="polite"></div>
 <section id="welcome" class="panel">
 <h2 style="font-size:1.6rem">Welcome</h2>
 <p class="big">This tool helps you keep an eye on your health far from Earth.</p>
@@ -59,19 +66,20 @@ svg text{fill:var(--muted);font-size:12px}.region{fill:#22345c;stroke:var(--c,va
 <p class="legend">&#10003; Good &nbsp; &#9650; Watch &nbsp; &#9632; Urgent. Worst first. Tap "Why, and what to do" on any card.</p>
 <div id="cards"></div></section>
 <div class="two">
-<section class="panel"><h2>Your body</h2><p class="hint">Tap a body part to learn how space affects it.</p>
-<svg viewBox="0 0 200 330" role="group" aria-label="Body map. Tap a part." width="100%" style="max-width:260px;display:block;margin:0 auto">
+<section class="panel"><h2>Your body</h2><p class="hint">Tap or hover a body part to see its readings and safety notes. Keys <kbd>1</kbd> to <kbd>4</kbd> also work, <kbd>?</kbd> opens help.</p>
+<svg viewBox="0 0 200 330" role="group" aria-label="Body map. Tap a part, or press keys 1 to 4." width="100%" style="max-width:260px;display:block;margin:0 auto">
 <circle id="r-head" class="region" tabindex="0" role="button" aria-label="Head" cx="100" cy="42" r="32"/>
 <rect id="r-chest" class="region" tabindex="0" role="button" aria-label="Chest" x="62" y="84" width="76" height="70" rx="18"/>
 <rect id="r-abdomen" class="region" tabindex="0" role="button" aria-label="Abdomen" x="68" y="158" width="64" height="55" rx="14"/>
 <rect id="r-legs" class="region" tabindex="0" role="button" aria-label="Legs and bones" x="70" y="218" width="60" height="105" rx="14"/>
 <text x="100" y="46" text-anchor="middle">Head</text><text x="100" y="124" text-anchor="middle">Chest</text>
 <text x="100" y="190" text-anchor="middle">Abdomen</text><text x="100" y="274" text-anchor="middle">Legs</text></svg>
-<div id="regionInfo"></div></section>
+<div id="regionInfo"></div><div id="regionData" aria-live="polite"></div></section>
 <section class="panel"><h2>How it changed</h2><p class="hint" id="chartCaption"></p>
 <div class="row" style="margin-bottom:10px"><label for="chartIndicator">Show:</label><select id="chartIndicator"></select></div>
 <div id="chart"></div><p class="hint">The green band is the healthy range. Amber dots are outside it.</p></section>
 </div>
+<section class="panel" id="safety" aria-live="polite"></section>
 <section class="panel"><h2>Add a new reading</h2>
 <div class="steps"><div><label for="formIndicator">1. What did you measure?</label><select id="formIndicator"></select></div>
 <div><label for="formValue">2. What was the result? <span id="unit" class="hint"></span></label><input id="formValue" type="number" step="any" inputmode="decimal"></div>
@@ -79,17 +87,23 @@ svg text{fill:var(--muted);font-size:12px}.region{fill:#22345c;stroke:var(--c,va
 <p id="help" class="hint" style="margin-top:12px"></p><div id="result" role="status" hidden></div></section>
 </div>
 </main>
+<div id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden><div class="box"><h2 id="tourTitle"></h2><p id="tourText"></p>
+<div class="row"><button id="tourNext" type="button">Next</button><button id="tourSkip" class="quiet" type="button">Skip</button></div></div></div>
 <script>
 const $=s=>document.querySelector(s);
-const api=async(p,o)=>{const r=await fetch(p,o);const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.detail||r.status);return b};
+const notice=t=>{const n=$('#notices');n.replaceChildren();if(t){const d=document.createElement('p');d.className='note';d.textContent=t;n.append(d)}};
+const api=async(p,o)=>{const slow=setTimeout(()=>notice('Loading is taking longer than usual. Showing the last data you have.'),3000);
+ try{const r=await fetch(p,o);const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.detail||r.status);notice('');return b}
+ catch(e){if(e&&e.name==='TypeError')notice('You appear to be offline or the monitor cannot be reached. The last data loaded is still shown.');throw e}
+ finally{clearTimeout(slow)}};
 const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
 const ST={normal:{i:'\u2713',w:'Good'},caution:{i:'\u25B2',w:'Watch'},critical:{i:'\u25A0',w:'Urgent'}};
 const HERO={critical:['Get medical help now','Contact the flight surgeon. At least one reading is in the danger zone.'],caution:['Some readings need attention','Nothing urgent, but please follow the steps below.'],normal:['Everything looks good','Keep measuring on your usual schedule.']};
 const REGIONS={
-head:{t:'Head',f:'Your brain controls mood, alertness and sleep.',h:'Isolation, confinement and odd light cycles disturb sleep and mood. Immune changes make a fever more important.',i:['mood_score','sleep_duration','body_temperature']},
-chest:{t:'Chest',f:'Your heart pumps blood. Blood pressure shows how hard it works.',h:'In low gravity body fluids shift toward the head and the heart works less, which can weaken it over time.',i:['heart_rate','systolic_blood_pressure','diastolic_blood_pressure']},
-abdomen:{t:'Abdomen',f:'Digestion and blood sugar control.',h:'Stress, limited food variety and less activity can upset blood sugar.',i:['blood_glucose']},
-legs:{t:'Legs',f:'Legs carry your weight on Earth.',h:'With little load in low gravity, bones and muscles weaken. This prototype does not track a bone reading yet.',i:[]}};
+head:{t:'Head',pre:['Watch for headaches, dizziness or vision changes and note when they start.','Keep a regular sleep schedule. Poor sleep and low mood often go together.','Check your temperature at the same time every day.'],space:['Body fluids shift toward the head in microgravity, which can cause a feeling of pressure or congestion.','Isolation and confinement are recognised behavioural-health hazards of long missions.'],act:['Low mood or poor sleep for several days: talk to a crewmate or ground support.','Any fever: contact the flight surgeon (this app treats any fever as urgent).','Feeling hopeless or thinking about harming yourself: contact the flight surgeon or ground support immediately.'],f:'Your brain controls mood, alertness and sleep.',h:'Isolation, confinement and odd light cycles disturb sleep and mood. Immune changes make a fever more important.',i:['mood_score','sleep_duration','body_temperature']},
+chest:{t:'Chest',pre:['Rest for five minutes before measuring heart rate and blood pressure.','Use the same arm and body position for every blood pressure reading.','Report chest pain, fainting or shortness of breath at once.'],space:['Without gravity the heart works less, and long missions can lead to cardiovascular deconditioning.','Spacewalks (EVA) and hard exercise raise heart rate for a while. Measure at rest so readings can be compared.'],act:['Readings outside the range several times: repeat after resting, then tell the flight surgeon.','Any Urgent reading: contact the flight surgeon now.'],f:'Your heart pumps blood. Blood pressure shows how hard it works.',h:'In low gravity body fluids shift toward the head and the heart works less, which can weaken it over time.',i:['heart_rate','systolic_blood_pressure','diastolic_blood_pressure']},
+abdomen:{t:'Abdomen',pre:['For a fasting reading, measure after at least eight hours without food, otherwise before a meal.','Note meals, stress and activity beside each reading.'],space:['Limited food variety, stress and low activity can affect blood sugar and nutrition.'],act:['Low glucose with shakiness or confusion: eat a quick source of carbohydrate and contact the flight surgeon.','High readings that repeat: tell the flight surgeon.'],f:'Digestion and blood sugar control.',h:'Stress, limited food variety and less activity can upset blood sugar.',i:['blood_glucose']},
+legs:{t:'Legs',pre:['Complete the planned exercise sessions. They help protect bone and muscle.','Report new bone, joint or back pain.'],space:['Low gravity reduces the load on bones and muscles, which can lead to bone density and muscle loss.','This prototype tracks no bone or muscle reading yet. Use the mission medical tests for those.'],act:['Ask the flight surgeon about scheduled bone and muscle checks.'],f:'Legs carry your weight on Earth.',h:'With little load in low gravity, bones and muscles weaken. This prototype does not track a bone reading yet.',i:[]}};
 const S={crew:[],ref:{},rules:{},sum:null,region:'chest'},ORDER={critical:0,caution:1,normal:2};
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 const cur=()=>$('#crew').value,name=i=>S.ref[i]?S.ref[i].display_name:i;
@@ -103,7 +117,7 @@ async function loadCrew(){
  S.crew=await api('/astronauts');const sel=$('#crew');sel.replaceChildren();
  S.crew.forEach(a=>sel.append(new Option(a.full_name,a.id)));
  $('#welcome').hidden=S.crew.length>0;$('#app').hidden=!S.crew.length;$('#crew').hidden=!S.crew.length;
- if(S.crew.length)await refresh()}
+ if(S.crew.length){await refresh();let seen='1';try{seen=localStorage.getItem('tourSeen')}catch(e){}if(!seen)openTour()}}
 async function refresh(){
  S.sum=await api('/astronauts/'+cur()+'/health-summary');
  renderBanner();renderActions();renderCards();renderRegion();await renderChart();showHelp()}
@@ -134,7 +148,24 @@ function renderRegion(){
  for(const k in REGIONS){const e=$('#r-'+k),w=worst(S.sum.assessments.filter(a=>REGIONS[k].i.includes(a.indicator_type)));
   e.setAttribute('class','region'+(w?' s-'+w:'')+(k===S.region?' on':''))}
  const r=REGIONS[S.region],box=$('#regionInfo');box.replaceChildren(el('h2','',r.t),el('p','',r.f),el('p','hint','How space affects it: '+r.h));
- r.i.forEach(i=>{const a=S.sum.assessments.find(x=>x.indicator_type===i);box.append(el('p','',name(i)+': '+(a?tag(a)+' ('+a.measured_value+')':'no reading yet')))})}
+ renderSafety();renderRegionData()}
+const SRC={manual_entry:'Entered by you',wearable_device:'Wearable sensor',medical_device:'Medical device',camera_analysis:'Camera analysis'};
+const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':(SRC[m.measurement_source]||m.measurement_source);
+let regionToken=0;
+async function renderRegionData(){const box=$('#regionData'),mine=++regionToken,r=REGIONS[S.region];
+ box.replaceChildren();if(!r.i.length){box.append(el('p','hint','No readings are tracked for this body part yet.'));return}
+ for(const i of r.i){const row=el('div','row2');box.append(row);const a=S.sum.assessments.find(x=>x.indicator_type===i),u=S.rules[i];
+  row.append(el('b','',name(i)));
+  if(!a){row.append(el('div','hint','No reading yet. Add one below.'));continue}
+  row.append(el('div','',tag(a)+': '+a.measured_value+' '+a.measurement_unit+' (healthy range '+u.normal_minimum+' to '+u.normal_maximum+')'));
+  const b=a.personal_baseline,q=b.has_enough_history?'Personal baseline from '+b.sample_count+' earlier readings.':'Building your baseline: '+b.sample_count+' of 5 earlier readings.';
+  const meta=el('div','meta','Last updated '+new Date(a.measured_at).toLocaleString()+'. '+q);row.append(meta);
+  try{const m=(await api('/measurements?astronaut_id='+cur()+'&indicator_type='+i+'&limit=1'))[0];if(mine!==regionToken)return;
+   if(m)meta.textContent='Source: '+srcLabel(m)+'. '+meta.textContent}
+  catch(e){meta.textContent='Source unavailable right now. '+meta.textContent}}}
+function renderSafety(){const r=REGIONS[S.region],box=$('#safety');box.replaceChildren(el('h2','','Precautions and safety: '+r.t));
+ [['Precautions',r.pre],['Spaceflight considerations',r.space],['Suggested actions and when to get help',r.act]].forEach(([h,l])=>{box.append(el('h3','',h));const u=el('ul');l.forEach(t=>u.append(el('li','',t)));box.append(u)});
+ box.append(el('p','hint','Radiation exposure is measured by the mission dosimeters, not by this app. This is general guidance for an educational prototype, not medical advice. Follow your mission medical procedures.'))}
 async function renderChart(){
  const ind=$('#chartIndicator').value,box=$('#chart'),cap=$('#chartCaption'),rule=S.rules[ind];
  const rows=(await api('/measurements?astronaut_id='+cur()+'&indicator_type='+ind+'&limit=60')).reverse();
@@ -161,11 +192,23 @@ async function record(){const box=$('#result'),v=parseFloat($('#formValue').valu
  catch(e){box.style.setProperty('--c','var(--bad)');box.textContent='Not saved: '+e.message}}
 async function demo(){
  const a=await post('/astronauts',{full_name:'Demo Astronaut',mission_role:'Commander'});const items=[],stamp=Date.now();let n=0;
- for(let d=14;d>=1;d--){const t=new Date(Date.now()-d*864e5-n*1000).toISOString(),k=14-d,add=(i,v)=>items.push({astronaut_id:a.id,indicator_type:i,measured_value:v,measured_at:t,client_reference:'demo-'+stamp+'-'+(n++)});
+ for(let d=14;d>=1;d--){const t=new Date(Date.now()-d*864e5-n*1000).toISOString(),k=14-d,add=(i,v)=>items.push({astronaut_id:a.id,indicator_type:i,measured_value:v,measured_at:t,notes:'Simulated sample data',client_reference:'demo-'+stamp+'-'+(n++)});
   add('heart_rate',60+(k%2)+(k>9?(k-9)*3:0));add('systolic_blood_pressure',114+k%3);add('diastolic_blood_pressure',72+k%2);add('blood_glucose',88+k%4);
   add('body_temperature',36.6+(k%3)/10);add('sleep_duration',k>9?7.5-(k-9)*.8:7.6);add('mood_score',k>9?8-(k-9):8)}
  await post('/measurements/batch',{measurements:items});await loadCrew();$('#crew').value=a.id;await refresh()}
-for(const k in REGIONS){const e=$('#r-'+k),go=()=>{S.region=k;if(S.sum)renderRegion()};e.addEventListener('click',go);e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}})}
+const TOUR=[['Welcome','Tap or hover a body part to see its readings, and the safety notes for it appear below.'],['Read the symbols','\u2713 Good, \u25B2 Watch, \u25A0 Urgent. Every status has a symbol and a word, not just a color.'],['Add readings','Use "Add a new reading" at the bottom. The top of the page always tells you what to do next. Press ? any time for help.']];
+let tourStep=0;
+function showTour(){const t=$('#tour');if(tourStep>=TOUR.length){t.hidden=true;try{localStorage.setItem('tourSeen','1')}catch(e){}return}
+ $('#tourTitle').textContent=TOUR[tourStep][0];$('#tourText').textContent=TOUR[tourStep][1];$('#tourNext').textContent=tourStep===TOUR.length-1?'Done':'Next';t.hidden=false;$('#tourNext').focus()}
+const openTour=()=>{tourStep=0;showTour()};
+$('#tourNext').addEventListener('click',()=>{tourStep++;showTour()});$('#tourSkip').addEventListener('click',()=>{tourStep=TOUR.length;showTour()});
+$('#helpBtn').addEventListener('click',openTour);
+document.addEventListener('keydown',ev=>{if(/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName))return;
+ if(ev.key==='Escape'){tourStep=TOUR.length;showTour()}else if(ev.key==='?')openTour();
+ else if('1234'.includes(ev.key)&&ev.key){S.region=Object.keys(REGIONS)[+ev.key-1];if(S.sum)renderRegion()}});
+window.addEventListener('offline',()=>notice('You are offline. The last data loaded is still shown, and new readings cannot be saved until you reconnect.'));
+window.addEventListener('online',()=>{notice('');if(S.crew.length)refresh().catch(()=>{})});
+for(const k in REGIONS){const e=$('#r-'+k),go=()=>{S.region=k;if(S.sum)renderRegion()};e.addEventListener('click',go);e.addEventListener('mouseenter',go);e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}})}
 $('#crew').addEventListener('change',refresh);$('#chartIndicator').addEventListener('change',renderChart);
 $('#formIndicator').addEventListener('change',showHelp);$('#record').addEventListener('click',record);
 $('#formValue').addEventListener('keydown',e=>{if(e.key==='Enter')record()});
