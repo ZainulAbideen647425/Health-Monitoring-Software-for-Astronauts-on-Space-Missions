@@ -77,3 +77,11 @@ def test_dashboard_reveals_information_in_stages_and_respects_reduced_motion(api
     assert "Show full context" in page
     assert "aria-expanded" in page
     assert "prefers-reduced-motion" in page
+
+
+def test_dashboard_is_split_into_focused_tabs(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    assert 'role="tablist"' in page
+    for view in ("today", "body", "history", "add"):
+        assert f'data-go="{view}"' in page
+        assert f'data-view="{view}"' in page

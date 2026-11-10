@@ -26,9 +26,10 @@ their status at a glance and suggests actions.
 One self-contained page, served by the app itself with no internet or external libraries. It is written for
 people who are not technical:
 
+- **Four focused tabs** (Today, Body, History, Add reading) so only one thing is on screen at a time.
 - **Welcome screen** with three plain steps and one button to start with sample data.
 - **One big answer** at the top: "Everything looks good", "Some readings need attention" or "Get medical help now".
-- **What to do now:** a short list of the next steps, worst problem first.
+- **What to do now:** at most three next steps, worst problem first.
 - **Simple cards** with the value, a plain status (Good, Watch, Urgent, always a symbol plus a word, never color alone)
   and a "Why, and what to do" section that opens on tap.
 - **Anatomy body map** (an illustration with clickable hotspots on the head, chest, abdomen, arms and legs) with three
