@@ -97,6 +97,13 @@ and (mission control only) the Audit log. The overview shows a readiness ring (t
 inside the healthy range), the actions to take, and one card per reading. A Print report button prints the current
 screen. On a phone the sidebar becomes a row of tabs. The page still uses no external fonts, scripts or images.
 
+### If the page stays empty after signing in
+
+Phase 4 encrypts stored health data. A local database file created by an earlier phase (`astronaut_health_monitor.db`)
+holds unencrypted records that can no longer be read, and the page then says that your data could not be loaded.
+For test data, stop the app, delete that file, and start again. Never delete the file or the `.data_encryption_key` file
+of a database that holds data you need.
+
 ### Creating your own account
 
 On the sign-in screen click **Register**. You choose a username and a password (at least 8 characters with an uppercase

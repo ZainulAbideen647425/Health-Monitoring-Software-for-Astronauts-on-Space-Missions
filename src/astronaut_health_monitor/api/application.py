@@ -26,6 +26,7 @@ from astronaut_health_monitor.domain.exceptions import (
     AuthenticationRequiredError,
     DemoModeDisabledError,
     DeviceNotFoundError,
+    FieldDecryptionError,
     ImplausibleMeasurementError,
     InvalidMeasurementTimeError,
     InvalidUserDetailsError,
@@ -136,6 +137,18 @@ def create_application(database_url: str | None = None, settings: ApplicationSet
     @application.exception_handler(UserAlreadyExistsError)
     async def handle_conflict(_: Request, error: Exception) -> JSONResponse:
         return _error_response(409, error)
+
+    @application.exception_handler(FieldDecryptionError)
+    async def handle_unreadable_data(_: Request, error: Exception) -> JSONResponse:
+        logger.error("Stored data could not be decrypted: %s", error)
+        return _error_response(
+            500,
+            Exception(
+                "Stored data cannot be read. The database was probably created before encryption was added, "
+                "or the encryption key changed. For test data, stop the app, delete the file "
+                "astronaut_health_monitor.db and start again."
+            ),
+        )
 
     @application.exception_handler(AccountLockedError)
     async def handle_locked(_: Request, error: Exception) -> JSONResponse:
