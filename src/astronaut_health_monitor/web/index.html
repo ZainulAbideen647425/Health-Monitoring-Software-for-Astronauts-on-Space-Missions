@@ -4,70 +4,127 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Astronaut Health Monitor</title>
-<style>
-:root{--bg:#0a1228;--panel:#111c3a;--panel2:#16234a;--line:#25356170;--text:#f5f7fc;--muted:#aebbd6;--ok:#3ddc97;--warn:#ffc233;--bad:#ff6b6b;--accent:#4f9cff;--nasa:#fc3d21;--r:16px}
-*{box-sizing:border-box}html{font-size:17px}body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#16306a55,transparent),var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.55}
+<style>:root{color-scheme:dark;
+--bg:oklch(0.205 0.012 218);--side:oklch(0.177 0.012 218);--panel:oklch(0.242 0.013 218);--panel2:oklch(0.285 0.014 216);--inset:oklch(0.222 0.012 216);
+--line:oklch(0.35 0.014 214);--text:oklch(0.94 0.014 92);--muted:oklch(0.74 0.014 150);--faint:oklch(0.6 0.012 155);
+--ok:oklch(0.77 0.075 158);--warn:oklch(0.8 0.115 77);--bad:oklch(0.72 0.12 29);--accent:oklch(0.77 0.075 158);--accent-ink:oklch(0.2 0.012 218);
+--sans:"Manrope",system-ui,"Segoe UI",Roboto,Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;--r:8px;--navw:268px}
+*{box-sizing:border-box}html{font-size:16px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "main"}
+body:has(#tabs:not([hidden])){grid-template-columns:var(--navw) minmax(0,1fr);grid-template-areas:"nav top" "nav main";grid-template-rows:auto 1fr}
 [hidden]{display:none!important}
-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 22px}
-.brand{display:flex;align-items:center;gap:12px}.logo{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0b3d91);border:2px solid #fff;box-shadow:inset -6px -6px 0 -2px var(--nasa)}
-h1{font-size:1.2rem;margin:0}.sub{margin:0;color:var(--muted);font-size:.82rem}
-h2{font-size:1.25rem;margin:0 0 8px}h3{margin:0}.hint{color:var(--muted);margin:0 0 12px;font-size:.95rem}
-button,select,input{font:inherit;color:var(--text);background:var(--panel2);border:1px solid #2c3d6d;border-radius:12px;padding:10px 14px;min-height:46px}
-button{cursor:pointer;background:var(--accent);border-color:var(--accent);color:#04101f;font-weight:700}
-button.quiet{background:transparent;color:var(--text);border-color:#2c3d6d;font-weight:500}
-button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,.region:focus-visible{outline:3px solid #fff;outline-offset:2px}
-#tabs{position:sticky;top:0;z-index:5;display:flex;gap:6px;padding:8px 22px;background:#0a1228ee;backdrop-filter:blur(6px);overflow-x:auto}
-#tabs button{flex:1;min-width:92px;background:transparent;color:var(--muted);border:1px solid transparent;font-weight:600}
-#tabs button[aria-selected=true]{background:var(--panel2);color:#fff;border-color:#2c3d6d;box-shadow:inset 0 -3px 0 var(--accent)}
-main{max-width:1040px;margin:0 auto;padding:12px 22px 48px;display:grid;gap:20px}
-.panel{background:var(--panel);border-radius:var(--r);padding:22px}
+header{grid-area:top;display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:6}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:38px;height:38px;display:grid;place-items:center;border:1px solid oklch(0.49 0.035 158);color:var(--ok);border-radius:6px}
+h1{font-size:1.05rem;margin:0;font-weight:800;letter-spacing:.01em}h1 span{color:var(--ok)}
+.sub{margin:0;color:var(--muted);font:.72rem/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.crumb{display:none;flex-direction:column;gap:2px}.crumb strong{font-size:1.15rem;font-weight:800}
+body:has(#tabs:not([hidden])) header .brand{display:none}
+body:has(#tabs:not([hidden])) header .crumb{display:flex}
+h2{font-size:1.2rem;margin:0 0 8px;font-weight:800}h3{margin:0;font-weight:700}.hint{color:var(--muted);margin:0 0 12px;font-size:.95rem}
+a{color:var(--ok)}
+button,select,input{font:inherit;color:var(--text);background:var(--inset);border:1px solid var(--line);border-radius:6px;padding:9px 13px;min-height:44px}
+input:focus,select:focus{border-color:var(--ok)}
+button{cursor:pointer;background:var(--ok);border-color:var(--ok);color:var(--accent-ink);font-weight:700}
+button:hover{filter:brightness(1.08)}
+button.quiet{background:transparent;color:var(--text);border-color:var(--line);font-weight:600}
+button.quiet:hover{background:var(--panel2)}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,.region:focus-visible,a:focus-visible{outline:3px solid oklch(0.94 0.014 92);outline-offset:2px}
+label{font-weight:700;font-size:.92rem}
+#tabs{grid-area:nav;position:sticky;top:0;align-self:start;height:100vh;display:flex;flex-direction:column;gap:3px;padding:0 12px 14px;background:var(--side);border-right:1px solid var(--line);overflow-y:auto}
+.nav-brand{display:flex;align-items:center;gap:12px;height:76px;padding:0 8px;margin:0 -12px 14px;padding-left:20px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.nav-brand .t{font-weight:800;font-size:.95rem;line-height:1.2}.nav-brand .t span{color:var(--ok)}
+.nav-brand .s{font:.62rem var(--mono);color:var(--muted);letter-spacing:.06em}
+.nav-chip{display:flex;align-items:center;gap:8px;margin:0 2px 8px;padding:8px 10px;border:1px solid var(--line);color:var(--ok);font:.7rem var(--mono);letter-spacing:.05em;border-radius:4px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:0 0 auto;box-shadow:0 0 8px oklch(0.73 0.05 158/.4)}.dot.off{background:var(--bad);box-shadow:none}
+.nav-group{margin:16px 10px 6px;color:var(--faint);font:.68rem var(--mono);letter-spacing:.08em}
+#tabs button{position:relative;display:flex;align-items:center;gap:12px;width:100%;justify-content:flex-start;min-height:44px;background:transparent;color:var(--muted);border:0;border-radius:4px;font-weight:600;font-size:.95rem;padding:0 12px;text-align:left}
+#tabs button svg{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#tabs button:hover{background:oklch(0.255 0.017 203);color:var(--text);filter:none}
+#tabs button[aria-selected=true]{background:oklch(0.29 0.026 157);color:var(--ok)}
+#tabs button[aria-selected=true]::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;background:var(--ok)}
+.nav-foot{margin-top:auto;padding:14px 8px 0;border-top:1px solid var(--line);font:.68rem var(--mono);color:var(--muted);letter-spacing:.05em;display:grid;gap:8px}
+.nav-foot .line{display:flex;align-items:center;gap:8px}.nav-foot b{margin-left:auto;color:var(--ok);font-weight:600}.nav-foot b.off{color:var(--bad)}
+main{grid-area:main;width:100%;max-width:1120px;margin:0 auto;padding:24px 32px 56px;display:grid;gap:20px;align-content:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.panel>h2:first-child,.panel>div>h2:first-child{font-size:1.1rem}
 .s-normal{--c:var(--ok)}.s-caution{--c:var(--warn)}.s-critical{--c:var(--bad)}.s-none{--c:var(--muted)}
-#banner{display:flex;gap:18px;align-items:center;padding:26px;border-radius:var(--r);background:linear-gradient(135deg,var(--panel2),var(--panel));border-left:8px solid var(--c)}
-#banner .icon{font-size:2.6rem;color:var(--c);line-height:1}#banner h2{font-size:1.6rem;color:var(--c);margin:0}#banner p{margin:4px 0 0;font-size:1.05rem}
-#welcome{text-align:center;padding:40px 22px}#welcome ol{display:inline-block;text-align:left;margin:12px 0 22px;padding-left:22px;font-size:1.05rem}#welcome button{font-size:1.1rem;padding:14px 28px}
-#actions{margin:0;padding-left:22px}#actions li{margin-bottom:10px;font-size:1.05rem}
-.legend{color:var(--muted);font-size:.88rem;margin:0 0 14px}
-#cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-.card{background:var(--panel2);border-radius:14px;padding:16px;border-top:5px solid var(--c)}
-.card .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;color:var(--muted);font-size:.92rem}.pill{color:var(--c);font-weight:700;white-space:nowrap}
-.card .v{font-size:2.1rem;font-weight:800;line-height:1.15;margin-top:6px}.card .u{color:var(--muted);font-size:.85rem;margin-bottom:4px}
-.card details{margin-top:10px}.card summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:32px}
-.card ul{margin:6px 0;padding-left:20px;color:var(--muted)}.card .help{margin-top:8px;padding:8px 10px;border-radius:8px;background:#3a1620;color:#ffd5db;font-weight:600}
+#banner{display:flex;gap:24px;align-items:center;padding:26px 28px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--c)}
+#banner .icon{display:none}#banner h2{font-size:1.55rem;color:var(--c);margin:0}#banner p{margin:6px 0 0;font-size:1.05rem}#banner button{margin-top:14px}
+.ring{position:relative;width:112px;height:112px;flex:0 0 auto}.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}.ring .bg{stroke:var(--inset)}.ring .fg{stroke:var(--c);stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-weight:800;font-size:1.6rem;line-height:1}
+.ring .num small{display:block;font:.58rem var(--mono);color:var(--muted);letter-spacing:.08em;margin-top:2px}
+#welcome{text-align:center;padding:40px 22px}#welcome ol{display:inline-block;text-align:left;margin:12px 0 22px;padding-left:22px;font-size:1.05rem}#welcome button{font-size:1.05rem;padding:12px 26px}
+#actions{margin:0;padding-left:22px}#actions li{margin-bottom:10px;font-size:1.02rem}
+.legend{color:var(--muted);font:.78rem var(--mono);margin:0 0 16px;letter-spacing:.03em}
+#cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:18px;border-left:4px solid var(--c)}
+.card .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;color:var(--muted);font:.74rem var(--mono);letter-spacing:.05em;text-transform:uppercase}.pill{color:var(--c);font-weight:700;white-space:nowrap}
+.card .v{font-size:2.2rem;font-weight:800;line-height:1.1;margin-top:8px}.card .u{color:var(--muted);font-size:.85rem;margin-bottom:4px}
+.card details{margin-top:10px}.card summary{cursor:pointer;color:var(--ok);font-weight:700;min-height:32px}
+.card ul{margin:6px 0;padding-left:20px;color:var(--muted)}.card .help{margin-top:8px;padding:10px 12px;border-radius:6px;background:oklch(0.3 0.05 29);color:oklch(0.93 0.03 29);font-weight:600}
 .card button{margin-top:8px;min-height:40px;padding:6px 12px}
-.two{display:grid;gap:22px;grid-template-columns:minmax(260px,340px) 1fr;align-items:start}@media(max-width:820px){.two{grid-template-columns:1fr}}
+.two{display:grid;gap:22px;grid-template-columns:minmax(260px,360px) 1fr;align-items:start}@media(max-width:900px){.two{grid-template-columns:1fr}}
 svg text{fill:var(--muted);font-size:12px}
-.region{fill:var(--c,#4f9cff);fill-opacity:.16;stroke:var(--c,#4f9cff);stroke-width:2.5;cursor:pointer;transition:fill-opacity .2s ease,stroke-width .2s ease}
+.region{fill:var(--c,oklch(0.77 0.075 158));fill-opacity:.16;stroke:var(--c,oklch(0.77 0.075 158));stroke-width:2.5;cursor:pointer;transition:fill-opacity .2s ease,stroke-width .2s ease}
 .region:hover{fill-opacity:.34}.region.on{fill-opacity:.42;stroke-width:4}
-svg .tag{fill:#fff;font-size:15px;font-weight:700;paint-order:stroke;stroke:#06101f;stroke-width:4px;pointer-events:none}
+svg .tag{fill:#fff;font-size:15px;font-weight:700;paint-order:stroke;stroke:oklch(0.15 0.01 218);stroke-width:4px;pointer-events:none}
 #regionInfo,#regionData,#safety{transition:opacity .2s ease}#regionInfo p{margin:6px 0}
-#regionData .row2{padding:10px 0;border-top:1px solid #2c3d6d}#regionData .meta{color:var(--muted);font-size:.85rem}
-#safety h3{margin:16px 0 4px;font-size:1.05rem;color:var(--accent)}#safety ul{margin:0;padding-left:22px}#safety li{margin-bottom:4px}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}label{font-weight:600}
+#regionData .row2{padding:12px 0;border-top:1px solid var(--line)}#regionData .meta{color:var(--muted);font-size:.85rem}
+#safety h3{margin:16px 0 4px;font-size:.78rem;color:var(--ok);font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase}#safety ul{margin:0;padding-left:22px}#safety li{margin-bottom:4px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.steps div{display:flex;flex-direction:column;gap:6px}
-#result{margin-top:16px;padding:16px;border-radius:12px;border-left:6px solid var(--c,#2c3d6d);background:var(--panel2);font-size:1.05rem}
-#notices .note{margin:0 0 10px;padding:12px 16px;border-radius:12px;border-left:6px solid var(--warn);background:#2b2410}
-#tour{position:fixed;inset:0;background:rgba(4,9,20,.88);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
-#tour .box{background:var(--panel);border:2px solid var(--accent);border-radius:var(--r);padding:24px;max-width:460px}
-kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:0 6px}.big{font-size:1.1rem}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
-.meter{height:10px;border-radius:99px;background:var(--panel2);overflow:hidden;margin-top:6px}
+#result{margin-top:16px;padding:16px;border-radius:6px;border-left:5px solid var(--c,var(--line));background:var(--panel2);font-size:1.03rem}
+#notices .note{margin:0 0 10px;padding:12px 16px;border-radius:6px;border:1px solid var(--line);border-left:5px solid var(--warn);background:oklch(0.27 0.03 80)}
+#tour{position:fixed;inset:0;background:oklch(0.12 0.01 218/.88);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+#tour .box{background:var(--panel);border:1px solid var(--ok);border-radius:var(--r);padding:24px;max-width:460px}
+kbd{background:var(--inset);border:1px solid var(--line);border-radius:4px;padding:0 6px;font-family:var(--mono)}.big{font-size:1.08rem}
+.hazards{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.hazard{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.hazard .code{font:.72rem var(--mono);color:var(--ok);letter-spacing:.08em}.hazard h3{margin:4px 0 8px}.hazard p{margin:0 0 8px;color:var(--text)}
+.hazard dt{font:.68rem var(--mono);color:var(--faint);letter-spacing:.08em;text-transform:uppercase;margin-top:8px}.hazard dd{margin:2px 0 0;color:var(--muted)}
+.meter{height:10px;border-radius:99px;background:var(--inset);overflow:hidden;margin-top:6px}
 .meter>span{display:block;height:100%;width:0;border-radius:99px;background:var(--bad);transition:width .2s,background .2s}
 .meter-label{font-weight:700;margin-top:6px}
 .rules{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:3px;font-size:.92rem}
 .rules li{color:var(--muted)}.rules li::before{content:"\25CB  "}
 .rules li.met{color:var(--ok)}.rules li.met::before{content:"\2713  "}
-@media (prefers-reduced-motion:reduce){.meter>span{transition:none}}
+#auditTable th{font:.7rem var(--mono);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--line)}
+#auditTable td{border-bottom:1px solid var(--line);vertical-align:top}
+#headerTools{gap:8px}#headerTools button,#headerTools select{min-height:38px;padding:5px 12px;font-size:.88rem}header .crumb{flex:0 0 auto}#headerTools{flex:1;justify-content:flex-end;flex-wrap:nowrap}#headerTools label.sub{display:none}#headerTools #who{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:900px){
+body:has(#tabs:not([hidden])){grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "nav" "main";grid-template-rows:auto auto 1fr}
+#tabs{position:sticky;top:0;z-index:5;height:auto;flex-direction:row;overflow-x:auto;padding:6px 12px;border-right:0;border-bottom:1px solid var(--line);gap:4px}
+#tabs .nav-brand,#tabs .nav-chip,#tabs .nav-group,#tabs .nav-foot{display:none}
+#tabs button{width:auto;flex:0 0 auto;min-height:42px;padding:0 14px}#tabs button[aria-selected=true]::before{left:10px;right:10px;top:auto;bottom:0;width:auto;height:3px}
+header{padding:12px 16px;position:static}main{padding:16px 16px 40px}
+body:has(#tabs:not([hidden])) header .brand{display:flex}body:has(#tabs:not([hidden])) header .crumb{display:none}
+#banner{flex-direction:column;align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media print{#tabs,header .row,#notices,#tour,button,.hint a{display:none!important}body,body:has(#tabs:not([hidden])){display:block;background:#fff;color:#000}.panel,.card,#banner,.hazard{background:#fff;color:#000;border-color:#999}main{max-width:none;padding:0}h2,.top,.v,.pill{color:#000}header{position:static;background:#fff;border-color:#999}[data-view]:not([hidden]){display:grid!important}}
 </style>
 </head>
 <body>
 <header>
-<div class="brand"><div class="logo" aria-hidden="true"></div><div><h1>Astronaut Health Monitor</h1><p class="sub">Educational prototype, not a medical device</p></div></div>
-<div class="row" id="headerTools" hidden><span id="who" class="sub"></span><label for="crew" class="sub">Showing</label><select id="crew"></select><button id="demo" class="quiet" type="button" hidden>Add sample data</button><button id="helpBtn" class="quiet" type="button">Help</button><button id="logout" class="quiet" type="button">Sign out</button></div>
+<div class="brand"><div class="logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-25 12 12)"/></svg></div><div><h1>Astronaut <span>Health</span> Monitor</h1><p class="sub">Educational prototype, not a medical device</p></div></div>
+<div class="crumb"><span class="sub">Crew health intelligence</span><strong id="pageTitle">Mission overview</strong></div>
+<div class="row" id="headerTools" hidden><span id="who" class="sub"></span><label for="crew" class="sub">Showing</label><select id="crew"></select><button id="demo" class="quiet" type="button" hidden>Add sample data</button><button id="printBtn" class="quiet" type="button">Print report</button><button id="helpBtn" class="quiet" type="button">Help</button><button id="logout" class="quiet" type="button">Sign out</button></div>
 </header>
 <nav id="tabs" role="tablist" aria-label="Sections" hidden>
-<button role="tab" data-go="today" aria-selected="true" type="button">Today</button><button role="tab" data-go="body" aria-selected="false" type="button">Body</button>
-<button role="tab" data-go="history" aria-selected="false" type="button">History</button>
-<button role="tab" data-go="audit" aria-selected="false" type="button" id="auditTab" hidden>Audit log</button><button role="tab" data-go="add" aria-selected="false" type="button">Add reading</button></nav>
+<div class="nav-brand"><div class="logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-25 12 12)"/></svg></div><div><div class="t">ASTRONAUT <span>HEALTH</span></div><div class="s">CREW HEALTH MONITOR</div></div></div>
+<div class="nav-chip"><span class="dot"></span>MONITOR ACTIVE</div>
+<p class="nav-group">MISSION</p>
+<button role="tab" data-go="today" aria-selected="true" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Mission overview</button>
+<button role="tab" data-go="body" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Body map</button>
+<p class="nav-group">CREW HEALTH</p>
+<button role="tab" data-go="history" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>Health trends</button>
+<button role="tab" data-go="add" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M12 9v6M9 12h6"/></svg>Add reading</button>
+<button role="tab" data-go="hazards" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Spaceflight hazards</button>
+<p class="nav-group" id="opsGroup" hidden>OPERATIONS</p>
+<button role="tab" data-go="audit" aria-selected="false" type="button" id="auditTab" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>Audit log</button>
+<div class="nav-foot"><div class="line"><span class="dot" id="linkDot"></span>CONNECTION<b id="linkState">ONLINE</b></div><div>HUMAN HEALTH. MISSION INTELLIGENCE.</div></div>
+</nav>
 <main>
 <div id="notices" role="status" aria-live="polite"></div>
 <section id="login" class="panel" hidden style="max-width:440px;margin:0 auto;width:100%">
@@ -96,7 +153,7 @@ kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:
 </section>
 <div id="app" hidden>
 <div data-view="today" style="display:grid;gap:20px">
-<div id="banner" class="s-none"><span class="icon" id="bannerIcon"></span><div><h2 id="bannerTitle"></h2><p id="bannerText"></p><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
+<div id="banner" class="s-none"><div class="ring" aria-hidden="false" role="img" id="ringBox" aria-label="Readings in the healthy range"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="51"/><circle class="fg" id="ringFg" cx="60" cy="60" r="51" stroke-dasharray="320.4" stroke-dashoffset="320.4"/></svg><div class="num"><div><span id="ringNum">0</span>%<small>IN RANGE</small></div></div></div><span class="icon" id="bannerIcon"></span><div><h2 id="bannerTitle"></h2><p id="bannerText"></p><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
 <section class="panel" id="todo"><h2>What to do now</h2><ol id="actions"></ol></section>
 <section class="panel"><h2>Your readings</h2><p class="legend">&#10003; Good &nbsp; &#9650; Watch &nbsp; &#9632; Urgent. Worst first.</p><div id="cards"></div></section>
 </div>
@@ -118,6 +175,15 @@ kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:
 <div data-view="history" hidden><section class="panel"><h2>How it changed</h2><p class="hint" id="chartCaption"></p>
 <div class="row" style="margin-bottom:12px"><label for="chartIndicator">Show</label><select id="chartIndicator"></select></div>
 <div id="chart"></div><p class="hint">The green band is the healthy range. Amber dots are outside it.</p></section></div>
+<div data-view="hazards" hidden><section class="panel"><h2>The five spaceflight hazards</h2>
+<p class="hint">NASA's Human Research Program groups the risks of human spaceflight into five hazards. This page explains each one in plain words and says what this app does about it. It gives general information and does not diagnose anything.</p>
+<div class="hazards">
+<article class="hazard"><div class="code">01</div><h3>Space radiation</h3><p>Radiation beyond Earth's protective environment can affect long-term health.</p><dl><dt>What to watch</dt><dd>Exposure records, new symptoms, mission environment.</dd><dt>What to do</dt><dd>Follow shielding and exposure-monitoring protocols. Report new symptoms to the flight surgeon.</dd></dl></article>
+<article class="hazard"><div class="code">02</div><h3>Isolation and confinement</h3><p>A small crew in a small habitat can affect mood, sleep and relationships.</p><dl><dt>What to watch</dt><dd>Mood, sleep hours, fatigue, crew check-ins.</dd><dt>What to do</dt><dd>Keep a regular check-in rhythm and use the mission's behavioral-health support.</dd></dl></article>
+<article class="hazard"><div class="code">03</div><h3>Distance from Earth</h3><p>Communication delay and limited access to care change how health concerns are escalated.</p><dl><dt>What to watch</dt><dd>Gaps in readings, worsening trends, communication windows.</dd><dt>What to do</dt><dd>Record changes early and use the mission escalation protocol. This app works offline for that reason.</dd></dl></article>
+<article class="hazard"><div class="code">04</div><h3>Altered gravity</h3><p>Low gravity can affect the heart and circulation, bones, muscles and balance.</p><dl><dt>What to watch</dt><dd>Heart rate, blood pressure, activity, bone or muscle symptoms.</dd><dt>What to do</dt><dd>Complete the planned exercise sessions and report new bone, joint or back pain.</dd></dl></article>
+<article class="hazard"><div class="code">05</div><h3>Closed environment</h3><p>A sealed habitat makes air, water, food and sleep conditions important for health.</p><dl><dt>What to watch</dt><dd>Sleep, nutrition, blood sugar, symptoms that follow habitat changes.</dd><dt>What to do</dt><dd>Follow environmental monitoring guidance and report notable changes.</dd></dl></article>
+</div></section></div>
 <div data-view="audit" hidden><section class="panel"><h2>Audit log</h2><p class="hint" id="auditStatus"></p><div id="auditTable" style="overflow-x:auto"></div></section></div>
 <div data-view="add" hidden><section class="panel"><h2>Add a new reading</h2>
 <div class="steps"><div><label for="formIndicator">1. What did you measure?</label><select id="formIndicator"></select></div>
@@ -148,7 +214,7 @@ const S={user:null,crew:[],ref:{},rules:{},sum:null,region:null,detail:'reading'
 function showLogin(msg){S.user=null;S.crew=[];S.sum=null;S.region=null;
  for(const id of ['#app','#tabs','#welcome','#headerTools'])$(id).hidden=true;$('#login').hidden=false;$('#register').hidden=true;$('#loginError').textContent=msg||'';$('#loginPassword').value=''}
 function afterSignIn(){$('#login').hidden=true;$('#headerTools').hidden=false;const mc=S.user.role==='mission_control';
- $('#who').textContent=S.user.username+' ('+S.user.role.replace('_',' ')+')';$('#demo').hidden=!mc;$('#auditTab').hidden=!mc;
+ $('#who').textContent=S.user.username+' ('+S.user.role.replace('_',' ')+')';$('#demo').hidden=!mc;$('#auditTab').hidden=!mc;$('#opsGroup').hidden=!mc;
  $('#welcomeNote').textContent=mc?'':'No readings are available for your account yet.';$('#demoBig').hidden=!mc;showView('today');return init()}
 async function signIn(){try{S.user=await post('/auth/login',{username:$('#loginUser').value,password:$('#loginPassword').value});$('#loginUser').value='';await afterSignIn()}
  catch(e){$('#loginError').textContent=e.message;$('#loginPassword').value=''}}
@@ -176,8 +242,12 @@ async function renderAudit(){const t=$('#auditTable');t.replaceChildren();
   log.events.forEach(e=>{const r=el('tr');[new Date(e.occurred_at).toLocaleString(),(e.username||'')+(e.user_role?' ('+e.user_role+')':''),e.action,e.target||'',e.outcome,e.detail].forEach(v=>{const c=el('td','',v);c.style.padding='4px 8px 4px 0';r.append(c)});tb.append(r)});t.append(tb)}
  catch(e){$('#auditStatus').textContent='Could not load the audit log: '+e.message}}
 function showView(v){document.querySelectorAll('[data-view]').forEach(e=>e.hidden=e.dataset.view!==v);
+ {const t=document.querySelector('#tabs button[data-go="'+v+'"]');if(t)$('#pageTitle').textContent=t.textContent}
  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.go===v)))}
 $('#firstReading').addEventListener('click',()=>showView('add'));
+$('#printBtn').addEventListener('click',()=>window.print());
+function setLink(){const on=navigator.onLine!==false;$('#linkState').textContent=on?'ONLINE':'OFFLINE';$('#linkState').classList.toggle('off',!on);$('#linkDot').classList.toggle('off',!on)}
+window.addEventListener('online',setLink);window.addEventListener('offline',setLink);setLink();
 document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{showView(b.dataset.go);if(b.dataset.go==='audit')renderAudit()}));
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 const cur=()=>$('#crew').value,name=i=>S.ref[i]?S.ref[i].display_name:i;
@@ -200,6 +270,8 @@ function renderBanner(){const s=S.sum,k=s.assessments.length?s.overall_status:'n
  $('#banner').className='s-'+k;
  $('#bannerIcon').textContent=k==='none'?'\u2022':ST[k].i;
  $('#bannerTitle').textContent=k==='none'?'No readings yet':HERO[k][0];
+ {const n=S.sum.assessments.length,ok=S.sum.assessments.filter(a=>a.final_status==='normal').length,pc=n?Math.round(ok/n*100):0;
+ $('#ringNum').textContent=pc;$('#ringFg').style.strokeDashoffset=String(320.4*(1-pc/100));$('#ringBox').setAttribute('aria-label',n?ok+' of '+n+' readings are in the healthy range':'No readings yet')}
  $('#bannerText').textContent=k==='none'?'Press the button to enter your first reading. Your dashboard fills in as you add readings.':HERO[k][1];
  $('#firstReading').hidden=k!=='none'}
 function sorted(){return S.sum.assessments.slice().sort((a,b)=>ORDER[a.final_status]-ORDER[b.final_status])}
@@ -260,9 +332,9 @@ async function renderChart(){
  const lo=Math.min(...vals,rule.normal_minimum),hi=Math.max(...vals,rule.normal_maximum),pad=(hi-lo)*.1||1;
  const y=v=>H-B-(v-lo+pad)/(hi-lo+2*pad)*(H-B-10),x=i=>L+i/(rows.length-1)*(W-L-10);
  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Chart of '+name(ind)+' over time">';
- s+='<rect x="'+L+'" y="'+y(rule.normal_maximum)+'" width="'+(W-L-10)+'" height="'+(y(rule.normal_minimum)-y(rule.normal_maximum))+'" fill="#34d399" opacity=".2"/>';
- s+='<polyline fill="none" stroke="#5b9bff" stroke-width="2.5" points="'+rows.map((r,i)=>x(i)+','+y(r.measured_value)).join(' ')+'"/>';
- rows.forEach((r,i)=>{const o=r.measured_value<rule.normal_minimum||r.measured_value>rule.normal_maximum;s+='<circle cx="'+x(i)+'" cy="'+y(r.measured_value)+'" r="5" fill="'+(o?'#fbbf24':'#34d399')+'"/>'});
+ s+='<rect x="'+L+'" y="'+y(rule.normal_maximum)+'" width="'+(W-L-10)+'" height="'+(y(rule.normal_minimum)-y(rule.normal_maximum))+'" fill="oklch(0.77 0.075 158)" opacity=".2"/>';
+ s+='<polyline fill="none" stroke="oklch(0.94 0.014 92)" stroke-width="2.5" points="'+rows.map((r,i)=>x(i)+','+y(r.measured_value)).join(' ')+'"/>';
+ rows.forEach((r,i)=>{const o=r.measured_value<rule.normal_minimum||r.measured_value>rule.normal_maximum;s+='<circle cx="'+x(i)+'" cy="'+y(r.measured_value)+'" r="5" fill="'+(o?'oklch(0.8 0.115 77)':'oklch(0.77 0.075 158)')+'"/>'});
  s+='<text x="4" y="'+(y(rule.normal_maximum)+4)+'">'+rule.normal_maximum+'</text><text x="4" y="'+(y(rule.normal_minimum)+4)+'">'+rule.normal_minimum+'</text>';
  s+='<text x="'+L+'" y="'+(H-6)+'">'+rows[0].measured_at.slice(0,10)+'</text><text x="'+(W-10)+'" y="'+(H-6)+'" text-anchor="end">'+last.measured_at.slice(0,10)+'</text></svg>';
  box.innerHTML=s}

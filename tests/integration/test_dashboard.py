@@ -109,3 +109,18 @@ def test_empty_dashboard_points_to_the_add_reading_tab(api_client: TestClient) -
     page = api_client.get("/").text
     assert 'id="firstReading"' in page
     assert "Add my first reading" in page
+
+
+def test_revamped_dashboard_has_sidebar_hazards_and_readiness_ring(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    assert 'data-go="hazards"' in page and 'data-view="hazards"' in page
+    for hazard in (
+        "Space radiation",
+        "Isolation and confinement",
+        "Distance from Earth",
+        "Altered gravity",
+        "Closed environment",
+    ):
+        assert hazard in page
+    assert 'id="ringFg"' in page and 'id="printBtn"' in page and 'id="linkState"' in page
+    assert "https://" not in page.replace("http://127.0.0.1", "")  # still fully offline: no external resources
