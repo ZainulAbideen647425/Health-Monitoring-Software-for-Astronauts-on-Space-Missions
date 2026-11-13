@@ -15,6 +15,9 @@ dependencies = [
     "pydantic>=2.6",
     "pydantic-settings>=2.2",
     "cryptography>=42",
+    "scikit-learn>=1.4",
+    "pandas>=2.2",
+    "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
@@ -43,3 +46,7 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["sklearn.*", "pandas.*"]
+ignore_missing_imports = true

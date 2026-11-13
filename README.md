@@ -7,6 +7,9 @@ On long missions, astronauts carry much of the responsibility for spotting healt
 This software collects health indicators, helps the astronaut understand them, and (in later phases) shows
 their status at a glance and suggests actions.
 
+**Tech stack:** Python, FastAPI, SQLAlchemy/SQLite, Pydantic, scikit-learn, pandas, NumPy, and a single-file offline dashboard.
+**AI/ML:** per-astronaut Isolation Forest (unusual days) and linear-regression risk forecast. See [docs/analytics.md](docs/analytics.md).
+
 > **Disclaimer:** This is an educational prototype for a hackathon. It is not a medical device and must not be
 > used for real medical decisions.
 
@@ -186,7 +189,7 @@ tests/            unit and integration tests
 docs/             architecture documentation
 ```
 
-See [docs/architecture.md](docs/architecture.md), [docs/security.md](docs/security.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md), [docs/resilience.md](docs/resilience.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [docs/architecture.md](docs/architecture.md), [docs/security.md](docs/security.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md), [docs/resilience.md](docs/resilience.md), [docs/analytics.md](docs/analytics.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Acknowledgements
 
