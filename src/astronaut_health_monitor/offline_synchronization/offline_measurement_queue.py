@@ -22,7 +22,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from astronaut_health_monitor.core.field_encryption import FieldEncryptor
 from astronaut_health_monitor.domain.enumerations import BatchItemOutcome, HealthIndicatorType, MeasurementSource
+from astronaut_health_monitor.domain.exceptions import FieldDecryptionError
 
 DEFAULT_BATCH_SIZE = 100
 
@@ -47,8 +49,10 @@ class SynchronizationReport:
 
 
 class OfflineMeasurementQueue:
-    def __init__(self, queue_file_path: Path) -> None:
+    def __init__(self, queue_file_path: Path, encryptor: FieldEncryptor | None = None) -> None:
+        """With an encryptor the queue file is stored encrypted; without one it is readable JSON."""
         self._queue_file_path = queue_file_path
+        self._encryptor = encryptor
 
     def enqueue_measurement(
         self,
@@ -134,9 +138,11 @@ class OfflineMeasurementQueue:
         if not self._queue_file_path.exists():
             return {"pending": [], "rejected": []}
         try:
-            data = json.loads(self._queue_file_path.read_text(encoding="utf-8"))
+            raw = self._queue_file_path.read_bytes()
+            text = (self._encryptor.decrypt_bytes(raw) if self._encryptor else raw).decode("utf-8")
+            data = json.loads(text)
             return {"pending": list(data["pending"]), "rejected": list(data["rejected"])}
-        except (json.JSONDecodeError, KeyError, TypeError) as error:
+        except (json.JSONDecodeError, KeyError, TypeError, UnicodeDecodeError, FieldDecryptionError) as error:
             raise OfflineQueueCorruptedError(f"Queue file {self._queue_file_path} is not a valid queue.") from error
 
     def _save(self, queue_contents: dict[str, list[dict[str, Any]]]) -> None:
@@ -144,8 +150,11 @@ class OfflineMeasurementQueue:
         self._queue_file_path.parent.mkdir(parents=True, exist_ok=True)
         file_descriptor, temporary_path = tempfile.mkstemp(dir=self._queue_file_path.parent, suffix=".tmp")
         try:
-            with os.fdopen(file_descriptor, "w", encoding="utf-8") as temporary_file:
-                json.dump(queue_contents, temporary_file)
+            payload = json.dumps(queue_contents).encode("utf-8")
+            if self._encryptor:
+                payload = self._encryptor.encrypt_bytes(payload)
+            with os.fdopen(file_descriptor, "wb") as temporary_file:
+                temporary_file.write(payload)
             os.replace(temporary_path, self._queue_file_path)
         except BaseException:
             if os.path.exists(temporary_path):

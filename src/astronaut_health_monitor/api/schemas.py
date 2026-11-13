@@ -6,12 +6,14 @@ from typing import Any
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 from astronaut_health_monitor.domain.enumerations import (
+    AuditOutcome,
     BatchItemOutcome,
     HealthIndicatorType,
     HealthStatus,
     MeasurementSource,
     MissionEnvironment,
     TrendDirection,
+    UserRole,
     ValueDirection,
 )
 
@@ -170,3 +172,41 @@ class AstronautHealthSummaryResponse(BaseModel):
     overall_status: HealthStatus
     contact_flight_surgeon: bool
     assessments: list[HealthAssessmentResponse]
+
+
+class LoginRequest(BaseModel):
+    username: str = Field(min_length=1, max_length=64)
+    password: str = Field(min_length=1, max_length=200)
+
+
+class UserResponse(BaseModel):
+    username: str
+    role: UserRole
+    astronaut_id: int | None
+
+
+class UserCreateRequest(BaseModel):
+    username: str = Field(min_length=3, max_length=64)
+    password: str = Field(min_length=1, max_length=200)
+    role: UserRole
+    astronaut_id: int | None = None
+
+
+class AuditEventResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    occurred_at: datetime
+    username: str | None
+    user_role: str | None
+    action: str
+    target: str | None
+    outcome: AuditOutcome
+    detail: str
+
+
+class AuditLogResponse(BaseModel):
+    chain_is_valid: bool
+    checked_event_count: int
+    first_broken_event_id: int | None
+    events: list[AuditEventResponse]

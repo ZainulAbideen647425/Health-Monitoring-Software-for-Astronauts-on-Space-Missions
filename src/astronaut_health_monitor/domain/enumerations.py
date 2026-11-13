@@ -74,3 +74,19 @@ class BatchItemOutcome(StrEnum):
     CREATED = "created"
     DUPLICATE = "duplicate"
     REJECTED = "rejected"
+
+
+class UserRole(StrEnum):
+    """What a signed-in person is allowed to do."""
+
+    ASTRONAUT = "astronaut"
+    CLINICIAN = "clinician"
+    MISSION_CONTROL = "mission_control"
+
+
+class AuditOutcome(StrEnum):
+    """Result of an action that was written to the audit log."""
+
+    SUCCESS = "success"
+    DENIED = "denied"
+    FAILED = "failed"

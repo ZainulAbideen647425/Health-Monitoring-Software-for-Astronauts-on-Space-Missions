@@ -11,3 +11,10 @@ htmlcov/
 *.egg-info/
 build/
 dist/
+
+# Secrets and local data: never commit these
+.data_encryption_key
+*.key
+*.queue
+offline_queue*.json
+demo_queue.json

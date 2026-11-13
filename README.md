@@ -17,7 +17,7 @@ their status at a glance and suggests actions.
 | 1 | Foundation: data model, ingestion API, reference data, tests, CI | **Done** |
 | 2 | Health status rules, personal baselines, guidance, offline queue | **Done** |
 | 3 | Dashboard and interactive body map | **Done** (core version) |
-| 4 | Security: local authentication, audit log, encryption at rest | Planned |
+| 4 | Security: sign-in, roles, audit log, encryption at rest | **Done** |
 | 5 | Resilience tests and full documentation | Planned |
 | 6 | Release and submission package | Planned |
 
@@ -42,7 +42,7 @@ people who are not technical:
 - **History chart** with the healthy range shaded and a one-line summary.
 - **Add a reading in three steps**, with how-to-measure help and an immediate plain-language result.
 
-Not yet included: login and roles (Phase 4), multiple mission environments, gamification, report export, and a bone reading for the legs. Readings come from what the user enters or from clearly labelled simulated sample data; no NASA datasets are connected.
+Not yet included: multiple mission environments, gamification, report export, and a bone reading for the legs. Readings come from what the user enters or from clearly labelled simulated sample data; no NASA datasets are connected.
 
 ## What phases 1 and 2 provide
 
@@ -72,8 +72,33 @@ pip install -e ".[development]"
 python -m astronaut_health_monitor
 ```
 
-Open http://127.0.0.1:8000/ for the dashboard (click **Load demo crew** to see sample data) and
-http://127.0.0.1:8000/docs for the interactive API documentation.
+### Try the demo (quickest)
+
+Demo mode creates simulated data and three accounts. **Never use demo mode with real data**: the password is public.
+
+```bash
+export ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true     # Windows PowerShell: $env:ASTRONAUT_HEALTH_MONITOR_DEMO_MODE="true"
+python -m astronaut_health_monitor
+```
+
+Open http://127.0.0.1:8000/ and sign in with password `demo-passphrase-2026` as:
+
+| Username | Role | What you can do |
+|---|---|---|
+| `astronaut.demo` | astronaut | see and add your own readings only |
+| `clinician.demo` | clinician | see and add readings for every crew member |
+| `control.demo` | mission control | everything, plus users, crew, sample data and the audit log |
+
+### Real accounts (no demo mode)
+
+Create the first mission control account from the command line (the password is typed, not shown):
+
+```bash
+python -m astronaut_health_monitor.management create-user --username control.lead --role mission_control
+```
+
+Then start the app normally, sign in, and create other users with `POST /users` (see http://127.0.0.1:8000/docs, which
+needs you to be signed in on the same browser). See [docs/security.md](docs/security.md) for the security design and its limits.
 
 ## API overview
 
@@ -101,10 +126,12 @@ curl -X POST http://127.0.0.1:8000/measurements -H "Content-Type: application/js
 }'
 ```
 
-### Upgrading from Phase 1
+### Upgrading from an earlier phase
 
-Phase 2 adds a column (`client_reference`) to the measurements table. There is no migration tool yet, so delete
-the old `astronaut_health_monitor.db` file once; it is recreated automatically on the next start.
+Phases 2 and 4 changed the database tables, and Phase 4 encrypts stored data. There is no migration tool yet, so delete
+the old `astronaut_health_monitor.db` file (and any old offline queue file) once; it is recreated on the next start.
+Back up your encryption key (`.data_encryption_key`, or the value in `ASTRONAUT_HEALTH_MONITOR_ENCRYPTION_KEY`): without it
+the encrypted data cannot be read.
 
 ## Development
 
@@ -129,7 +156,7 @@ tests/            unit and integration tests
 docs/             architecture documentation
 ```
 
-See [docs/architecture.md](docs/architecture.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [docs/architecture.md](docs/architecture.md), [docs/security.md](docs/security.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Acknowledgements
 

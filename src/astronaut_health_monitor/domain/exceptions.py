@@ -31,3 +31,39 @@ class MeasurementNotFoundError(AstronautHealthMonitorError):
 
 class DuplicateMeasurementReferenceError(AstronautHealthMonitorError):
     """A measurement with the same client reference is already stored."""
+
+
+class AuthenticationRequiredError(AstronautHealthMonitorError):
+    """The request has no valid signed-in session."""
+
+
+class AuthenticationFailedError(AstronautHealthMonitorError):
+    """The username or password is wrong. The message never says which one."""
+
+
+class AccountLockedError(AstronautHealthMonitorError):
+    """Too many wrong passwords were entered; the account is locked for a while."""
+
+
+class PermissionDeniedError(AstronautHealthMonitorError):
+    """The signed-in user's role does not allow this action."""
+
+
+class UserAlreadyExistsError(AstronautHealthMonitorError):
+    """A user with this username already exists."""
+
+
+class InvalidUserDetailsError(AstronautHealthMonitorError):
+    """The username, password or role link of a new user is not acceptable."""
+
+
+class EncryptionNotConfiguredError(AstronautHealthMonitorError):
+    """Encrypted fields were used before an encryption key was configured."""
+
+
+class FieldDecryptionError(AstronautHealthMonitorError):
+    """Stored encrypted data could not be decrypted (wrong key, or the data was altered)."""
+
+
+class DemoModeDisabledError(AstronautHealthMonitorError):
+    """Demo features were requested but demo mode is switched off."""
