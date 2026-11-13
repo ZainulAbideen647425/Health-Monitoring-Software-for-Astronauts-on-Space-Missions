@@ -103,27 +103,82 @@ body:has(#tabs:not([hidden])) header .brand{display:flex}body:has(#tabs:not([hid
 #banner{flex-direction:column;align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media print{#tabs,header .row,#notices,#tour,button,.hint a{display:none!important}body,body:has(#tabs:not([hidden])){display:block;background:#fff;color:#000}.panel,.card,#banner,.hazard{background:#fff;color:#000;border-color:#999}main{max-width:none;padding:0}h2,.top,.v,.pill{color:#000}header{position:static;background:#fff;border-color:#999}[data-view]:not([hidden]){display:grid!important}}
+.eyebrow{margin:0 0 4px;font:.7rem var(--mono);color:var(--ok);letter-spacing:.1em;text-transform:uppercase}
+.sechead{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.sechead h1{margin:0;font-size:1.9rem;font-weight:800;line-height:1.2}.sechead p{margin:4px 0 0;color:var(--muted)}.sechead .eyebrow{margin:0}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;font:.72rem var(--mono);letter-spacing:.08em;color:var(--faint);text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border:1px solid var(--line);border-radius:4px;color:var(--ok);font:.7rem var(--mono);letter-spacing:.06em}
+.chip.sim{color:var(--warn);border-color:oklch(0.5 0.08 77)}
+.strip{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border:1px solid oklch(0.5 0.08 77);border-left:4px solid var(--warn);border-radius:6px;background:oklch(0.27 0.03 80)}
+.strip strong{font:.74rem var(--mono);letter-spacing:.08em}.strip span{color:var(--muted)}
+.notice-strip{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border:1px solid var(--line);border-left:4px solid var(--bad);border-radius:6px;background:var(--panel)}
+.stats{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}.stat span{font:.68rem var(--mono);letter-spacing:.08em;color:var(--faint)}.stat strong{display:block;font-size:1.25rem;margin-top:4px}.stat small{display:block;color:var(--muted)}
+.twocol{display:grid;gap:20px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}@media(max-width:1000px){.twocol{grid-template-columns:1fr}}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}.ph h2{margin:0}
+.count{font:.8rem var(--mono);padding:2px 9px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
+.signal{margin:0 0 16px}.signal h3{font-size:.95rem;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px}.signal h3 small{color:var(--muted);font-weight:500}
+.alert{display:grid;gap:4px;padding:14px;border:1px solid var(--line);border-left:4px solid var(--c,var(--muted));border-radius:6px;background:var(--panel2);margin-bottom:10px}
+.alert .lab{font:.68rem var(--mono);letter-spacing:.1em;color:var(--c,var(--muted))}.alert .when{float:right;color:var(--faint);font:.68rem var(--mono)}.alert h3{font-size:1rem;margin:2px 0}.alert p{margin:0;color:var(--muted);font-size:.92rem}
+.alert .acts{display:flex;gap:8px;margin-top:6px}.alert button{min-height:36px;padding:4px 12px;font-size:.88rem}
+.cta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.cta h3{margin:2px 0 4px}.cta p{margin:0;color:var(--muted)}
+.spark{margin:8px 0 2px}.spark svg{display:block;width:100%;height:46px}.trend{font:.74rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.card .acts{display:flex;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}.seg button{border:0;border-radius:0;background:transparent;color:var(--muted);min-height:38px;padding:4px 16px;font-weight:700}.seg button[aria-pressed=true]{background:oklch(0.29 0.026 157);color:var(--ok)}
+.grid2{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.mini{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:16px}.mini .t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.mini h3{font-size:1rem}.mini .val{font-size:1.3rem;font-weight:800}.mini small{color:var(--muted)}
+.callout{display:flex;gap:16px;align-items:flex-start;padding:18px 20px;border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:var(--r);background:var(--panel)}.callout h3{margin:2px 0 6px}.callout p{margin:0;color:var(--muted)}
+.systems{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.systems button{background:var(--inset);color:var(--muted);border:1px solid var(--line);font-weight:600;min-height:40px;padding:4px 14px}.systems button[aria-pressed=true]{background:oklch(0.29 0.026 157);color:var(--ok);border-color:var(--ok)}
+.sysbox h2{margin:2px 0}.sysbox .sub{margin-bottom:10px}.sysbox dl{display:grid;gap:10px;margin:14px 0 0}.sysbox dt{font:.68rem var(--mono);letter-spacing:.1em;color:var(--faint);text-transform:uppercase}.sysbox dd{margin:2px 0 0}
+.progress{height:6px;border-radius:99px;background:var(--inset);overflow:hidden;margin:8px 0 14px}.progress>span{display:block;height:100%;background:var(--ok);transition:width .2s}
+.wiz{display:grid;gap:20px;grid-template-columns:240px minmax(0,1fr)}@media(max-width:900px){.wiz{grid-template-columns:1fr}}
+.wsteps{display:grid;gap:10px;align-content:start}.wsteps div{display:flex;gap:10px;align-items:center;color:var(--muted)}.wsteps b{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--line);border-radius:50%;font:.72rem var(--mono)}.wsteps .on{color:var(--text)}.wsteps .on b{border-color:var(--ok);color:var(--ok)}.wsteps .done b{background:var(--ok);color:var(--accent-ink);border-color:var(--ok)}
+.fields{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:16px 0}.fields label{display:flex;flex-direction:column;gap:6px}.fields small{color:var(--muted);font-weight:500}
+.scale{display:flex;flex-wrap:wrap;gap:6px}.scale button{min-width:42px;min-height:42px;padding:0;background:var(--inset);color:var(--text);border:1px solid var(--line);font-weight:700}.scale button[aria-pressed=true]{background:var(--ok);color:var(--accent-ink);border-color:var(--ok)}
+textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid var(--line);border-radius:6px;padding:10px 14px;width:100%;min-height:90px;resize:vertical}
+.wfoot{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem}.tbl th{text-align:left;font:.68rem var(--mono);letter-spacing:.08em;color:var(--faint);text-transform:uppercase;padding:6px 10px 6px 0;border-bottom:1px solid var(--line)}.tbl td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.chat .ans{padding:14px 16px;border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:6px;background:var(--panel2);margin:14px 0;white-space:pre-wrap}
+.chat form{display:flex;gap:10px}.chat form input{flex:1}
+.prompts{display:grid;gap:8px}.prompts button{justify-content:flex-start;text-align:left;background:var(--inset);color:var(--text);border:1px solid var(--line);font-weight:600}
+.obs{display:grid;gap:12px;margin-top:14px}.obs div{padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel2)}.obs b{display:block;font:.68rem var(--mono);letter-spacing:.1em;color:var(--ok);margin-bottom:2px}
+.model{display:grid;gap:20px;grid-template-columns:minmax(240px,340px) 1fr;align-items:center}@media(max-width:800px){.model{grid-template-columns:1fr}}
+.model svg{width:100%;max-width:340px;margin:0 auto;display:block}.model .node{fill:var(--panel2);stroke:var(--ok);stroke-width:1.5}.model .link{stroke:var(--line);stroke-width:1.5}.model text{font:600 11px var(--mono);fill:var(--text)}
+.hazard .tagline{margin-top:10px;font:.68rem var(--mono);letter-spacing:.08em;color:var(--faint)}
+.overlay{position:fixed;inset:0;background:oklch(0.12 0.01 218/.88);display:flex;align-items:center;justify-content:center;padding:16px;z-index:12}
+.overlay .box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:24px;width:min(640px,100%);max-height:90vh;overflow:auto}
+.overlay .big-v{font-size:2.4rem;font-weight:800}
+.rep h2{margin:0}.rep .meta{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin:16px 0}.rep .meta div span{display:block;font:.68rem var(--mono);color:var(--faint);letter-spacing:.08em}
+.profile{display:flex;gap:16px;align-items:center;margin-bottom:16px}.avatar{display:grid;place-items:center;width:56px;height:56px;border:1px solid oklch(0.48 0.028 158);background:oklch(0.3 0.022 157);color:var(--ok);font:700 1rem var(--mono);border-radius:50%}
+.profile-brief{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.profile-brief .avatar{width:34px;height:34px;font-size:.75rem;flex:0 0 auto}.profile-brief p{margin:0;font-size:.85rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.profile-brief span{font:.66rem var(--mono);color:var(--muted)}
+.bell{position:relative;min-width:44px;padding:0 10px}.bell svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;display:block}.bell b{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:99px;background:var(--warn);color:var(--accent-ink);font:700 .7rem var(--mono);display:grid;place-items:center;padding:0 4px}
+.foot{display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between;margin-top:8px;padding-top:16px;border-top:1px solid var(--line);font:.66rem var(--mono);letter-spacing:.06em;color:var(--faint);text-transform:uppercase}
+@media print{.overlay,.seg,.systems,.wfoot,.cta button,.foot{display:none!important}}
 </style>
 </head>
 <body>
 <header>
 <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-25 12 12)"/></svg></div><div><h1>Astronaut <span>Health</span> Monitor</h1><p class="sub">Educational prototype, not a medical device</p></div></div>
 <div class="crumb"><span class="sub">Crew health intelligence</span><strong id="pageTitle">Mission overview</strong></div>
-<div class="row" id="headerTools" hidden><span id="who" class="sub"></span><label for="crew" class="sub">Showing</label><select id="crew"></select><button id="demo" class="quiet" type="button" hidden>Add sample data</button><button id="printBtn" class="quiet" type="button">Print report</button><button id="helpBtn" class="quiet" type="button">Help</button><button id="logout" class="quiet" type="button">Sign out</button></div>
+<div class="row" id="headerTools" hidden><span id="who" class="sub"></span><label for="crew" class="sub">Showing</label><select id="crew"></select><button id="bell" class="quiet bell" type="button" aria-label="Observations and reminders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><b id="bellCount" hidden>0</b></button><button id="demo" class="quiet" type="button" hidden>Add sample data</button><button id="printBtn" class="quiet" type="button">Print report</button><button id="helpBtn" class="quiet" type="button">Help</button><button id="logout" class="quiet" type="button">Sign out</button></div>
 </header>
 <nav id="tabs" role="tablist" aria-label="Sections" hidden>
 <div class="nav-brand"><div class="logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-25 12 12)"/></svg></div><div><div class="t">ASTRONAUT <span>HEALTH</span></div><div class="s">CREW HEALTH MONITOR</div></div></div>
 <div class="nav-chip"><span class="dot"></span>MONITOR ACTIVE</div>
 <p class="nav-group">MISSION</p>
 <button role="tab" data-go="today" aria-selected="true" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Mission overview</button>
-<button role="tab" data-go="body" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Body map</button>
-<p class="nav-group">CREW HEALTH</p>
+<button role="tab" data-go="body" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Body intelligence</button>
 <button role="tab" data-go="history" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>Health trends</button>
-<button role="tab" data-go="add" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M12 9v6M9 12h6"/></svg>Add reading</button>
+<p class="nav-group">CREW HEALTH</p>
+<button role="tab" data-go="assessment" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Daily assessment</button>
+<button role="tab" data-go="add" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>Add reading</button>
+<button role="tab" data-go="assistant" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17v4M17 19h4"/></svg>Health intelligence</button>
 <button role="tab" data-go="hazards" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Spaceflight hazards</button>
-<p class="nav-group" id="opsGroup" hidden>OPERATIONS</p>
-<button role="tab" data-go="audit" aria-selected="false" type="button" id="auditTab" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>Audit log</button>
-<div class="nav-foot"><div class="line"><span class="dot" id="linkDot"></span>CONNECTION<b id="linkState">ONLINE</b></div><div>HUMAN HEALTH. MISSION INTELLIGENCE.</div></div>
+<p class="nav-group">OPERATIONS</p>
+<button role="tab" data-go="reports" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>Mission reports</button>
+<button role="tab" data-go="settings" aria-selected="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Profile &amp; settings</button>
+<button role="tab" data-go="audit" aria-selected="false" type="button" id="auditTab" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Audit log</button>
+<div class="nav-foot"><div class="profile-brief" id="profileBrief"><div class="avatar" id="avatar">--</div><div style="min-width:0"><p id="pbName"></p><span id="pbSub"></span></div></div><div class="line"><span class="dot" id="linkDot"></span>CONNECTION<b id="linkState">ONLINE</b></div><div>HUMAN HEALTH. MISSION INTELLIGENCE.</div></div>
 </nav>
 <main>
 <div id="notices" role="status" aria-live="polite"></div>
@@ -152,10 +207,17 @@ body:has(#tabs:not([hidden])) header .brand{display:flex}body:has(#tabs:not([hid
 <div><button id="demoBig" type="button">Start with sample data</button><p id="welcomeNote" class="hint"></p></div>
 </section>
 <div id="app" hidden>
+<div class="crumbs" id="crumbs"><span id="crumbPath">MISSION &rsaquo; MISSION OVERVIEW</span><span class="chip" id="dataTag">YOUR READINGS</span></div>
 <div data-view="today" style="display:grid;gap:20px">
+<div class="sechead"><div><p class="eyebrow" id="todayEyebrow">CREW HEALTH STATUS</p><h1 id="greeting">Hello.</h1><p id="todayDesc">Your health overview for today.</p></div><button type="button" id="goAssessment">Daily assessment &rarr;</button></div>
+<div class="strip" id="simBanner" hidden><div><strong>SIMULATED SAMPLE DATA</strong><br><span>These readings are made up for demonstration. They are not from a real person and not clinically validated.</span></div></div>
 <div id="banner" class="s-none"><div class="ring" aria-hidden="false" role="img" id="ringBox" aria-label="Readings in the healthy range"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="51"/><circle class="fg" id="ringFg" cx="60" cy="60" r="51" stroke-dasharray="320.4" stroke-dashoffset="320.4"/></svg><div class="num"><div><span id="ringNum">0</span>%<small>IN RANGE</small></div></div></div><span class="icon" id="bannerIcon"></span><div><h2 id="bannerTitle"></h2><p id="bannerText"></p><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
+<div class="stats" id="stats"><div class="stat"><span>ASSESSMENT</span><strong id="stAssess">-</strong><small id="stAssessNote"></small></div><div class="stat"><span>LAST RECORDED</span><strong id="stLast">-</strong><small id="stLastNote"></small></div><div class="stat"><span>INDICATORS TRACKED</span><strong id="stTracked">-</strong><small>of all indicators in this app</small></div></div>
 <section class="panel" id="todo"><h2>What to do now</h2><ol id="actions"></ol></section>
-<section class="panel"><h2>Your readings</h2><p class="legend">&#10003; Good &nbsp; &#9650; Watch &nbsp; &#9632; Urgent. Worst first.</p><div id="cards"></div></section>
+<section class="panel"><p class="eyebrow">CREW TELEMETRY</p><h2>Health indicators</h2><p class="legend">&#10003; Good &nbsp; &#9650; Watch &nbsp; &#9632; Urgent. Worst first. Open a card for the full detail.</p><div id="cards"></div></section>
+<div class="twocol"><section class="panel"><div class="ph"><div><p class="eyebrow">PERSONAL SERIES</p><h2>Recent signal</h2></div><button class="quiet" type="button" id="allTrends">All trends &rarr;</button></div><div id="signals"></div></section>
+<section class="panel" id="alertsPanel"><div class="ph"><div><p class="eyebrow">OBSERVATIONS</p><h2>Attention &amp; reminders</h2></div><span class="count" id="alertCount">00</span></div><div id="alerts"></div></section></div>
+<section class="panel cta"><div><p class="eyebrow">CONNECTED SYSTEMS</p><h3>Explore body intelligence</h3><p>See how spaceflight conditions connect to health signals and prevention.</p></div><button class="quiet" type="button" id="goBody">Explore body &rarr;</button></section>
 </div>
 <div data-view="body" hidden style="display:grid;gap:20px">
 <div class="two"><section class="panel"><h2>Your body</h2><p class="hint">Hover or tap a part. Tap again for full context. Keys <kbd>1</kbd> to <kbd>5</kbd>, <kbd>Esc</kbd> closes.</p>
@@ -171,19 +233,59 @@ body:has(#tabs:not([hidden])) header .brand{display:flex}body:has(#tabs:not([hid
 <text class="tag" x="160" y="560" text-anchor="middle">Legs</text></svg>
 </section><section class="panel"><div id="regionInfo"></div><div id="regionData" aria-live="polite"></div></section></div>
 <section class="panel" id="safety" aria-live="polite" hidden></section>
+<section class="panel"><p class="eyebrow">HUMAN SYSTEMS MAP</p><h2>Body systems</h2><p class="hint">Select a system to see which of your readings relate to it and what to do. Illustrative context only: this view does not diagnose or measure anatomy.</p>
+<div class="systems" id="systemButtons" role="group" aria-label="Body systems"></div><div class="sysbox" id="systemBox" aria-live="polite"></div></section>
+<section class="panel cta"><div><p class="eyebrow">ENVIRONMENTAL CONNECTION</p><h3>Spaceflight conditions shape how we monitor human systems.</h3></div><button class="quiet" type="button" id="bodyToHazards">Explore mission hazards &rarr;</button></section>
 </div>
-<div data-view="history" hidden><section class="panel"><h2>How it changed</h2><p class="hint" id="chartCaption"></p>
+<div data-view="history" hidden style="display:grid;gap:20px">
+<div class="sechead"><div><p class="eyebrow">HEALTH TELEMETRY &middot; PERSONAL SERIES</p><h1>Health trends</h1><p>Recent signals and self-reported patterns from your recorded readings.</p></div>
+<div class="seg" role="group" aria-label="Time range" id="rangeButtons"><button type="button" data-range="24H" aria-pressed="false">24H</button><button type="button" data-range="7D" aria-pressed="false">7D</button><button type="button" data-range="30D" aria-pressed="true">30D</button><button type="button" data-range="ALL" aria-pressed="false">ALL</button></div></div>
+<section class="panel"><h2>How it changed</h2><p class="hint" id="chartCaption"></p>
 <div class="row" style="margin-bottom:12px"><label for="chartIndicator">Show</label><select id="chartIndicator"></select></div>
-<div id="chart"></div><p class="hint">The green band is the healthy range. Amber dots are outside it.</p></section></div>
-<div data-view="hazards" hidden><section class="panel"><h2>The five spaceflight hazards</h2>
+<div id="chart"></div><p class="hint">The green band is the healthy range. Amber dots are outside it.</p></section>
+<section class="panel"><p class="eyebrow">ALL INDICATORS</p><h2>Every signal at a glance</h2><div class="grid2" id="trendGrid"></div></section>
+<section class="callout" id="pattern"><div><p class="eyebrow">PATTERN TO REVIEW</p><h3 id="patternTitle">Not enough readings yet</h3><p id="patternText">Record readings on several days to see patterns.</p></div></section>
+</div>
+<div data-view="hazards" hidden style="display:grid;gap:20px">
+<div class="sechead"><div><p class="eyebrow">MISSION ENVIRONMENT &middot; HUMAN SYSTEMS</p><h1>Spaceflight hazards</h1><p>Five connected conditions shape how crew health is monitored and supported.</p></div></div>
+<section class="panel model"><svg viewBox="0 0 340 300" role="img" aria-label="The five spaceflight hazards connected around the crew member"><g class="link"><line x1="170" y1="150" x2="170" y2="40"/><line x1="170" y1="150" x2="285" y2="115"/><line x1="170" y1="150" x2="245" y2="240"/><line x1="170" y1="150" x2="95" y2="240"/><line x1="170" y1="150" x2="55" y2="115"/></g>
+<circle class="node" cx="170" cy="150" r="34"/><text x="170" y="154" text-anchor="middle">CREW</text>
+<g><circle class="node" cx="170" cy="40" r="26"/><text x="170" y="44" text-anchor="middle">01</text><circle class="node" cx="285" cy="115" r="26"/><text x="285" y="119" text-anchor="middle">02</text><circle class="node" cx="245" cy="240" r="26"/><text x="245" y="244" text-anchor="middle">03</text><circle class="node" cx="95" cy="240" r="26"/><text x="95" y="244" text-anchor="middle">04</text><circle class="node" cx="55" cy="115" r="26"/><text x="55" y="119" text-anchor="middle">05</text></g></svg>
+<div><p class="eyebrow">CONNECTED RISK MODEL</p><h2>Mission conditions, seen through the crew member.</h2><p class="hint">The hazards are not separate. Sleep, mood, heart signals, activity and symptoms give context, never a diagnosis. Numbers 01 to 05 match the cards below.</p></div></section>
+<section class="panel"><h2>The five spaceflight hazards</h2>
 <p class="hint">NASA's Human Research Program groups the risks of human spaceflight into five hazards. This page explains each one in plain words and says what this app does about it. It gives general information and does not diagnose anything.</p>
 <div class="hazards">
-<article class="hazard"><div class="code">01</div><h3>Space radiation</h3><p>Radiation beyond Earth's protective environment can affect long-term health.</p><dl><dt>What to watch</dt><dd>Exposure records, new symptoms, mission environment.</dd><dt>What to do</dt><dd>Follow shielding and exposure-monitoring protocols. Report new symptoms to the flight surgeon.</dd></dl></article>
-<article class="hazard"><div class="code">02</div><h3>Isolation and confinement</h3><p>A small crew in a small habitat can affect mood, sleep and relationships.</p><dl><dt>What to watch</dt><dd>Mood, sleep hours, fatigue, crew check-ins.</dd><dt>What to do</dt><dd>Keep a regular check-in rhythm and use the mission's behavioral-health support.</dd></dl></article>
-<article class="hazard"><div class="code">03</div><h3>Distance from Earth</h3><p>Communication delay and limited access to care change how health concerns are escalated.</p><dl><dt>What to watch</dt><dd>Gaps in readings, worsening trends, communication windows.</dd><dt>What to do</dt><dd>Record changes early and use the mission escalation protocol. This app works offline for that reason.</dd></dl></article>
-<article class="hazard"><div class="code">04</div><h3>Altered gravity</h3><p>Low gravity can affect the heart and circulation, bones, muscles and balance.</p><dl><dt>What to watch</dt><dd>Heart rate, blood pressure, activity, bone or muscle symptoms.</dd><dt>What to do</dt><dd>Complete the planned exercise sessions and report new bone, joint or back pain.</dd></dl></article>
-<article class="hazard"><div class="code">05</div><h3>Closed environment</h3><p>A sealed habitat makes air, water, food and sleep conditions important for health.</p><dl><dt>What to watch</dt><dd>Sleep, nutrition, blood sugar, symptoms that follow habitat changes.</dd><dt>What to do</dt><dd>Follow environmental monitoring guidance and report notable changes.</dd></dl></article>
-</div></section></div>
+<article class="hazard"><div class="code">01 / 05</div><h3>Space radiation</h3><p>Radiation beyond Earth's protective environment can affect long-term health.</p><dl><dt>What to watch</dt><dd>Exposure records, new symptoms, mission environment.</dd><dt>What to do</dt><dd>Follow shielding and exposure-monitoring protocols. Report new symptoms to the flight surgeon.</dd></dl><div class="tagline">MONITOR &middot; NO AUTOMATED DIAGNOSIS</div></article>
+<article class="hazard"><div class="code">02 / 05</div><h3>Isolation and confinement</h3><p>A small crew in a small habitat can affect mood, sleep and relationships.</p><dl><dt>What to watch</dt><dd>Mood, sleep hours, fatigue, crew check-ins.</dd><dt>What to do</dt><dd>Keep a regular check-in rhythm and use the mission's behavioral-health support.</dd></dl><div class="tagline">MONITOR &middot; NO AUTOMATED DIAGNOSIS</div></article>
+<article class="hazard"><div class="code">03 / 05</div><h3>Distance from Earth</h3><p>Communication delay and limited access to care change how health concerns are escalated.</p><dl><dt>What to watch</dt><dd>Gaps in readings, worsening trends, communication windows.</dd><dt>What to do</dt><dd>Record changes early and use the mission escalation protocol. This app works offline for that reason.</dd></dl><div class="tagline">MONITOR &middot; NO AUTOMATED DIAGNOSIS</div></article>
+<article class="hazard"><div class="code">04 / 05</div><h3>Altered gravity</h3><p>Low gravity can affect the heart and circulation, bones, muscles and balance.</p><dl><dt>What to watch</dt><dd>Heart rate, blood pressure, activity, bone or muscle symptoms.</dd><dt>What to do</dt><dd>Complete the planned exercise sessions and report new bone, joint or back pain.</dd></dl><div class="tagline">MONITOR &middot; NO AUTOMATED DIAGNOSIS</div></article>
+<article class="hazard"><div class="code">05 / 05</div><h3>Closed environment</h3><p>A sealed habitat makes air, water, food and sleep conditions important for health.</p><dl><dt>What to watch</dt><dd>Sleep, nutrition, blood sugar, symptoms that follow habitat changes.</dd><dt>What to do</dt><dd>Follow environmental monitoring guidance and report notable changes.</dd></dl><div class="tagline">MONITOR &middot; NO AUTOMATED DIAGNOSIS</div></article>
+</div></section>
+<p class="hint">Risk information is educational context and does not replace mission protocols or clinician guidance.</p></div>
+<div data-view="assessment" hidden style="display:grid;gap:20px">
+<div class="sechead"><div><p class="eyebrow">CREW CHECK-IN &middot; PRIVATE RECORD</p><h1>Daily health assessment</h1><p>A quick check-in to support awareness and mission monitoring. Every field is optional.</p></div><span class="chip">ENCRYPTED AT REST</span></div>
+<div class="notice-strip"><span>This is not a medical device. Follow mission protocols and contact the flight surgeon about any health concern.</span></div>
+<div class="wiz"><section class="panel"><p class="eyebrow">CHECK-IN PROGRESS</p><h2 id="wizCount">01 / 03</h2><div class="progress"><span id="wizBar" style="width:33%"></span></div><div class="wsteps" id="wizSteps"></div></section>
+<section class="panel" id="wizard"></section></div>
+<p class="hint">Use approved instruments and mission procedures for clinical measurements. A single reading cannot determine a diagnosis.</p></div>
+<div data-view="assistant" hidden style="display:grid;gap:20px">
+<div class="sechead"><div><p class="eyebrow">CREW SUPPORT &middot; STRUCTURED HEALTH INTELLIGENCE</p><h1>Health intelligence</h1><p>A guided review of your health signals and the mission context. It is not a diagnostic chatbot.</p></div><span class="chip">OBSERVATIONS ONLY</span></div>
+<div class="notice-strip"><span><strong>Not a medical decision-maker.</strong> It does not diagnose, prescribe or replace the flight surgeon. Answers come from the app's built-in rules and your recorded readings, with no AI model involved.</span></div>
+<div class="twocol"><section class="panel chat"><p class="eyebrow">CREW HEALTH REVIEW</p><h2 id="obsTitle">Mission health observations</h2><div class="obs" id="obs"></div><div id="answer" role="status"></div>
+<form id="askForm"><input id="askInput" placeholder="Ask about your recorded readings, for example sleep" aria-label="Your question" maxlength="200"><button type="submit">Ask</button></form></section>
+<aside style="display:grid;gap:20px;align-content:start"><section class="panel"><p class="eyebrow">GUIDED REVIEW</p><h2>Explore a question</h2><div class="prompts" id="prompts"></div></section>
+<section class="panel"><p class="eyebrow">WHEN TO CONTACT THE FLIGHT SURGEON</p><p>Contact the mission medical team about concerning symptoms, significant changes from your own baseline, any reading marked Urgent, or any time you need medical guidance.</p></section></aside></div></div>
+<div data-view="reports" hidden style="display:grid;gap:20px">
+<div class="sechead"><div><p class="eyebrow">OPERATIONS &middot; CREW RECORDS</p><h1>Mission reports</h1><p>A shareable summary built from the readings recorded in this app.</p></div><div class="row"><button type="button" id="printReport">Print / save as PDF</button><button type="button" class="quiet" id="downloadText">Download summary (.txt)</button><button type="button" class="quiet" id="downloadCsv">Download readings (.csv)</button></div></div>
+<div class="notice-strip"><span>Check the values before you share a report with an authorized flight surgeon.</span></div>
+<section class="panel rep" id="reportBody"></section></div>
+<div data-view="settings" hidden style="display:grid;gap:20px">
+<div class="sechead"><div><p class="eyebrow">CREW IDENTITY &middot; PREFERENCES</p><h1>Profile &amp; settings</h1><p>Your account details and the name shown on this device.</p></div><span class="chip">THIS DEVICE ONLY</span></div>
+<div class="twocol"><section class="panel"><p class="eyebrow">CREW PROFILE</p><h2>Identity</h2><div class="profile"><div class="avatar" id="setAvatar">--</div><div><h2 id="setName" style="margin:0"></h2><span class="sub" id="setSub"></span></div></div>
+<form id="profileForm" class="fields"><label>Display name<input id="setDisplay" maxlength="60" autocomplete="off"></label><label>Callsign<input id="setCallsign" maxlength="30" autocomplete="off" placeholder="Optional"></label><div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="submit">Save profile</button><span id="profileSaved" role="status" class="hint" style="margin:0"></span></div></form>
+<p class="hint">The display name and callsign are saved in this browser only. They do not change your account on the server.</p></section>
+<section class="panel"><p class="eyebrow">ACCOUNT</p><h2>Access and security</h2><table class="tbl" id="accountTable"></table>
+<div class="row" style="margin-top:16px"><button class="quiet" type="button" id="replayTour">Replay the tour</button><button class="quiet" type="button" id="settingsSignOut">Sign out</button></div></section></div></div>
 <div data-view="audit" hidden><section class="panel"><h2>Audit log</h2><p class="hint" id="auditStatus"></p><div id="auditTable" style="overflow-x:auto"></div></section></div>
 <div data-view="add" hidden><section class="panel"><h2>Add a new reading</h2>
 <div class="steps"><div><label for="formIndicator">1. What did you measure?</label><select id="formIndicator"></select></div>
@@ -191,7 +293,9 @@ body:has(#tabs:not([hidden])) header .brand{display:flex}body:has(#tabs:not([hid
 <div><label>3. Save it</label><button id="record" type="button">Save reading</button></div></div>
 <p id="help" class="hint" style="margin-top:14px"></p><div id="result" role="status" hidden></div></section></div>
 </div>
+<div class="foot" id="appFoot" hidden><span>ASTRONAUT HEALTH MONITOR &middot; EDUCATIONAL PROTOTYPE</span><span>NOT A CLINICAL DEVICE &middot; FLIGHT SURGEON GUIDANCE TAKES PRECEDENCE</span></div>
 </main>
+<div class="overlay" id="metricDialog" role="dialog" aria-modal="true" aria-labelledby="mdTitle" hidden><div class="box"><p class="eyebrow" id="mdGroup"></p><h2 id="mdTitle"></h2><div class="big-v" id="mdValue"></div><p id="mdStatus"></p><div id="mdChart"></div><dl class="sysbox" id="mdInfo" style="display:grid;gap:10px"></dl><div class="row" style="margin-top:14px"><button type="button" id="mdHistory">Open in trends</button><button type="button" class="quiet" id="mdClose">Close</button></div></div></div>
 <div id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden><div class="box"><h2 id="tourTitle"></h2><p id="tourText"></p>
 <div class="row"><button id="tourNext" type="button">Next</button><button id="tourSkip" class="quiet" type="button">Skip</button></div></div></div>
 <script>
@@ -214,7 +318,7 @@ const S={user:null,crew:[],ref:{},rules:{},sum:null,region:null,detail:'reading'
 function showLogin(msg){S.user=null;S.crew=[];S.sum=null;S.region=null;
  for(const id of ['#app','#tabs','#welcome','#headerTools'])$(id).hidden=true;$('#login').hidden=false;$('#register').hidden=true;$('#loginError').textContent=msg||'';$('#loginPassword').value=''}
 function afterSignIn(){$('#login').hidden=true;$('#headerTools').hidden=false;const mc=S.user.role==='mission_control';
- $('#who').textContent=S.user.username+' ('+S.user.role.replace('_',' ')+')';$('#demo').hidden=!mc;$('#auditTab').hidden=!mc;$('#opsGroup').hidden=!mc;
+ $('#who').textContent=S.user.username+' ('+S.user.role.replace('_',' ')+')';$('#demo').hidden=!mc;$('#auditTab').hidden=!mc;
  $('#welcomeNote').textContent=mc?'':'No readings are available for your account yet.';$('#demoBig').hidden=!mc;showView('today');return init()}
 async function signIn(){try{S.user=await post('/auth/login',{username:$('#loginUser').value,password:$('#loginPassword').value})}
  catch(e){$('#loginError').textContent=e.message;$('#loginPassword').value='';return}
@@ -349,7 +453,7 @@ async function record(){const box=$('#result'),v=parseFloat($('#formValue').valu
   box.textContent=tag(a)+'. '+a.headline+'. '+a.recommended_actions[0];$('#formValue').value='';await refresh()}
  catch(e){box.style.setProperty('--c','var(--bad)');box.textContent='Not saved: '+e.message}}
 async function demo(){const a=await post('/demo/sample-crew',{});await loadCrew();$('#crew').value=a.id;await refresh()}
-const TOUR=[['Welcome','Use the tabs at the top. Today shows how you are doing, Body explains each part, History shows changes, and Add reading saves a new one.'],['Read the symbols','\u2713 Good, \u25B2 Watch, \u25A0 Urgent. Every status has a symbol and a word, not just a color.'],['Add readings','Use the Add reading tab. The top of the Today tab always tells you what to do next. Press ? any time for help.']];
+const TOUR=[['Welcome','Use the menu on the left. Mission overview shows how you are doing, Body intelligence explains each part, Health trends shows changes, and Daily assessment or Add reading saves new readings.'],['Read the symbols','\u2713 Good, \u25B2 Watch, \u25A0 Urgent. Every status has a symbol and a word, not just a color.'],['Add readings','Use Daily assessment for a full check-in or Add reading for one value. The top of Mission overview always tells you what to do next. Press ? any time for help.']];
 let tourStep=0;
 function showTour(){const t=$('#tour');if(tourStep>=TOUR.length){t.hidden=true;try{localStorage.setItem('tourSeen','1')}catch(e){}return}
  $('#tourTitle').textContent=TOUR[tourStep][0];$('#tourText').textContent=TOUR[tourStep][1];$('#tourNext').textContent=tourStep===TOUR.length-1?'Done':'Next';t.hidden=false;$('#tourNext').focus()}
@@ -373,6 +477,188 @@ $('#demo').addEventListener('click',runDemo);$('#demoBig').addEventListener('cli
 $('#loginBtn').addEventListener('click',signIn);$('#loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('#logout').addEventListener('click',signOut);
 $('#showRegister').addEventListener('click',e=>{e.preventDefault();showRegister()});$('#showLogin').addEventListener('click',e=>{e.preventDefault();showLogin('')});$('#registerBtn').addEventListener('click',register);$('#regPassword').addEventListener('input',updateStrength);$('#regPassword2').addEventListener('keydown',e=>{if(e.key==='Enter')register()});
 api('/auth/me').then(u=>{S.user=u;return afterSignIn()}).catch(()=>{if($('#login').hidden)showLogin('')});
+
+/* ---- Extended dashboard: overview extras, systems, trends, assessment, intelligence, reports, settings ---- */
+S.hist={};S.range='30D';S.wiz={step:0,vals:{},notes:''};
+const GROUPS={heart_rate:'Cardiovascular',systolic_blood_pressure:'Cardiovascular',diastolic_blood_pressure:'Cardiovascular',blood_glucose:'Nutrition',body_temperature:'General',sleep_duration:'Behavioral health',mood_score:'Behavioral health',fatigue_level:'Behavioral health',stress_level:'Behavioral health',physical_activity:'Activity'};
+const SYSTEMS=[
+ {k:'cog',t:'Cognitive & behavioral',i:['mood_score','sleep_duration','fatigue_level','stress_level'],txt:'Sleep, mood, fatigue and stress show how isolation, confinement and odd light cycles affect you.',do:['Keep a regular sleep schedule and a daily routine.','Stay in touch with crewmates and ground support.','Low mood or poor sleep for several days: tell the flight surgeon.']},
+ {k:'cv',t:'Cardiovascular',i:['heart_rate','systolic_blood_pressure','diastolic_blood_pressure'],txt:'In low gravity body fluids shift and the heart works less. Heart rate and blood pressure show how it is coping.',do:['Measure at rest, same arm and position each time.','Complete planned exercise sessions.','Report chest pain, fainting or breathlessness at once.']},
+ {k:'resp',t:'Respiratory',i:[],txt:'This prototype has no breathing reading. Cabin air quality and breathlessness matter in a closed environment.',do:['Report breathlessness, cough or chest tightness to the flight surgeon.','Follow cabin air and dust procedures.']},
+ {k:'bone',t:'Bone health',i:[],txt:'With little load in low gravity, bones lose density over a long mission. This app does not measure bone.',do:['Complete the planned resistance exercise.','Ask about scheduled bone checks with the mission medical tests.']},
+ {k:'musc',t:'Musculoskeletal',i:['physical_activity'],txt:'Muscles weaken without gravity. Exercise minutes are the only related signal tracked here.',do:['Meet the daily exercise plan.','Report new pain, numbness or swelling.']},
+ {k:'nutri',t:'Nutrition & digestive',i:['blood_glucose'],txt:'Limited food variety, stress and activity change blood sugar and nutrition.',do:['Note meals beside each reading.','Low glucose with shakiness: eat quick carbohydrate and contact the flight surgeon.']}];
+REGIONS.head.i=['mood_score','sleep_duration','body_temperature','fatigue_level','stress_level'];
+REGIONS.arms.i=['physical_activity'];REGIONS.legs.i=['physical_activity'];
+const n2=n=>String(n).padStart(2,'0');
+const fmt=v=>Number.isInteger(v)?String(v):String(Math.round(v*10)/10);
+const dayKey=t=>new Date(t).toDateString();
+const sev=a=>a.final_status;
+async function loadHistory(){S.hist={};
+ const rows=await api('/measurements?astronaut_id='+cur()+'&limit=1000');
+ rows.slice().reverse().forEach(r=>{(S.hist[r.indicator_type]=S.hist[r.indicator_type]||[]).push(r)});
+ S.simulated=rows.length>0&&rows.every(r=>r.notes==='Simulated sample data')}
+function inRange(rows){if(S.range==='ALL')return rows;const d={'24H':1,'7D':7,'30D':30}[S.range],t=Date.now()-d*864e5;
+ const f=rows.filter(r=>new Date(r.measured_at).getTime()>=t);return f.length?f:rows.slice(-2)}
+/* generic svg line chart, numbers only so safe for innerHTML */
+function lineSvg(rows,rule,o){o=o||{};const W=o.w||640,H=o.h||230,L=o.small?4:46,B=o.small?4:26,T=o.small?4:10;
+ const vals=rows.map(r=>r.measured_value),lo0=Math.min(...vals,...(rule&&!o.small?[rule.normal_minimum]:[])),hi0=Math.max(...vals,...(rule&&!o.small?[rule.normal_maximum]:[])),pad=(hi0-lo0)*.1||1,lo=lo0-pad,hi=hi0+pad;
+ const y=v=>H-B-(v-lo)/(hi-lo)*(H-B-T),x=i=>L+(rows.length>1?i/(rows.length-1):.5)*(W-L-6);
+ let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="'+(o.label||'Chart')+'">';
+ if(rule&&!o.small)s+='<rect x="'+L+'" y="'+y(Math.min(rule.normal_maximum,hi))+'" width="'+(W-L-6)+'" height="'+Math.max(0,y(Math.max(rule.normal_minimum,lo))-y(Math.min(rule.normal_maximum,hi)))+'" fill="oklch(0.77 0.075 158)" opacity=".2"/>';
+ s+='<polyline fill="none" stroke="oklch(0.94 0.014 92)" stroke-width="'+(o.small?2:2.5)+'" points="'+rows.map((r,i)=>x(i)+','+y(r.measured_value)).join(' ')+'"/>';
+ if(!o.small)rows.forEach((r,i)=>{const out=rule&&(r.measured_value<rule.normal_minimum||r.measured_value>rule.normal_maximum);s+='<circle cx="'+x(i)+'" cy="'+y(r.measured_value)+'" r="4.5" fill="'+(out?'oklch(0.8 0.115 77)':'oklch(0.77 0.075 158)')+'"/>'});
+ else s+='<circle cx="'+x(rows.length-1)+'" cy="'+y(vals[vals.length-1])+'" r="3" fill="oklch(0.77 0.075 158)"/>';
+ if(!o.small){if(rule)s+='<text x="4" y="'+(y(rule.normal_maximum)+4)+'">'+rule.normal_maximum+'</text><text x="4" y="'+(y(rule.normal_minimum)+4)+'">'+rule.normal_minimum+'</text>';
+  s+='<text x="'+L+'" y="'+(H-6)+'">'+rows[0].measured_at.slice(0,10)+'</text><text x="'+(W-6)+'" y="'+(H-6)+'" text-anchor="end">'+rows[rows.length-1].measured_at.slice(0,10)+'</text>'}
+ return s+'</svg>'}
+function trendOf(rows,ind){if(rows.length<2)return{a:'→',w:'steady'};const r=S.rules[ind],d=rows[rows.length-1].measured_value-rows[rows.length-2].measured_value,m=r?r.minimum_meaningful_change:0;
+ if(Math.abs(d)<m)return{a:'→',w:'steady'};return d>0?{a:'↑',w:'rising'}:{a:'↓',w:'falling'}}
+/* ---- overview ---- */
+function dispName(){let d='';try{d=localStorage.getItem('dn:'+S.user.username)||''}catch(e){}return d||(S.crew.find(a=>String(a.id)===cur())||{}).full_name||S.user.username}
+function renderOverview(){const h=new Date().getHours(),g=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+ $('#greeting').textContent=g+', '+dispName().split(' ')[0]+'.';
+ const all=Object.values(S.hist).flat(),today=all.filter(r=>dayKey(r.measured_at)===new Date().toDateString());
+ $('#simBanner').hidden=!S.simulated;$('#dataTag').textContent=S.simulated?'SIMULATED SAMPLE DATA':'YOUR READINGS';
+ const done=assessedToday();$('#stAssess').textContent=done?'Recorded':'Pending';$('#stAssessNote').textContent=done?'You recorded a check-in today':'No check-in recorded today';
+ const last=all.length?all.reduce((m,r)=>r.measured_at>m.measured_at?r:m):null;
+ $('#stLast').textContent=last?new Date(last.measured_at).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'None';$('#stLastNote').textContent=last?name(last.indicator_type):'No readings yet';
+ $('#stTracked').textContent=Object.keys(S.hist).length+' / '+Object.keys(S.ref).length;
+ renderSignals();renderAlerts()}
+function assessedToday(){return Object.values(S.hist).flat().some(r=>dayKey(r.measured_at)===new Date().toDateString())}
+function renderSignals(){const box=$('#signals');box.replaceChildren();let n=0;
+ ['heart_rate','sleep_duration','mood_score','stress_level'].forEach(i=>{const rows=(S.hist[i]||[]).slice(-7);if(rows.length<2||n>=2)return;n++;
+  const w=el('div','spark');const hd=el('div','');hd.append(el('b','',name(i)),el('span','',' last '+rows.length+' readings'));w.append(hd);
+  const c=el('div','');c.innerHTML=lineSvg(rows,null,{small:true,w:300,h:70,label:name(i)+' recent readings'});w.append(c);box.append(w)});
+ if(!n)box.append(el('p','hint','Record readings on two or more days to see recent signals.'))}
+function ackKey(){return 'ack:'+S.user.username+':'+cur()+':'+new Date().toDateString()}
+function getAck(){try{return JSON.parse(localStorage.getItem(ackKey())||'[]')}catch(e){return[]}}
+function setAck(a){try{localStorage.setItem(ackKey(),JSON.stringify(a))}catch(e){}}
+function collectAlerts(){const out=[],ack=getAck();
+ if(S.sum)sorted().filter(a=>a.final_status!=='normal').forEach(a=>out.push({id:'a:'+a.indicator_type+':'+a.measurement_id,sev:a.final_status,t:a.indicator_display_name+': '+a.headline,d:a.recommended_actions[0]||'',ind:a.indicator_type}));
+ if(!assessedToday())out.push({id:'r:daily',sev:'reminder',t:'Daily assessment not recorded',d:'A short check-in keeps your trends complete.',go:'assessment'});
+ return out.filter(x=>!ack.includes(x.id))}
+function renderAlerts(){const box=$('#alerts');box.replaceChildren();const list=collectAlerts();
+ $('#alertCount').textContent=n2(list.length);const bc=$('#bellCount');bc.textContent=String(list.length);bc.hidden=!list.length;
+ if(!list.length)box.append(el('p','hint','Nothing needs attention right now.'));
+ list.forEach(x=>{const d=el('div','alert '+x.sev);const b=el('div','');b.append(el('b','',(x.sev==='critical'?'■ URGENT. ':x.sev==='caution'?'▲ WATCH. ':'• REMINDER. ')+x.t),el('p','',x.d));d.append(b);
+  const bt=el('button','quiet',x.go?'Open':'Got it');bt.type='button';bt.addEventListener('click',()=>{if(x.go){showView(x.go)}else{setAck(getAck().concat(x.id));renderAlerts()}});d.append(bt);box.append(d)})}
+/* ---- metric dialog ---- */
+function openMetric(ind){const a=S.sum.assessments.find(z=>z.indicator_type===ind);if(!a)return;const rows=S.hist[ind]||[];
+ $('#mdGroup').textContent=(GROUPS[ind]||'').toUpperCase();$('#mdTitle').textContent=a.indicator_display_name;$('#mdValue').textContent=fmt(a.measured_value)+' '+a.measurement_unit;
+ $('#mdStatus').textContent=tag(a)+'. '+a.headline;
+ $('#mdChart').innerHTML=rows.length>1?lineSvg(rows.slice(-30),S.rules[ind],{w:520,h:170,label:a.indicator_display_name+' history'}):'';
+ const info=$('#mdInfo');info.replaceChildren();const r=S.rules[ind];
+ [['Healthy range',r.normal_minimum+' to '+r.normal_maximum+' '+r.unit],['Why',a.explanation],['What to do',a.recommended_actions.join(' ')],['Measure it like this',r.measurement_conditions]].forEach(([k,v])=>{const d=el('div','');d.append(el('dt','',k),el('dd','',v));info.append(d)});
+ $('#mdHistory').onclick=()=>{closeMetric();$('#chartIndicator').value=ind;showView('history')};
+ $('#metricDialog').hidden=false;$('#mdClose').focus()}
+const closeMetric=()=>{$('#metricDialog').hidden=true};
+/* ---- cards extras: sparkline, trend, open ---- */
+const _card=card;card=function(a){const c=_card(a);const rows=S.hist[a.indicator_type]||[],t=trendOf(rows,a.indicator_type);
+ const g=el('div','trend',(GROUPS[a.indicator_type]||'').toUpperCase()+'  '+t.a+' '+t.w);c.insertBefore(g,c.children[1]);
+ if(rows.length>1){const sp=el('div','');sp.innerHTML=lineSvg(rows.slice(-10),null,{small:true,w:200,h:36,label:'Sparkline'});c.insertBefore(sp,c.children[2])}
+ const o=el('button','quiet','Open detail');o.type='button';o.addEventListener('click',()=>openMetric(a.indicator_type));c.append(o);return c};
+/* ---- body systems ---- */
+function renderSystems(){const bx=$('#systemButtons');bx.replaceChildren();if(!S.sys)S.sys='cog';
+ SYSTEMS.forEach(s=>{const b=el('button',S.sys===s.k?'':'quiet',s.t);b.type='button';b.setAttribute('aria-pressed',String(S.sys===s.k));b.addEventListener('click',()=>{S.sys=s.k;renderSystems()});bx.append(b)});
+ const s=SYSTEMS.find(z=>z.k===S.sys),box=$('#systemBox');box.replaceChildren(el('h3','',s.t),el('p','',s.txt));
+ const rel=el('p','');rel.append(el('b','','Related readings: '));
+ if(!s.i.length)rel.append(document.createTextNode('none measured in this prototype. Use the mission medical tests.'));
+ else s.i.forEach((i,k)=>{const a=S.sum&&S.sum.assessments.find(z=>z.indicator_type===i);rel.append(document.createTextNode((k?'; ':'')+name(i)+(a?' '+fmt(a.measured_value)+' ('+ST[a.final_status].w+')':' (no reading yet)')))});
+ box.append(rel);const u=el('ul');s.do.forEach(x=>u.append(el('li','',x)));box.append(u)}
+/* ---- trends ---- */
+function renderTrends(){document.querySelectorAll('#rangeButtons button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.range===S.range)));
+ const g=$('#trendGrid');g.replaceChildren();
+ Object.keys(S.ref).forEach(i=>{const rows=inRange(S.hist[i]||[]);const m=el('div','mini');const t=trendOf(rows,i);
+  m.append(el('b','',name(i)),el('span','',rows.length?fmt(rows[rows.length-1].measured_value)+' '+S.ref[i].unit+'  '+t.a:'No readings'));
+  if(rows.length>1){const c=el('div','');c.innerHTML=lineSvg(rows,null,{small:true,w:300,h:60,label:name(i)});m.append(c)}g.append(m)});
+ let best=null;Object.keys(S.hist).forEach(i=>{const rows=inRange(S.hist[i]);if(rows.length<3)return;const r=S.rules[i];if(!r)return;
+  const first=rows[0].measured_value,last=rows[rows.length-1].measured_value,d=last-first;if(Math.abs(d)>=r.minimum_meaningful_change*2){const sc=Math.abs(d)/r.minimum_meaningful_change;if(!best||sc>best.sc)best={i,d,sc,first,last,n:rows.length}}});
+ $('#patternTitle').textContent=best?name(best.i)+' has '+(best.d>0?'risen':'fallen')+' over this period':'No clear pattern yet';
+ $('#patternText').textContent=best?'It moved from '+fmt(best.first)+' to '+fmt(best.last)+' '+S.ref[best.i].unit+' across '+best.n+' readings. This is an observation, not a diagnosis. Discuss lasting changes with the flight surgeon.':'Not enough change across several readings to flag. Keep recording to build your baseline.'}
+const _rc=renderChart;renderChart=async function(){const ind=$('#chartIndicator').value,box=$('#chart'),cap=$('#chartCaption'),rule=S.rules[ind];
+ const rows=inRange(S.hist[ind]||[]);if(rows.length<2){cap.textContent='';box.textContent='Add at least two readings of this to see a chart.';return}
+ const last=rows[rows.length-1];cap.textContent=name(ind)+': latest '+fmt(last.measured_value)+' '+S.ref[ind].unit+'. Healthy range: '+rule.normal_minimum+' to '+rule.normal_maximum+'. Range: '+S.range+'.';
+ box.innerHTML=lineSvg(rows,rule,{label:'Chart of '+name(ind)+' over time'})};
+/* ---- daily assessment wizard ---- */
+const WSTEPS=[['Vitals','Heart rate, blood pressure, glucose, temperature'],['Wellbeing','Mood, sleep, fatigue, stress, activity, symptoms'],['Review','Check and save']];
+const WIZ_VITALS=['heart_rate','systolic_blood_pressure','diastolic_blood_pressure','blood_glucose','body_temperature'];
+const WIZ_WELL=['sleep_duration','mood_score','fatigue_level','stress_level','physical_activity'];
+function renderWizard(){const st=S.wiz.step,box=$('#wizard');box.replaceChildren();
+ $('#wizCount').textContent=n2(st+1)+' / 03';$('#wizBar').style.width=Math.round((st+1)/3*100)+'%';
+ const ws=$('#wizSteps');ws.replaceChildren();WSTEPS.forEach((w,k)=>{const d=el('div',k===st?'on':'');d.append(el('b','',n2(k+1)+' '+w[0]),el('span','',w[1]));ws.append(d)});
+ box.append(el('p','eyebrow','STEP '+n2(st+1)),el('h2','',WSTEPS[st][0]));
+ const mk=i=>{const r=S.ref[i];if(!r)return null;const l=el('label','',r.display_name+' ('+r.unit+')');const inp=el('input');inp.type='number';inp.step='any';inp.id='w-'+i;inp.value=S.wiz.vals[i]!==undefined?S.wiz.vals[i]:'';inp.addEventListener('input',()=>{if(inp.value==='')delete S.wiz.vals[i];else S.wiz.vals[i]=inp.value});l.append(inp);return l};
+ if(st<2){const f=el('div','fields');(st===0?WIZ_VITALS:WIZ_WELL).forEach(i=>{const x=mk(i);if(x)f.append(x)});box.append(f);
+  if(st===1){const l=el('label','','Symptoms or notes (optional, encrypted, 500 characters)');const t=el('textarea');t.id='w-notes';t.maxLength=500;t.rows=3;t.value=S.wiz.notes;t.addEventListener('input',()=>{S.wiz.notes=t.value});l.append(t);box.append(l)}}
+ else{const u=el('ul');const ks=Object.keys(S.wiz.vals);if(!ks.length)u.append(el('li','','Nothing entered yet. Go back to add values.'));
+  ks.forEach(i=>u.append(el('li','',name(i)+': '+S.wiz.vals[i]+' '+S.ref[i].unit)));if(S.wiz.notes)u.append(el('li','','Notes: '+S.wiz.notes));box.append(u)}
+ box.append(el('p','',''));box.lastChild.id='wizMsg';box.lastChild.setAttribute('role','status');
+ const ft=el('div','wfoot');const back=el('button','quiet','Back');back.type='button';back.disabled=st===0;back.addEventListener('click',()=>{S.wiz.step--;renderWizard()});
+ const nx=el('button','',st<2?'Next':'Save assessment');nx.type='button';nx.addEventListener('click',()=>st<2?(S.wiz.step++,renderWizard()):saveWizard());ft.append(back,nx);box.append(ft)}
+async function saveWizard(){const m=$('#wizMsg'),ks=Object.keys(S.wiz.vals);
+ if(!ks.length){m.textContent='Enter at least one value first.';return}
+ const when=new Date(Date.now()-60000).toISOString(),stamp=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+ const items=ks.map((i,k)=>{const o={astronaut_id:+cur(),indicator_type:i,measured_value:parseFloat(S.wiz.vals[i]),measured_at:when,client_reference:'wiz-'+stamp+'-'+i};if(k===0&&S.wiz.notes.trim())o.notes=S.wiz.notes.trim().slice(0,500);return o});
+ if(items.some(o=>Number.isNaN(o.measured_value))){m.textContent='One of the values is not a number.';return}
+ try{const r=await post('/measurements/batch',{measurements:items});
+  if(r.rejected_count){m.textContent='Saved '+r.created_count+'. Not saved: '+r.results.filter(x=>x.rejection_reason).map(x=>x.rejection_reason).join('; ');}
+  else{S.wiz={step:0,vals:{},notes:''};await refresh();showView('today');return}
+  await refresh()}catch(e){m.textContent='Not saved: '+e.message}}
+/* ---- health intelligence (rule-based) ---- */
+function observations(){const o=[];if(!S.sum)return o;
+ sorted().filter(a=>a.final_status!=='normal').forEach(a=>o.push((a.final_status==='critical'?'■ ':'▲ ')+a.indicator_display_name+' is '+ST[a.final_status].w.toLowerCase()+' ('+fmt(a.measured_value)+' '+a.measurement_unit+'). '+a.recommended_actions[0]));
+ Object.keys(S.hist).forEach(i=>{const rows=S.hist[i].slice(-7),r=S.rules[i];if(rows.length<4||!r)return;const d=rows[rows.length-1].measured_value-rows[0].measured_value;if(Math.abs(d)>=r.minimum_meaningful_change*2)o.push(name(i)+' has '+(d>0?'risen':'fallen')+' by '+fmt(Math.abs(d))+' '+S.ref[i].unit+' over the last '+rows.length+' readings.')});
+ if(!assessedToday())o.push('No check-in recorded today.');
+ if(!o.length)o.push('All recorded readings are in the healthy range and no strong patterns stand out.');return o}
+const PROMPTS=[['Review my sleep','sleep_duration'],['How is my mood?','mood_score'],['Stress and fatigue','stress_level'],['Heart and blood pressure','heart_rate'],['What needs attention?','attention']];
+function answer(q){q=q.toLowerCase();const map=[[/sleep|rest|tired/,'sleep_duration'],[/mood|feel|sad|low/,'mood_score'],[/stress|anx/,'stress_level'],[/fatigue/,'fatigue_level'],[/heart|pulse/,'heart_rate'],[/pressure|bp/,'systolic_blood_pressure'],[/glucose|sugar/,'blood_glucose'],[/temp|fever/,'body_temperature'],[/exercise|activity|workout/,'physical_activity']];
+ if(/attention|urgent|worry|concern|wrong/.test(q)||q==='attention')return observations().join(' ');
+ for(const [re,i] of map)if(re.test(q)){const a=S.sum&&S.sum.assessments.find(z=>z.indicator_type===i),rows=S.hist[i]||[];if(!a)return 'No '+name(i).toLowerCase()+' reading is recorded yet. Add one in Daily assessment.';
+  const t=trendOf(rows,i);return name(i)+': latest '+fmt(a.measured_value)+' '+a.measurement_unit+' ('+ST[a.final_status].w+', '+t.w+'). '+a.explanation+' '+a.recommended_actions[0]}
+ return 'I only understand questions about your recorded readings (sleep, mood, stress, fatigue, heart, blood pressure, glucose, temperature, activity) or what needs attention. This is a rule-based reviewer, not an AI model and not a medical decision-maker.'}
+function renderAssistant(){const o=$('#obs');o.replaceChildren();observations().forEach(t=>o.append(el('div','',t)));
+ const p=$('#prompts');if(!p.children.length)PROMPTS.forEach(([t,k])=>{const b=el('button','quiet',t);b.type='button';b.addEventListener('click',()=>{$('#answer').textContent=answer(k)});p.append(b)})}
+/* ---- reports ---- */
+function reportRows(){return Object.keys(S.ref).map(i=>{const a=S.sum&&S.sum.assessments.find(z=>z.indicator_type===i);return{i,a}})}
+function renderReport(){const b=$('#reportBody');b.replaceChildren();const nm=dispName();
+ b.append(el('h2','','Crew health summary: '+nm),el('p','hint','Generated '+new Date().toLocaleString()+(S.simulated?'. Simulated sample data.':'.')));
+ const t=el('table','tbl');const h=el('tr');['Indicator','Latest','Status','Note'].forEach(x=>h.append(el('th','',x)));t.append(h);
+ reportRows().forEach(({i,a})=>{const r=el('tr');[name(i),a?fmt(a.measured_value)+' '+a.measurement_unit:'-',a?tag(a):'No reading',a?a.headline:''].forEach(x=>r.append(el('td','',x)));t.append(r)});b.append(t);
+ b.append(el('h3','','Observations'));const u=el('ul');observations().forEach(x=>u.append(el('li','',x)));b.append(u);
+ b.append(el('p','hint','Educational prototype. Not a clinical record. Flight surgeon guidance takes precedence.'))}
+function download(fn,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=fn;document.body.append(a);a.click();a.remove()}
+function reportText(){let s='ASTRONAUT HEALTH MONITOR - CREW HEALTH SUMMARY\n'+dispName()+'\nGenerated '+new Date().toLocaleString()+(S.simulated?'\nSIMULATED SAMPLE DATA':'')+'\n\n';
+ reportRows().forEach(({i,a})=>{s+=name(i)+': '+(a?fmt(a.measured_value)+' '+a.measurement_unit+' - '+ST[a.final_status].w+'. '+a.headline:'no reading')+'\n'});
+ return s+'\nObservations:\n'+observations().map(x=>'- '+x).join('\n')+'\n\nEducational prototype. Not a clinical record.\n'}
+const csvCell=v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};
+function reportCsv(){const lines=['indicator,value,unit,measured_at,source']; Object.keys(S.hist).forEach(i=>S.hist[i].forEach(r=>lines.push([i,r.measured_value,S.ref[i].unit,r.measured_at,r.measurement_source].map(csvCell).join(','))));return lines.join('\n')+'\n'}
+/* ---- settings ---- */
+function renderSettings(){const u=S.user,d=dispName();$('#setName').textContent=d;$('#setSub').textContent=u.username+' - '+u.role.replace('_',' ');$('#setAvatar').textContent=initials(d);
+ $('#setDisplay').value=(()=>{try{return localStorage.getItem('dn:'+u.username)||''}catch(e){return''}})();$('#setCallsign').value=(()=>{try{return localStorage.getItem('cs:'+u.username)||''}catch(e){return''}})();
+ const t=$('#accountTable');t.replaceChildren();[['Username',u.username],['Role',u.role.replace('_',' ')],['Crew record',d],['Data protection','Names, values and notes encrypted at rest'],['Sessions','Signed out automatically after inactivity']].forEach(([k,v])=>{const r=el('tr');r.append(el('th','',k),el('td','',v));t.append(r)})}
+const initials=s=>(s.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('')||'--').toUpperCase();
+function renderBrief(){const d=dispName();$('#avatar').textContent=initials(d);$('#pbName').textContent=d;let cs='';try{cs=localStorage.getItem('cs:'+S.user.username)||''}catch(e){}$('#pbSub').textContent=cs||S.user.role.replace('_',' ')}
+/* ---- wiring ---- */
+const PATHS={today:'MISSION OVERVIEW',body:'BODY INTELLIGENCE',history:'HEALTH TRENDS',assessment:'DAILY ASSESSMENT',add:'ADD READING',assistant:'HEALTH INTELLIGENCE',hazards:'SPACEFLIGHT HAZARDS',reports:'MISSION REPORTS',settings:'PROFILE & SETTINGS',audit:'AUDIT LOG'};
+const _sv=showView;showView=function(v){_sv(v);$('#crumbPath').textContent='MISSION › '+(PATHS[v]||'');$('#dataTag').hidden=v==='audit'||v==='settings';
+ $('#appFoot').hidden=!S.user;
+ if(S.sum){if(v==='body')renderSystems();else if(v==='history'){renderTrends();renderChart()}else if(v==='assessment')renderWizard();else if(v==='assistant')renderAssistant();else if(v==='reports')renderReport();else if(v==='settings')renderSettings()}};
+const _rf=refresh;refresh=async function(){S.sum=await api('/astronauts/'+cur()+'/health-summary');await loadHistory();
+ renderBanner();renderActions();renderCards();renderRegion();renderOverview();renderBrief();await renderChart();showHelp();
+ const cv=document.querySelector('[data-view]:not([hidden])').dataset.view;if(cv!=='today')showView(cv)};
+$('#goAssessment').addEventListener('click',()=>showView('assessment'));$('#allTrends').addEventListener('click',()=>showView('history'));$('#goBody').addEventListener('click',()=>showView('body'));$('#bodyToHazards').addEventListener('click',()=>showView('hazards'));
+$('#bell').addEventListener('click',()=>{showView('today');$('#alertsPanel').scrollIntoView({block:'center'})});
+$('#mdClose').addEventListener('click',closeMetric);$('#metricDialog').addEventListener('click',e=>{if(e.target.id==='metricDialog')closeMetric()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#metricDialog').hidden)closeMetric()});
+document.querySelectorAll('#rangeButtons button').forEach(b=>b.addEventListener('click',()=>{S.range=b.dataset.range;renderTrends();renderChart()}));
+$('#askForm').addEventListener('submit',e=>{e.preventDefault();const q=$('#askInput').value.trim();if(q)$('#answer').textContent=answer(q)});
+$('#printReport').addEventListener('click',()=>window.print());
+$('#downloadText').addEventListener('click',()=>download('crew-health-summary.txt',reportText(),'text/plain'));
+$('#downloadCsv').addEventListener('click',()=>download('crew-health-readings.csv',reportCsv(),'text/csv'));
+$('#profileForm').addEventListener('submit',e=>{e.preventDefault();try{localStorage.setItem('dn:'+S.user.username,$('#setDisplay').value.trim());localStorage.setItem('cs:'+S.user.username,$('#setCallsign').value.trim())}catch(x){}
+ $('#profileSaved').textContent='Saved on this device.';renderBrief();renderSettings();renderOverview()});
+$('#replayTour').addEventListener('click',openTour);$('#settingsSignOut').addEventListener('click',signOut);
 </script>
 </body>
 </html>

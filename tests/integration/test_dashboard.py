@@ -124,3 +124,14 @@ def test_revamped_dashboard_has_sidebar_hazards_and_readiness_ring(api_client: T
         assert hazard in page
     assert 'id="ringFg"' in page and 'id="printBtn"' in page and 'id="linkState"' in page
     assert "https://" not in page.replace("http://127.0.0.1", "")  # still fully offline: no external resources
+
+
+def test_dashboard_has_every_planned_view_and_feature(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for view in ("today", "body", "history", "assessment", "add", "assistant", "hazards", "reports", "settings", "audit"):
+        assert f'data-view="{view}"' in page and f'data-go="{view}"' in page
+    for element in ("metricDialog", "systemButtons", "trendGrid", "rangeButtons", "wizard", "askForm", "bellCount"):
+        assert f'id="{element}"' in page
+    assert "rule-based" in page or "not an AI model" in page
+    assert "NO AUTOMATED DIAGNOSIS" in page and "SIMULATED SAMPLE DATA" in page
+    assert "/measurements/batch" in page  # the daily assessment saves in one batch

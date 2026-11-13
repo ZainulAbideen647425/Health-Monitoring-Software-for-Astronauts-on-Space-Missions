@@ -160,6 +160,51 @@ HEALTH_STATUS_RULES: dict[HealthIndicatorType, HealthStatusRule] = {
         ),
         source_urls=(),
     ),
+    HealthIndicatorType.FATIGUE_LEVEL: HealthStatusRule(
+        indicator_type=HealthIndicatorType.FATIGUE_LEVEL,
+        normal_minimum=1,
+        normal_maximum=5,
+        critical_below=None,
+        critical_above=8,
+        minimum_meaningful_change=2,
+        measurement_conditions="Self-rated from 1 (no tiredness) to 10 (exhausted), at a consistent time of day.",
+        source_notes=(
+            "This is a self-report scale designed for this prototype, not a diagnostic instrument. "
+            "NASA's Human Research Program lists fatigue from sleep loss and workload as a spaceflight risk, so "
+            "high scores prompt rest and, when severe, contact with the flight surgeon."
+        ),
+        source_urls=(),
+    ),
+    HealthIndicatorType.STRESS_LEVEL: HealthStatusRule(
+        indicator_type=HealthIndicatorType.STRESS_LEVEL,
+        normal_minimum=1,
+        normal_maximum=5,
+        critical_below=None,
+        critical_above=8,
+        minimum_meaningful_change=2,
+        measurement_conditions="Self-rated from 1 (calm) to 10 (extreme stress), at a consistent time of day.",
+        source_notes=(
+            "This is a self-report scale designed for this prototype, not a diagnostic instrument. "
+            "NASA's Human Research Program identifies isolation, confinement and distance from Earth as "
+            "behavioral health hazards, so high scores prompt support early."
+        ),
+        source_urls=(),
+    ),
+    HealthIndicatorType.PHYSICAL_ACTIVITY: HealthStatusRule(
+        indicator_type=HealthIndicatorType.PHYSICAL_ACTIVITY,
+        normal_minimum=30,
+        normal_maximum=240,
+        critical_below=None,
+        critical_above=None,
+        minimum_meaningful_change=30,
+        measurement_conditions="Total minutes of planned exercise completed in the current day.",
+        source_notes=(
+            "Crews on the International Space Station exercise roughly two hours a day to limit bone and muscle "
+            "loss (NASA Human Research Program). On Earth the WHO advises adults at least 150 minutes of "
+            "moderate activity a week. 30 to 240 minutes a day is used here as the expected range for this prototype."
+        ),
+        source_urls=("https://www.who.int/news-room/fact-sheets/detail/physical-activity",),
+    ),
 }
 
 

@@ -106,6 +106,39 @@ HEALTH_INDICATOR_REFERENCES: dict[HealthIndicatorType, HealthIndicatorReference]
             "Isolation, confinement and distance from Earth are linked to behavioral health risks."
         ),
     ),
+    HealthIndicatorType.FATIGUE_LEVEL: HealthIndicatorReference(
+        indicator_type=HealthIndicatorType.FATIGUE_LEVEL,
+        display_name="Fatigue level",
+        unit="score from 1 (none) to 10 (exhausted)",
+        minimum_plausible_value=1,
+        maximum_plausible_value=10,
+        how_to_measure="Rate how tired you feel right now on the 1 to 10 scale.",
+        why_it_matters_in_spaceflight=(
+            "Disturbed sleep, workload and altered gravity increase fatigue, which affects safety and performance."
+        ),
+    ),
+    HealthIndicatorType.STRESS_LEVEL: HealthIndicatorReference(
+        indicator_type=HealthIndicatorType.STRESS_LEVEL,
+        display_name="Stress level",
+        unit="score from 1 (calm) to 10 (extreme stress)",
+        minimum_plausible_value=1,
+        maximum_plausible_value=10,
+        how_to_measure="Rate how stressed you feel right now on the 1 to 10 scale.",
+        why_it_matters_in_spaceflight=(
+            "Confinement, risk and distance from home are stressors, and long-lasting stress affects sleep and health."
+        ),
+    ),
+    HealthIndicatorType.PHYSICAL_ACTIVITY: HealthIndicatorReference(
+        indicator_type=HealthIndicatorType.PHYSICAL_ACTIVITY,
+        display_name="Physical activity",
+        unit="minutes of exercise today",
+        minimum_plausible_value=0,
+        maximum_plausible_value=600,
+        how_to_measure="Add up the minutes of planned exercise you completed today.",
+        why_it_matters_in_spaceflight=(
+            "In low gravity bones and muscles weaken without regular loading, so crews exercise every day."
+        ),
+    ),
 }
 
 

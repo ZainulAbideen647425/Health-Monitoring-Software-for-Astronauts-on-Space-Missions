@@ -28,6 +28,9 @@ def _simulated_value(day_index: int, indicator: HealthIndicatorType) -> float:
         HealthIndicatorType.BODY_TEMPERATURE: 36.6 + (day_index % 3) / 10,
         HealthIndicatorType.SLEEP_DURATION: 7.5 - late * 0.8 if late else 7.6,
         HealthIndicatorType.MOOD_SCORE: 8 - late,
+        HealthIndicatorType.FATIGUE_LEVEL: 3 + late,
+        HealthIndicatorType.STRESS_LEVEL: 3 + (day_index % 2) + (late // 2),
+        HealthIndicatorType.PHYSICAL_ACTIVITY: 120 - late * 10 + (day_index % 3) * 5,
     }
     return float(values[indicator])
 
