@@ -10,6 +10,14 @@ their status at a glance and suggests actions.
 > **Disclaimer:** This is an educational prototype for a hackathon. It is not a medical device and must not be
 > used for real medical decisions.
 
+## Screenshots
+
+![Mission overview](docs/screenshots/today.png)
+![Body intelligence](docs/screenshots/body.png)
+![Health trends](docs/screenshots/history.png)
+
+Release material: [demo script](docs/release/demo_script.md), [pitch](docs/release/pitch.md), [submission description](docs/release/submission_description.md).
+
 ## Project status
 
 | Phase | Content | Status |
