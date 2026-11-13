@@ -1,3 +1,6 @@
+import sqlite3
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -129,3 +132,25 @@ def test_demo_mode_creates_demo_accounts_for_every_role() -> None:
 
 def test_demo_endpoint_is_unavailable_when_demo_mode_is_off(api_client: TestClient) -> None:
     assert api_client.post("/demo/sample-crew").status_code == 404
+
+
+def test_unreadable_stored_data_gives_a_clear_error_not_a_blank_failure(tmp_path: Path) -> None:
+    from astronaut_health_monitor.core.field_encryption import generate_encryption_key
+
+    database_url = f"sqlite:///{tmp_path / 'legacy.db'}"
+    settings = ApplicationSettings(encryption_key=generate_encryption_key())
+    with TestClient(create_application(database_url, settings)) as setup_client:
+        setup_client.get("/health")
+    connection = sqlite3.connect(tmp_path / "legacy.db")
+    connection.execute(
+        "INSERT INTO astronauts(full_name, mission_role, created_at) VALUES (?, ?, ?)",
+        ("Plain Name", "Pilot", "2026-11-05 10:00:00"),
+    )
+    connection.commit()
+    connection.close()
+    with TestClient(create_application(database_url, settings)) as client:
+        create_account(client, "ada", UserRole.MISSION_CONTROL)
+        sign_in(client, "ada")
+        response = client.get("/astronauts")
+    assert response.status_code == 500
+    assert "delete the file" in response.json()["detail"]

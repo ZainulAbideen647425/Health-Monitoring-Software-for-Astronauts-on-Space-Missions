@@ -216,8 +216,10 @@ function showLogin(msg){S.user=null;S.crew=[];S.sum=null;S.region=null;
 function afterSignIn(){$('#login').hidden=true;$('#headerTools').hidden=false;const mc=S.user.role==='mission_control';
  $('#who').textContent=S.user.username+' ('+S.user.role.replace('_',' ')+')';$('#demo').hidden=!mc;$('#auditTab').hidden=!mc;$('#opsGroup').hidden=!mc;
  $('#welcomeNote').textContent=mc?'':'No readings are available for your account yet.';$('#demoBig').hidden=!mc;showView('today');return init()}
-async function signIn(){try{S.user=await post('/auth/login',{username:$('#loginUser').value,password:$('#loginPassword').value});$('#loginUser').value='';await afterSignIn()}
- catch(e){$('#loginError').textContent=e.message;$('#loginPassword').value=''}}
+async function signIn(){try{S.user=await post('/auth/login',{username:$('#loginUser').value,password:$('#loginPassword').value})}
+ catch(e){$('#loginError').textContent=e.message;$('#loginPassword').value='';return}
+ $('#loginUser').value='';
+ try{await afterSignIn()}catch(e){showLogin('You signed in, but your data could not be loaded: '+e.message)}}
 function showRegister(){$('#login').hidden=true;$('#register').hidden=false;$('#registerError').textContent='';$('#regName').focus()}
 function passwordChecks(pw){return{length:pw.length>=8,upper:/[A-Z]/.test(pw),lower:/[a-z]/.test(pw),special:/[^A-Za-z0-9]/.test(pw),number:/[0-9]/.test(pw),long:pw.length>=12}}
 function updateStrength(){const pw=$('#regPassword').value,c=passwordChecks(pw),req=['length','upper','lower','special'],met=req.filter(k=>c[k]).length,bonus=(c.number?1:0)+(c.long?1:0);
