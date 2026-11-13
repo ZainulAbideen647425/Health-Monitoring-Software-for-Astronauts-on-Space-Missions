@@ -11,7 +11,7 @@ On a Mars mission, a message to Earth takes up to 22 minutes each way. Astronaut
 2. **Explainable AI**: transparent rules with cited sources decide the safety status; scikit-learn models (Isolation Forest, linear regression) trained on each astronaut's own history add unusual-day flags and a 3-day risk forecast, always labelled as flags, not diagnoses.
 3. **Safe by design**: encrypted data, roles, tamper-evident audit log, honest limits.
 4. **Accessible**: symbol and word beside every colour, keyboard and screen-reader friendly.
-5. **Tested**: 274 automated tests, 98% coverage, type-checked, CI on every push.
+5. **Tested**: 289 automated tests, 98% coverage, type-checked, CI on every push.
 
 ## Honest limits
 Educational prototype using reference ranges. Not a medical device. The models are small and trained on one person's own history, so they need about 7 to 10 days of readings before they speak. They have not been clinically validated.

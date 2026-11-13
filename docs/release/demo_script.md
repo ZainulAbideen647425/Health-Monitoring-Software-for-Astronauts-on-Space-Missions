@@ -13,4 +13,4 @@ Start: `ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true python -m uvicorn astronaut_heal
 | 2:15 | "Rules decide the status. Machine-learning models trained on this astronaut's own history flag unusual days and forecast risk three days ahead." | **Health intelligence**: show **Model flags** (unusual days, 3-day forecast), then ask "how is my sleep". |
 | 2:30 | "It works with no link to Earth. Readings queue locally and sync without duplicates." | Open `docs/resilience.md` table or run `pytest tests/integration/test_resilience.py -q`. |
 | 2:45 | "Roles, encrypted data and a tamper-evident audit log protect crew privacy." | **Audit log** shows "The log is intact". |
-| 2:55 | "Open source, 274 tests, built solo." | Show GitHub repo. |
+| 2:55 | "Open source, 289 tests, built solo." | Show GitHub repo. |
