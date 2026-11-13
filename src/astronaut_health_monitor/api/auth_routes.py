@@ -19,11 +19,12 @@ from astronaut_health_monitor.api.schemas import (
     AuditEventResponse,
     AuditLogResponse,
     LoginRequest,
+    RegistrationRequest,
     UserCreateRequest,
     UserResponse,
 )
 from astronaut_health_monitor.domain.authenticated_user import AuthenticatedUser
-from astronaut_health_monitor.domain.exceptions import DemoModeDisabledError
+from astronaut_health_monitor.domain.exceptions import DemoModeDisabledError, RegistrationDisabledError
 from astronaut_health_monitor.domain.permissions import Permission
 from astronaut_health_monitor.services.authentication_service import SESSION_ABSOLUTE_LIFETIME
 from astronaut_health_monitor.services.demo_data_service import DemoDataService
@@ -40,15 +41,7 @@ def _describe(user: AuthenticatedUser) -> UserResponse:
     return UserResponse(username=user.username, role=user.role, astronaut_id=user.astronaut_id)
 
 
-@router.post("/auth/login", response_model=UserResponse, tags=["authentication"])
-def sign_in(
-    credentials: LoginRequest,
-    request: Request,
-    response: Response,
-    authentication_service: AuthenticationServiceDependency,
-) -> UserResponse:
-    """Check the username and password. On success a session cookie is set that scripts on the page cannot read."""
-    token, user = authentication_service.login(credentials.username, credentials.password)
+def _set_session_cookie(request: Request, response: Response, token: str) -> None:
     response.set_cookie(
         SESSION_COOKIE_NAME,
         token,
@@ -58,6 +51,38 @@ def sign_in(
         secure=request.app.state.settings.secure_cookies,
         path="/",
     )
+
+
+@router.post("/auth/login", response_model=UserResponse, tags=["authentication"])
+def sign_in(
+    credentials: LoginRequest,
+    request: Request,
+    response: Response,
+    authentication_service: AuthenticationServiceDependency,
+) -> UserResponse:
+    """Check the username and password. On success a session cookie is set that scripts on the page cannot read."""
+    token, user = authentication_service.login(credentials.username, credentials.password)
+    _set_session_cookie(request, response, token)
+    return _describe(user)
+
+
+@router.post("/auth/register", response_model=UserResponse, status_code=201, tags=["authentication"])
+def register(
+    details: RegistrationRequest,
+    request: Request,
+    response: Response,
+    authentication_service: AuthenticationServiceDependency,
+    audit_service: AuditServiceDependency,
+) -> UserResponse:
+    """Create your own astronaut account and sign in. Only astronaut accounts can be created this way."""
+    if not request.app.state.settings.allow_self_registration:
+        raise RegistrationDisabledError("Self-registration is switched off. Ask mission control for an account.")
+    created = authentication_service.register_astronaut_account(
+        details.username, details.password, details.full_name, details.mission_role
+    )
+    audit_service.record("user.self_registered", username=created.username, target=f"astronaut:{created.astronaut_id}")
+    token, user = authentication_service.login(details.username, details.password)
+    _set_session_cookie(request, response, token)
     return _describe(user)
 
 

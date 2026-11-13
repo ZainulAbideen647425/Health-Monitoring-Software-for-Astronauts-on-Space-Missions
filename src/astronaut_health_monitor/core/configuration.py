@@ -16,6 +16,7 @@ class ApplicationSettings(BaseSettings):
     encryption_key_file: str = ".data_encryption_key"
     secure_cookies: bool = False
     demo_mode: bool = False
+    allow_self_registration: bool = True
 
 
 @lru_cache

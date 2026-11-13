@@ -18,6 +18,7 @@ from astronaut_health_monitor.domain.exceptions import (
     AuthenticationFailedError,
     AuthenticationRequiredError,
     InvalidUserDetailsError,
+    UserAlreadyExistsError,
 )
 from astronaut_health_monitor.repositories.astronaut_repository import AstronautRepository
 from astronaut_health_monitor.repositories.database_records import UserRecord
@@ -61,6 +62,25 @@ class AuthenticationService:
         elif astronaut_id is not None:
             raise InvalidUserDetailsError("Only astronaut accounts can be linked to an astronaut.")
         return self._user_repository.add_user(username, hash_password(password), role.value, astronaut_id)
+
+    def register_astronaut_account(self, username: str, password: str, full_name: str, mission_role: str) -> UserRecord:
+        """Self-registration. Always creates an astronaut-role account with its own new crew record.
+
+        Clinician and mission-control accounts can never be created this way.
+        """
+        username = username.strip().lower()
+        full_name = full_name.strip()
+        if not full_name:
+            raise InvalidUserDetailsError("Full name is required.")
+        if not USERNAME_PATTERN.match(username):
+            raise InvalidUserDetailsError(
+                "Username must be 3 to 64 characters: letters, digits, dot, dash or underscore."
+            )
+        validate_password_strength(password)
+        if self._user_repository.get_user_by_username(username) is not None:
+            raise UserAlreadyExistsError(f"User {username!r} already exists.")
+        astronaut = self._astronaut_repository.add_astronaut(full_name, mission_role.strip() or "Crew member", None)
+        return self.create_user(username, password, UserRole.ASTRONAUT, astronaut.id)
 
     def login(self, username: str, password: str) -> tuple[str, AuthenticatedUser]:
         """Check the credentials and start a session. Returns the session token and the user."""
