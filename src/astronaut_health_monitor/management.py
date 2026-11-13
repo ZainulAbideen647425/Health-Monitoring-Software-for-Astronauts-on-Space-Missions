@@ -47,7 +47,7 @@ def create_user_from_command_line(arguments: Sequence[str], password: str | None
     engine = create_database_engine(settings.database_url)
     create_all_tables(engine)
     if password is None:
-        password = getpass.getpass("Password (at least 12 characters): ")
+        password = getpass.getpass("Password (8+ characters, upper and lower case, one special character): ")
         if getpass.getpass("Repeat password: ") != password:
             print("The passwords do not match.", file=sys.stderr)
             return 1

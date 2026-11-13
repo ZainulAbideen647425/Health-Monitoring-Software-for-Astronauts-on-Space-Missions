@@ -24,6 +24,7 @@ from astronaut_health_monitor.api.schemas import (
     UserResponse,
 )
 from astronaut_health_monitor.domain.authenticated_user import AuthenticatedUser
+from astronaut_health_monitor.domain.enumerations import UserRole
 from astronaut_health_monitor.domain.exceptions import DemoModeDisabledError, RegistrationDisabledError
 from astronaut_health_monitor.domain.permissions import Permission
 from astronaut_health_monitor.services.authentication_service import SESSION_ABSOLUTE_LIFETIME
@@ -70,20 +71,17 @@ def sign_in(
 def register(
     details: RegistrationRequest,
     request: Request,
-    response: Response,
     authentication_service: AuthenticationServiceDependency,
     audit_service: AuditServiceDependency,
 ) -> UserResponse:
-    """Create your own astronaut account and sign in. Only astronaut accounts can be created this way."""
+    """Create your own astronaut account. You are not signed in yet: sign in afterwards with the new credentials."""
     if not request.app.state.settings.allow_self_registration:
         raise RegistrationDisabledError("Self-registration is switched off. Ask mission control for an account.")
     created = authentication_service.register_astronaut_account(
         details.username, details.password, details.full_name, details.mission_role
     )
     audit_service.record("user.self_registered", username=created.username, target=f"astronaut:{created.astronaut_id}")
-    token, user = authentication_service.login(details.username, details.password)
-    _set_session_cookie(request, response, token)
-    return _describe(user)
+    return UserResponse(username=created.username, role=UserRole.ASTRONAUT, astronaut_id=created.astronaut_id)
 
 
 @router.post("/auth/logout", tags=["authentication"])

@@ -81,13 +81,20 @@ export ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true     # Windows PowerShell: $env:AS
 python -m astronaut_health_monitor
 ```
 
-Open http://127.0.0.1:8000/ and sign in with password `demo-passphrase-2026` as:
+Open http://127.0.0.1:8000/ and sign in with password `Demo-Passphrase-2026!` as:
 
 | Username | Role | What you can do |
 |---|---|---|
 | `astronaut.demo` | astronaut | see and add your own readings only |
 | `clinician.demo` | clinician | see and add readings for every crew member |
 | `control.demo` | mission control | everything, plus users, crew, sample data and the audit log |
+
+### Creating your own account
+
+On the sign-in screen click **Register**. You choose a username and a password (at least 8 characters with an uppercase
+letter, a lowercase letter and a special character; a live meter shows weak, average or strong). The account is always an
+astronaut account that sees only its own data. After registering you are taken back to the sign-in screen to sign in.
+Switch this off with `ASTRONAUT_HEALTH_MONITOR_ALLOW_SELF_REGISTRATION=false`.
 
 ### Real accounts (no demo mode)
 

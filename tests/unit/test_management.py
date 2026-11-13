@@ -22,7 +22,7 @@ def isolated_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterat
 
 def test_command_line_creates_a_user_and_audits_it(isolated_settings: Path, capsys: pytest.CaptureFixture[str]) -> None:
     code = create_user_from_command_line(
-        ["create-user", "--username", "control.lead", "--role", "mission_control"], password="a-long-test-passphrase"
+        ["create-user", "--username", "control.lead", "--role", "mission_control"], password="A-long-test-passphrase1"
     )
     assert code == 0
     assert "Created mission_control account 'control.lead'" in capsys.readouterr().out
@@ -36,7 +36,7 @@ def test_command_line_reports_bad_details_without_crashing(
     isolated_settings: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     code = create_user_from_command_line(
-        ["create-user", "--username", "ada", "--role", "astronaut"], password="a-long-test-passphrase"
+        ["create-user", "--username", "ada", "--role", "astronaut"], password="A-long-test-passphrase1"
     )
     assert code == 1
     assert "linked to an existing astronaut" in capsys.readouterr().err

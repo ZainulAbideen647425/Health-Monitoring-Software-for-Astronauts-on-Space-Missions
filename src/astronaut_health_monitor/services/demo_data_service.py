@@ -11,7 +11,7 @@ from astronaut_health_monitor.services.measurement_service import MeasurementSer
 
 SIMULATED_DATA_LABEL = "Simulated sample data"
 # Demo accounts exist only when demo mode is switched on. The password is public, so never use demo mode for real data.
-DEMO_PASSWORD = "demo-passphrase-2026"
+DEMO_PASSWORD = "Demo-Passphrase-2026!"
 DEMO_ASTRONAUT_USERNAME = "astronaut.demo"
 DEMO_CLINICIAN_USERNAME = "clinician.demo"
 DEMO_MISSION_CONTROL_USERNAME = "control.demo"

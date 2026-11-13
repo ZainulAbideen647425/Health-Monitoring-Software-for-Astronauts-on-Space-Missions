@@ -8,24 +8,29 @@ from tests.conftest import TEST_PASSWORD, create_account, sign_in
 REGISTRATION = {"username": "New.Crew", "password": TEST_PASSWORD, "full_name": "Nora Crew", "mission_role": "Pilot"}
 
 
-def test_registering_creates_an_astronaut_account_and_signs_in(raw_client: TestClient) -> None:
+def test_registering_creates_an_astronaut_account_but_does_not_sign_in(raw_client: TestClient) -> None:
     response = raw_client.post("/auth/register", json=REGISTRATION)
     assert response.status_code == 201
     body = response.json()
     assert body["username"] == "new.crew"
     assert body["role"] == "astronaut"
     assert body["astronaut_id"] is not None
+    assert "set-cookie" not in response.headers
+    assert raw_client.get("/auth/me").status_code == 401
+    sign_in(raw_client, "new.crew")
     assert raw_client.get("/auth/me").json()["username"] == "new.crew"
 
 
 def test_a_registered_astronaut_sees_only_their_own_record(raw_client: TestClient) -> None:
     raw_client.post("/auth/register", json=REGISTRATION)
+    sign_in(raw_client, "new.crew")
     names = [crew["full_name"] for crew in raw_client.get("/astronauts").json()]
     assert names == ["Nora Crew"]
 
 
 def test_registered_account_can_sign_in_again_after_signing_out(raw_client: TestClient) -> None:
     raw_client.post("/auth/register", json=REGISTRATION)
+    sign_in(raw_client, "new.crew")
     raw_client.post("/auth/logout")
     assert raw_client.get("/auth/me").status_code == 401
     sign_in(raw_client, "new.crew")
@@ -45,6 +50,8 @@ def test_username_already_taken_is_refused_and_no_extra_crew_record_is_left(
 
 def test_weak_password_and_bad_username_are_refused(raw_client: TestClient) -> None:
     assert raw_client.post("/auth/register", json={**REGISTRATION, "password": "short"}).status_code == 422
+    for weak in ("alllowercase-1", "ALLUPPERCASE-1", "NoSpecialChar1"):
+        assert raw_client.post("/auth/register", json={**REGISTRATION, "password": weak}).status_code == 422
     assert raw_client.post("/auth/register", json={**REGISTRATION, "username": "no spaces!"}).status_code == 422
     assert raw_client.post("/auth/register", json={**REGISTRATION, "full_name": "   "}).status_code == 422
 
@@ -53,6 +60,7 @@ def test_registration_cannot_choose_a_role(raw_client: TestClient) -> None:
     response = raw_client.post("/auth/register", json={**REGISTRATION, "role": "mission_control"})
     assert response.status_code == 201
     assert response.json()["role"] == "astronaut"
+    sign_in(raw_client, "new.crew")
     assert raw_client.get("/audit-log").status_code == 403
 
 
@@ -73,3 +81,4 @@ def test_dashboard_offers_registration(raw_client: TestClient) -> None:
     page = raw_client.get("/").text
     assert 'id="showRegister"' in page
     assert 'id="registerBtn"' in page
+    assert 'id="strengthLabel"' in page and 'id="strengthBar"' in page

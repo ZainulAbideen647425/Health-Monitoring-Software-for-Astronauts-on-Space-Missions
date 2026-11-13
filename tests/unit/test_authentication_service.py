@@ -24,7 +24,7 @@ from astronaut_health_monitor.services.authentication_service import (
     AuthenticationService,
 )
 
-PASSWORD = "a-long-test-passphrase"
+PASSWORD = "A-long-test-passphrase1"
 
 
 class MutableClock:

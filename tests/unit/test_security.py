@@ -32,11 +32,19 @@ def test_malformed_stored_hash_simply_fails(broken_hash: str) -> None:
 
 
 def test_password_strength_rules() -> None:
-    validate_password_strength("a" * 6 + "bcdef" + "ghi")
-    with pytest.raises(InvalidUserDetailsError, match="at least"):
-        validate_password_strength("short")
+    assert MINIMUM_PASSWORD_LENGTH == 8
+    validate_password_strength("Abcdef-1")
+    validate_password_strength("Abcdefg h")
+    with pytest.raises(InvalidUserDetailsError, match="at least 8"):
+        validate_password_strength("Ab-1xyz")
+    with pytest.raises(InvalidUserDetailsError, match="uppercase"):
+        validate_password_strength("abcdef-1")
+    with pytest.raises(InvalidUserDetailsError, match="lowercase"):
+        validate_password_strength("ABCDEF-1")
+    with pytest.raises(InvalidUserDetailsError, match="special"):
+        validate_password_strength("Abcdefg1")
     with pytest.raises(InvalidUserDetailsError, match="different characters"):
-        validate_password_strength("a" * MINIMUM_PASSWORD_LENGTH)
+        validate_password_strength("Aa-" + "a" * 8)
 
 
 def test_session_tokens_are_random_and_only_their_hash_is_kept() -> None:

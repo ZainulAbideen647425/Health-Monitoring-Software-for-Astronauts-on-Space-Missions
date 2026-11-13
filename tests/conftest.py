@@ -21,7 +21,7 @@ from astronaut_health_monitor.repositories.user_repository import UserRepository
 from astronaut_health_monitor.services.audit_service import AuditService
 from astronaut_health_monitor.services.authentication_service import AuthenticationService
 
-TEST_PASSWORD = "a-long-test-passphrase"
+TEST_PASSWORD = "A-long-test-passphrase1"
 
 
 @pytest.fixture(autouse=True)

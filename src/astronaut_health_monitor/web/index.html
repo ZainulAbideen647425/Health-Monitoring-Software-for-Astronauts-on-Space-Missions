@@ -50,6 +50,13 @@ svg .tag{fill:#fff;font-size:15px;font-weight:700;paint-order:stroke;stroke:#061
 #tour .box{background:var(--panel);border:2px solid var(--accent);border-radius:var(--r);padding:24px;max-width:460px}
 kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:0 6px}.big{font-size:1.1rem}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+.meter{height:10px;border-radius:99px;background:var(--panel2);overflow:hidden;margin-top:6px}
+.meter>span{display:block;height:100%;width:0;border-radius:99px;background:var(--bad);transition:width .2s,background .2s}
+.meter-label{font-weight:700;margin-top:6px}
+.rules{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:3px;font-size:.92rem}
+.rules li{color:var(--muted)}.rules li::before{content:"\25CB  "}
+.rules li.met{color:var(--ok)}.rules li.met::before{content:"\2713  "}
+@media (prefers-reduced-motion:reduce){.meter>span{transition:none}}
 </style>
 </head>
 <body>
@@ -70,11 +77,14 @@ kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:
 <button id="loginBtn" type="button">Sign in</button></div><p id="loginError" role="alert"></p>
 <p class="hint" id="registerPrompt">Don't have an account? <a href="#" id="showRegister">Register</a></p></section>
 <section id="register" class="panel" hidden style="max-width:440px;margin:0 auto;width:100%">
-<h2>Create your account</h2><p class="hint">This creates a crew member account that can see and record only your own health data.</p>
+<h2>Create your account</h2><p class="hint">This creates a crew member account that can see and record only your own health data. After creating it, you sign in.</p>
 <div class="steps" style="grid-template-columns:1fr"><div><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="120"></div>
 <div><label for="regRole">Mission role (optional)</label><input id="regRole" placeholder="Crew member" maxlength="80"></div>
 <div><label for="regUser">Username</label><input id="regUser" autocomplete="username" autocapitalize="none" maxlength="64"><span class="hint">3 to 64 characters: letters, digits, dot, dash or underscore.</span></div>
-<div><label for="regPassword">Password</label><input id="regPassword" type="password" autocomplete="new-password"><span class="hint">At least 12 characters.</span></div>
+<div><label for="regPassword">Password</label><input id="regPassword" type="password" autocomplete="new-password">
+<div class="meter" aria-hidden="true"><span id="strengthBar"></span></div>
+<div class="meter-label" id="strengthLabel" aria-live="polite">Password strength: enter a password</div>
+<ul class="rules" id="passwordRules"><li data-rule="length">At least 8 characters</li><li data-rule="upper">An uppercase letter (A-Z)</li><li data-rule="lower">A lowercase letter (a-z)</li><li data-rule="special">A special character, for example ! @ # - _</li><li data-rule="bonus">Stronger: also a number and 12 or more characters</li></ul></div>
 <div><label for="regPassword2">Repeat password</label><input id="regPassword2" type="password" autocomplete="new-password"></div>
 <button id="registerBtn" type="button">Create account</button></div><p id="registerError" role="alert"></p>
 <p class="hint">Already have an account? <a href="#" id="showLogin">Sign in</a></p></section>
@@ -143,10 +153,20 @@ function afterSignIn(){$('#login').hidden=true;$('#headerTools').hidden=false;co
 async function signIn(){try{S.user=await post('/auth/login',{username:$('#loginUser').value,password:$('#loginPassword').value});$('#loginUser').value='';await afterSignIn()}
  catch(e){$('#loginError').textContent=e.message;$('#loginPassword').value=''}}
 function showRegister(){$('#login').hidden=true;$('#register').hidden=false;$('#registerError').textContent='';$('#regName').focus()}
+function passwordChecks(pw){return{length:pw.length>=8,upper:/[A-Z]/.test(pw),lower:/[a-z]/.test(pw),special:/[^A-Za-z0-9]/.test(pw),number:/[0-9]/.test(pw),long:pw.length>=12}}
+function updateStrength(){const pw=$('#regPassword').value,c=passwordChecks(pw),req=['length','upper','lower','special'],met=req.filter(k=>c[k]).length,bonus=(c.number?1:0)+(c.long?1:0);
+ for(const li of document.querySelectorAll('#passwordRules li')){const k=li.dataset.rule;li.classList.toggle('met',k==='bonus'?bonus===2:c[k])}
+ let label,color,width;
+ if(!pw){label='Password strength: enter a password';color='var(--bad)';width=0}
+ else if(met<4){label='Weak password';color='var(--bad)';width=met*20}
+ else if(bonus<2){label='Average password (meets the requirements)';color='var(--warn)';width=80}
+ else{label='Strong password';color='var(--ok)';width=100}
+ $('#strengthBar').style.width=width+'%';$('#strengthBar').style.background=color;$('#strengthLabel').textContent=label;$('#strengthLabel').style.color=pw?color:''}
 async function register(){const pw=$('#regPassword').value;
  if(pw!==$('#regPassword2').value){$('#registerError').textContent='The two passwords do not match.';return}
- try{S.user=await post('/auth/register',{username:$('#regUser').value,password:pw,full_name:$('#regName').value,mission_role:$('#regRole').value.trim()||'Crew member'});
-  for(const id of ['#regName','#regRole','#regUser','#regPassword','#regPassword2'])$(id).value='';$('#register').hidden=true;await afterSignIn()}
+ try{const made=await post('/auth/register',{username:$('#regUser').value,password:pw,full_name:$('#regName').value,mission_role:$('#regRole').value.trim()||'Crew member'});
+  for(const id of ['#regName','#regRole','#regUser','#regPassword','#regPassword2'])$(id).value='';updateStrength();
+  showLogin('Account created. Now sign in with your new username and password.');$('#loginUser').value=made.username;$('#loginPassword').focus()}
  catch(e){$('#registerError').textContent=e.message;$('#regPassword').value='';$('#regPassword2').value=''}}
 async function signOut(){try{await post('/auth/logout',{})}catch(e){}showLogin('You have signed out.')}
 async function renderAudit(){const t=$('#auditTable');t.replaceChildren();
@@ -275,7 +295,7 @@ $('#formValue').addEventListener('keydown',e=>{if(e.key==='Enter')record()});
 const runDemo=()=>demo().catch(e=>alert('Could not add sample data: '+e.message+' (sample data needs demo mode).'));
 $('#demo').addEventListener('click',runDemo);$('#demoBig').addEventListener('click',runDemo);
 $('#loginBtn').addEventListener('click',signIn);$('#loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('#logout').addEventListener('click',signOut);
-$('#showRegister').addEventListener('click',e=>{e.preventDefault();showRegister()});$('#showLogin').addEventListener('click',e=>{e.preventDefault();showLogin('')});$('#registerBtn').addEventListener('click',register);$('#regPassword2').addEventListener('keydown',e=>{if(e.key==='Enter')register()});
+$('#showRegister').addEventListener('click',e=>{e.preventDefault();showRegister()});$('#showLogin').addEventListener('click',e=>{e.preventDefault();showLogin('')});$('#registerBtn').addEventListener('click',register);$('#regPassword').addEventListener('input',updateStrength);$('#regPassword2').addEventListener('keydown',e=>{if(e.key==='Enter')register()});
 api('/auth/me').then(u=>{S.user=u;return afterSignIn()}).catch(()=>{if($('#login').hidden)showLogin('')});
 </script>
 </body>
