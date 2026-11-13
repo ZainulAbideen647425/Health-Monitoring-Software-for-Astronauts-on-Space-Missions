@@ -146,3 +146,21 @@ def test_dashboard_has_every_planned_view_and_feature(api_client: TestClient) ->
     assert "rule-based" in page or "not an AI model" in page
     assert "NO AUTOMATED DIAGNOSIS" in page and "SIMULATED SAMPLE DATA" in page
     assert "/measurements/batch" in page  # the daily assessment saves in one batch
+
+
+def test_overview_matches_the_reference_design(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element in (
+        "rbFill",
+        "bannerWord",
+        "stAssess",
+        "stLast",
+        "stDays",
+        "updTag",
+        "signals",
+        "alerts",
+        "alertCount",
+    ):
+        assert f'id="{element}"' in page
+    for phrase in ("MISSION READINESS", "Health status", "Seven-day signal", "Acknowledge", "STEADY", "MONITOR"):
+        assert phrase in page
