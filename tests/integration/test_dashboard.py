@@ -29,7 +29,17 @@ def test_dashboard_works_offline_without_external_resources(api_client: TestClie
 def test_dashboard_only_calls_endpoints_that_exist(api_client: TestClient) -> None:
     page = api_client.get("/").text
     paths = set(api_client.get("/openapi.json").json()["paths"])
-    for called in ("/health-indicators", "/health-status-rules", "/astronauts", "/measurements", "/measurements/batch"):
+    for called in (
+        "/health-indicators",
+        "/health-status-rules",
+        "/astronauts",
+        "/measurements",
+        "/demo/sample-crew",
+        "/auth/login",
+        "/auth/logout",
+        "/auth/me",
+        "/audit-log",
+    ):
         assert f"'{called}" in page
         assert called in paths
     assert "/health-summary" in page and "/assessment" in page
@@ -85,3 +95,11 @@ def test_dashboard_is_split_into_focused_tabs(api_client: TestClient) -> None:
     for view in ("today", "body", "history", "add"):
         assert f'data-go="{view}"' in page
         assert f'data-view="{view}"' in page
+
+
+def test_dashboard_has_a_sign_in_screen_and_sign_out(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element_id in ("login", "loginUser", "loginPassword", "loginBtn", "logout", "who", "auditTab", "auditTable"):
+        assert f'id="{element_id}"' in page
+    assert 'type="password"' in page
+    assert 'autocomplete="current-password"' in page

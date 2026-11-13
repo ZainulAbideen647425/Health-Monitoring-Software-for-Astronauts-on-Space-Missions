@@ -12,6 +12,10 @@ class ApplicationSettings(BaseSettings):
 
     database_url: str = "sqlite:///./astronaut_health_monitor.db"
     application_title: str = "Astronaut Health Monitor"
+    encryption_key: str | None = None
+    encryption_key_file: str = ".data_encryption_key"
+    secure_cookies: bool = False
+    demo_mode: bool = False
 
 
 @lru_cache

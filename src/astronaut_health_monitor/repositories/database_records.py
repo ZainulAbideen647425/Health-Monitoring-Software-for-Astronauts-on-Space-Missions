@@ -2,10 +2,11 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import ForeignKey, Index, String, Text
+from sqlalchemy import Boolean, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from astronaut_health_monitor.core.database import DatabaseBase, UtcDateTime
+from astronaut_health_monitor.core.encrypted_types import EncryptedFloat, EncryptedText
 
 
 def _current_utc_time() -> datetime:
@@ -32,7 +33,7 @@ class AstronautRecord(DatabaseBase):
     __tablename__ = "astronauts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    full_name: Mapped[str] = mapped_column(String(120))
+    full_name: Mapped[str] = mapped_column(EncryptedText)
     mission_role: Mapped[str] = mapped_column(String(80))
     mission_id: Mapped[int | None] = mapped_column(ForeignKey("missions.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(UtcDateTime, default=_current_utc_time)
@@ -63,13 +64,60 @@ class MeasurementRecord(DatabaseBase):
     id: Mapped[int] = mapped_column(primary_key=True)
     astronaut_id: Mapped[int] = mapped_column(ForeignKey("astronauts.id"))
     indicator_type: Mapped[str] = mapped_column(String(40))
-    measured_value: Mapped[float]
+    measured_value: Mapped[float] = mapped_column(EncryptedFloat)
     measurement_unit: Mapped[str] = mapped_column(String(60))
     measured_at: Mapped[datetime] = mapped_column(UtcDateTime)
     measurement_source: Mapped[str] = mapped_column(String(30))
     device_id: Mapped[int | None] = mapped_column(ForeignKey("devices.id"), nullable=True)
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes: Mapped[str | None] = mapped_column(EncryptedText, nullable=True)
     client_reference: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
     recorded_at: Mapped[datetime] = mapped_column(UtcDateTime, default=_current_utc_time)
 
     astronaut: Mapped[AstronautRecord] = relationship(back_populates="measurements")
+
+
+class UserRecord(DatabaseBase):
+    """A person who can sign in."""
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(64), unique=True)
+    password_hash: Mapped[str] = mapped_column(String(300))
+    role: Mapped[str] = mapped_column(String(30))
+    astronaut_id: Mapped[int | None] = mapped_column(ForeignKey("astronauts.id"), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    failed_login_attempts: Mapped[int] = mapped_column(default=0)
+    locked_until: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime, default=_current_utc_time)
+
+
+class SessionRecord(DatabaseBase):
+    """A sign-in session. Only the hash of the session token is stored."""
+
+    __tablename__ = "user_sessions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    last_seen_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    expires_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    revoked_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
+
+
+class AuditEventRecord(DatabaseBase):
+    """One entry of the tamper-evident audit log. Each entry's hash covers the previous entry's hash."""
+
+    __tablename__ = "audit_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    occurred_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    username: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    user_role: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    action: Mapped[str] = mapped_column(String(60))
+    target: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    outcome: Mapped[str] = mapped_column(String(10))
+    detail: Mapped[str] = mapped_column(Text, default="")
+    previous_hash: Mapped[str] = mapped_column(String(64))
+    event_hash: Mapped[str] = mapped_column(String(64))

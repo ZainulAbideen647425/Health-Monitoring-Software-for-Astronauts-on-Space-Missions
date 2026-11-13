@@ -43,9 +43,15 @@ offline_synchronization/ (local queue file) sits beside the API: it sends batche
 - **Assessments are computed on demand, not stored,** so changing a rule immediately changes every judgement
   and there is no stale data to migrate.
 
+## Phase 4 additions
+
+- **Sign-in, roles and audit** live in services (`authentication_service`, `audit_service`) and pure rules (`domain/permissions.py`);
+  the API layer only asks 'may this user do this?' through dependencies and `api/authorization.py`.
+- **Encrypted columns** are database types (`core/encrypted_types.py`), so repositories and services are unchanged.
+- Full design and limits: docs/security.md.
+
 ## Known limits
 
-- No authentication or encryption at rest (Phase 4).
 - No endpoints to create devices yet (the table and repository exist).
 - The dashboard is a single page with no build step; it is not yet covered by browser-level automated tests
   (the tests check that it is served, has its features, uses no external resources and calls only existing endpoints).
