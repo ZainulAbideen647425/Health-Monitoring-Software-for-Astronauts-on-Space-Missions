@@ -89,6 +89,14 @@ Open http://127.0.0.1:8000/ and sign in with password `Demo-Passphrase-2026!` as
 | `clinician.demo` | clinician | see and add readings for every crew member |
 | `control.demo` | mission control | everything, plus users, crew, sample data and the audit log |
 
+### The dashboard design
+
+A dark graphite and ivory design with sage (good), amber (watch) and coral (urgent) status colors, inspired by a
+mission-control layout. A left sidebar holds Mission overview, Body map, Health trends, Add reading, Spaceflight hazards
+and (mission control only) the Audit log. The overview shows a readiness ring (the share of today's readings that are
+inside the healthy range), the actions to take, and one card per reading. A Print report button prints the current
+screen. On a phone the sidebar becomes a row of tabs. The page still uses no external fonts, scripts or images.
+
 ### Creating your own account
 
 On the sign-in screen click **Register**. You choose a username and a password (at least 8 characters with an uppercase
