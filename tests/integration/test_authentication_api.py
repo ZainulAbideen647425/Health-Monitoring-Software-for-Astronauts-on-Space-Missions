@@ -118,9 +118,9 @@ def test_demo_mode_creates_demo_accounts_for_every_role() -> None:
             ("clinician.demo", "clinician"),
             ("control.demo", "mission_control"),
         ):
-            response = client.post("/auth/login", json={"username": username, "password": "demo-passphrase-2026"})
+            response = client.post("/auth/login", json={"username": username, "password": "Demo-Passphrase-2026!"})
             assert response.status_code == 200 and response.json()["role"] == role
-        client.post("/auth/login", json={"username": "astronaut.demo", "password": "demo-passphrase-2026"})
+        client.post("/auth/login", json={"username": "astronaut.demo", "password": "Demo-Passphrase-2026!"})
         own = client.get("/astronauts").json()
         assert len(own) == 1
         notes = {m["notes"] for m in client.get("/measurements", params={"astronaut_id": own[0]["id"]}).json()}

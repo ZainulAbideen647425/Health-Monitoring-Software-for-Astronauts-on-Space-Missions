@@ -12,13 +12,19 @@ SCRYPT_BLOCK_SIZE = 8
 SCRYPT_PARALLELISM = 1
 HASH_LENGTH_BYTES = 32
 SALT_LENGTH_BYTES = 16
-MINIMUM_PASSWORD_LENGTH = 12
+MINIMUM_PASSWORD_LENGTH = 8
 
 
 def validate_password_strength(password: str) -> None:
-    """Reject passwords that are too short or too repetitive."""
+    """Reject passwords that are too short, miss a required kind of character, or are too repetitive."""
     if len(password) < MINIMUM_PASSWORD_LENGTH:
         raise InvalidUserDetailsError(f"Password must be at least {MINIMUM_PASSWORD_LENGTH} characters long.")
+    if not any(character.isupper() for character in password):
+        raise InvalidUserDetailsError("Password must contain an uppercase letter.")
+    if not any(character.islower() for character in password):
+        raise InvalidUserDetailsError("Password must contain a lowercase letter.")
+    if all(character.isalnum() for character in password):
+        raise InvalidUserDetailsError("Password must contain a special character, for example ! @ # - _ or a space.")
     if len(set(password)) < 5:
         raise InvalidUserDetailsError("Password must use at least five different characters.")
 

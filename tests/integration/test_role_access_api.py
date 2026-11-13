@@ -92,7 +92,7 @@ def test_astronaut_cannot_use_administrative_endpoints(crew: dict[str, Any]) -> 
     assert ada.post("/astronauts", json={"full_name": "X", "mission_role": "Y"}).status_code == 403
     assert (
         ada.post(
-            "/users", json={"username": "evil.user", "password": "a-long-test-passphrase", "role": "mission_control"}
+            "/users", json={"username": "evil.user", "password": "A-long-test-passphrase1", "role": "mission_control"}
         ).status_code
         == 403
     )
@@ -107,7 +107,7 @@ def test_clinician_reads_and_writes_all_crew_data_but_cannot_administer(crew: di
     assert doc.post("/astronauts", json={"full_name": "X", "mission_role": "Y"}).status_code == 403
     assert (
         doc.post(
-            "/users", json={"username": "evil.user", "password": "a-long-test-passphrase", "role": "mission_control"}
+            "/users", json={"username": "evil.user", "password": "A-long-test-passphrase1", "role": "mission_control"}
         ).status_code
         == 403
     )
@@ -117,12 +117,12 @@ def test_clinician_reads_and_writes_all_crew_data_but_cannot_administer(crew: di
 def test_mission_control_can_create_users_and_new_accounts_work(crew: dict[str, Any]) -> None:
     control: TestClient = crew["control"]
     created = control.post(
-        "/users", json={"username": "new.doc", "password": "another-long-passphrase", "role": "clinician"}
+        "/users", json={"username": "new.doc", "password": "Another-long-passphrase1", "role": "clinician"}
     )
     assert created.status_code == 201 and created.json()["role"] == "clinician"
     assert (
         control.post(
-            "/users", json={"username": "new.doc", "password": "another-long-passphrase", "role": "clinician"}
+            "/users", json={"username": "new.doc", "password": "Another-long-passphrase1", "role": "clinician"}
         ).status_code
         == 409
     )
@@ -132,7 +132,7 @@ def test_mission_control_can_create_users_and_new_accounts_work(crew: dict[str, 
     )
     fresh = TestClient(control.app)
     assert (
-        fresh.post("/auth/login", json={"username": "new.doc", "password": "another-long-passphrase"}).status_code
+        fresh.post("/auth/login", json={"username": "new.doc", "password": "Another-long-passphrase1"}).status_code
         == 200
     )
 
@@ -166,4 +166,4 @@ def test_sensitive_values_are_encrypted_in_the_database_file(crew: dict[str, Any
         session.close()
     flat = " ".join(str(part) for row in rows for part in row) + " ".join(names)
     assert "123.5" not in flat and "very private note" not in flat and "Ada" not in flat
-    assert all(h.startswith("scrypt$") and "a-long-test-passphrase" not in h for h in password_hashes)
+    assert all(h.startswith("scrypt$") and "A-long-test-passphrase1" not in h for h in password_hashes)

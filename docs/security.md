@@ -6,7 +6,7 @@
 ## Sign-in and sessions
 
 - Passwords are hashed with **scrypt** (a deliberately slow hash) and a random salt; the password itself is never stored.
-  Minimum 12 characters.
+  At least 8 characters with an uppercase letter, a lowercase letter and a special character.
 - A wrong username and a wrong password give the **same message** and take a similar time, so an attacker cannot learn
   which usernames exist.
 - **Lockout:** 5 wrong passwords lock the account for 15 minutes.
@@ -36,8 +36,8 @@ its image and `/health` requires sign-in (401 otherwise); a test checks this for
 The sign-in screen has a **Register** link. Anyone can create their own account, but only an **astronaut** account:
 it is linked to a brand-new crew record and can see and record only its own data. The role cannot be chosen in the
 request, so clinician and mission-control accounts can never be created this way (mission control creates them with
-`POST /users` or the `create-user` command). Passwords must be at least 12 characters. A registration is written to the
-audit log (`user.self_registered`). For a real mission, switch it off with
+`POST /users` or the `create-user` command). Passwords need at least 8 characters with an uppercase letter, a lowercase letter and a special character. A registration is written to the
+audit log (`user.self_registered`). After registering, the page returns to the sign-in screen with the username filled in; registering does not sign you in by itself. The form shows a live strength meter (weak / average / strong) and a checklist of the password rules. For a real mission, switch it off with
 `ASTRONAUT_HEALTH_MONITOR_ALLOW_SELF_REGISTRATION=false`; accounts are then created by mission control only.
 
 ## Audit log
@@ -67,7 +67,7 @@ old entry breaks the chain, and `GET /audit-log` (mission control) reports wheth
 ## Demo mode
 
 `ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true` creates simulated data and accounts `astronaut.demo`, `clinician.demo` and
-`control.demo` with the **public** password `demo-passphrase-2026`. Use it only for demonstrations, never with real data.
+`control.demo` with the **public** password `Demo-Passphrase-2026!`. Use it only for demonstrations, never with real data.
 
 ## What this does NOT protect against (honest limits)
 
