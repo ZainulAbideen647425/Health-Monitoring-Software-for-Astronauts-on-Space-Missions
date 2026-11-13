@@ -192,6 +192,15 @@ class UserCreateRequest(BaseModel):
     astronaut_id: int | None = None
 
 
+class RegistrationRequest(BaseModel):
+    """Self-registration. The new account is always an astronaut account linked to a new crew record."""
+
+    username: str = Field(min_length=3, max_length=64)
+    password: str = Field(min_length=1, max_length=200)
+    full_name: str = Field(min_length=1, max_length=120)
+    mission_role: str = Field(default="Crew member", min_length=1, max_length=80)
+
+
 class AuditEventResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

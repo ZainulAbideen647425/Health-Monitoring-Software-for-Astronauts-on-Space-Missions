@@ -32,6 +32,7 @@ from astronaut_health_monitor.domain.exceptions import (
     MeasurementNotFoundError,
     MissionNotFoundError,
     PermissionDeniedError,
+    RegistrationDisabledError,
     UserAlreadyExistsError,
 )
 from astronaut_health_monitor.repositories.astronaut_repository import AstronautRepository
@@ -128,6 +129,7 @@ def create_application(database_url: str | None = None, settings: ApplicationSet
         return _error_response(401, error)
 
     @application.exception_handler(PermissionDeniedError)
+    @application.exception_handler(RegistrationDisabledError)
     async def handle_forbidden(_: Request, error: Exception) -> JSONResponse:
         return _error_response(403, error)
 

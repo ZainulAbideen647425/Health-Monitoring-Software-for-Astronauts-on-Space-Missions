@@ -67,3 +67,7 @@ class FieldDecryptionError(AstronautHealthMonitorError):
 
 class DemoModeDisabledError(AstronautHealthMonitorError):
     """Demo features were requested but demo mode is switched off."""
+
+
+class RegistrationDisabledError(AstronautHealthMonitorError):
+    """Self-registration was requested but is switched off. Accounts must then be created by mission control."""

@@ -31,6 +31,15 @@ Hiding a button in the page is never the protection; a request without the right
 astronaut asking for someone else's data is refused and **recorded in the audit log**. Every endpoint except the page,
 its image and `/health` requires sign-in (401 otherwise); a test checks this for each endpoint.
 
+## Registration
+
+The sign-in screen has a **Register** link. Anyone can create their own account, but only an **astronaut** account:
+it is linked to a brand-new crew record and can see and record only its own data. The role cannot be chosen in the
+request, so clinician and mission-control accounts can never be created this way (mission control creates them with
+`POST /users` or the `create-user` command). Passwords must be at least 12 characters. A registration is written to the
+audit log (`user.self_registered`). For a real mission, switch it off with
+`ASTRONAUT_HEALTH_MONITOR_ALLOW_SELF_REGISTRATION=false`; accounts are then created by mission control only.
+
 ## Audit log
 
 Sign-ins (successful, failed, locked), sign-outs, refused actions, creation of users, crew and missions, every recorded

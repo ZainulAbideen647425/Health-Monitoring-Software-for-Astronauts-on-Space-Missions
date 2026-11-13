@@ -67,7 +67,17 @@ kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:
 <h2>Sign in</h2><p class="hint">Use the account given to you by mission control. After 30 minutes without activity you are signed out.</p>
 <div class="steps" style="grid-template-columns:1fr"><div><label for="loginUser">Username</label><input id="loginUser" autocomplete="username" autocapitalize="none"></div>
 <div><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
-<button id="loginBtn" type="button">Sign in</button></div><p id="loginError" role="alert"></p></section>
+<button id="loginBtn" type="button">Sign in</button></div><p id="loginError" role="alert"></p>
+<p class="hint" id="registerPrompt">Don't have an account? <a href="#" id="showRegister">Register</a></p></section>
+<section id="register" class="panel" hidden style="max-width:440px;margin:0 auto;width:100%">
+<h2>Create your account</h2><p class="hint">This creates a crew member account that can see and record only your own health data.</p>
+<div class="steps" style="grid-template-columns:1fr"><div><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="120"></div>
+<div><label for="regRole">Mission role (optional)</label><input id="regRole" placeholder="Crew member" maxlength="80"></div>
+<div><label for="regUser">Username</label><input id="regUser" autocomplete="username" autocapitalize="none" maxlength="64"><span class="hint">3 to 64 characters: letters, digits, dot, dash or underscore.</span></div>
+<div><label for="regPassword">Password</label><input id="regPassword" type="password" autocomplete="new-password"><span class="hint">At least 12 characters.</span></div>
+<div><label for="regPassword2">Repeat password</label><input id="regPassword2" type="password" autocomplete="new-password"></div>
+<button id="registerBtn" type="button">Create account</button></div><p id="registerError" role="alert"></p>
+<p class="hint">Already have an account? <a href="#" id="showLogin">Sign in</a></p></section>
 <section id="welcome" class="panel" hidden>
 <h2 style="font-size:1.7rem">Welcome</h2>
 <p class="big">This tool helps you keep an eye on your health far from Earth.</p>
@@ -112,7 +122,7 @@ kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:
 const $=s=>document.querySelector(s);
 const notice=t=>{const n=$('#notices');n.replaceChildren();if(t){const d=document.createElement('p');d.className='note';d.textContent=t;n.append(d)}};
 const api=async(p,o)=>{const slow=setTimeout(()=>notice('Loading is taking longer than usual. Showing the last data you have.'),3000);
- try{const r=await fetch(p,o);const b=await r.json().catch(()=>({}));if(!r.ok){if(r.status===401&&p!=='/auth/login')showLogin(b.detail);throw new Error(b.detail||r.status)}notice('');return b}
+ try{const r=await fetch(p,o);const b=await r.json().catch(()=>({}));if(!r.ok){if(r.status===401&&p!=='/auth/login')showLogin(b.detail);throw new Error(Array.isArray(b.detail)?b.detail.map(d=>d.msg).join(' '):(b.detail||r.status))}notice('');return b}
  catch(e){if(e&&e.name==='TypeError')notice('You appear to be offline or the monitor cannot be reached. The last data loaded is still shown.');throw e}
  finally{clearTimeout(slow)}};
 const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
@@ -126,12 +136,18 @@ arms:{t:'Arms',f:'Arms and hands do most of the work of moving and handling equi
 legs:{t:'Legs',pre:['Complete the planned exercise sessions. They help protect bone and muscle.','Report new bone, joint or back pain.'],space:['Low gravity reduces the load on bones and muscles, which can lead to bone density and muscle loss.','This prototype tracks no bone or muscle reading yet. Use the mission medical tests for those.'],act:['Ask the flight surgeon about scheduled bone and muscle checks.'],f:'Legs carry your weight on Earth.',h:'With little load in low gravity, bones and muscles weaken. This prototype does not track a bone reading yet.',i:[]}};
 const S={user:null,crew:[],ref:{},rules:{},sum:null,region:null,detail:'reading'},ORDER={critical:0,caution:1,normal:2};
 function showLogin(msg){S.user=null;S.crew=[];S.sum=null;S.region=null;
- for(const id of ['#app','#tabs','#welcome','#headerTools'])$(id).hidden=true;$('#login').hidden=false;$('#loginError').textContent=msg||'';$('#loginPassword').value=''}
+ for(const id of ['#app','#tabs','#welcome','#headerTools'])$(id).hidden=true;$('#login').hidden=false;$('#register').hidden=true;$('#loginError').textContent=msg||'';$('#loginPassword').value=''}
 function afterSignIn(){$('#login').hidden=true;$('#headerTools').hidden=false;const mc=S.user.role==='mission_control';
  $('#who').textContent=S.user.username+' ('+S.user.role.replace('_',' ')+')';$('#demo').hidden=!mc;$('#auditTab').hidden=!mc;
  $('#welcomeNote').textContent=mc?'':'No readings are available for your account yet.';$('#demoBig').hidden=!mc;showView('today');return init()}
 async function signIn(){try{S.user=await post('/auth/login',{username:$('#loginUser').value,password:$('#loginPassword').value});$('#loginUser').value='';await afterSignIn()}
  catch(e){$('#loginError').textContent=e.message;$('#loginPassword').value=''}}
+function showRegister(){$('#login').hidden=true;$('#register').hidden=false;$('#registerError').textContent='';$('#regName').focus()}
+async function register(){const pw=$('#regPassword').value;
+ if(pw!==$('#regPassword2').value){$('#registerError').textContent='The two passwords do not match.';return}
+ try{S.user=await post('/auth/register',{username:$('#regUser').value,password:pw,full_name:$('#regName').value,mission_role:$('#regRole').value.trim()||'Crew member'});
+  for(const id of ['#regName','#regRole','#regUser','#regPassword','#regPassword2'])$(id).value='';$('#register').hidden=true;await afterSignIn()}
+ catch(e){$('#registerError').textContent=e.message;$('#regPassword').value='';$('#regPassword2').value=''}}
 async function signOut(){try{await post('/auth/logout',{})}catch(e){}showLogin('You have signed out.')}
 async function renderAudit(){const t=$('#auditTable');t.replaceChildren();
  try{const log=await api('/audit-log?limit=50');$('#auditStatus').textContent=(log.chain_is_valid?'\u2713 The log is intact':'\u25A0 The log has been altered (first broken entry '+log.first_broken_event_id+')')+'. Entries checked: '+log.checked_event_count+'. Showing the newest 50.';
@@ -259,6 +275,7 @@ $('#formValue').addEventListener('keydown',e=>{if(e.key==='Enter')record()});
 const runDemo=()=>demo().catch(e=>alert('Could not add sample data: '+e.message+' (sample data needs demo mode).'));
 $('#demo').addEventListener('click',runDemo);$('#demoBig').addEventListener('click',runDemo);
 $('#loginBtn').addEventListener('click',signIn);$('#loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('#logout').addEventListener('click',signOut);
+$('#showRegister').addEventListener('click',e=>{e.preventDefault();showRegister()});$('#showLogin').addEventListener('click',e=>{e.preventDefault();showLogin('')});$('#registerBtn').addEventListener('click',register);$('#regPassword2').addEventListener('keydown',e=>{if(e.key==='Enter')register()});
 api('/auth/me').then(u=>{S.user=u;return afterSignIn()}).catch(()=>{if($('#login').hidden)showLogin('')});
 </script>
 </body>
