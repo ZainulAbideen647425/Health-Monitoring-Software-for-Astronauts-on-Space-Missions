@@ -13,6 +13,9 @@ class HealthIndicatorType(StrEnum):
     BODY_TEMPERATURE = "body_temperature"
     SLEEP_DURATION = "sleep_duration"
     MOOD_SCORE = "mood_score"
+    FATIGUE_LEVEL = "fatigue_level"
+    STRESS_LEVEL = "stress_level"
+    PHYSICAL_ACTIVITY = "physical_activity"
 
 
 class MissionEnvironment(StrEnum):

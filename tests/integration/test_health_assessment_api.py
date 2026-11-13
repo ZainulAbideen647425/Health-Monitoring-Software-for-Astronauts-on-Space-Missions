@@ -24,7 +24,7 @@ def record(client: TestClient, astronaut_id: int, indicator: str, value: float, 
 
 def test_health_status_rules_are_published_with_sources(api_client: TestClient) -> None:
     rules = api_client.get("/health-status-rules").json()
-    assert len(rules) == 7
+    assert len(rules) == 10
     heart_rate = next(rule for rule in rules if rule["indicator_type"] == "heart_rate")
     assert (heart_rate["normal_minimum"], heart_rate["normal_maximum"]) == (50, 100)
     assert heart_rate["unit"] == "beats per minute"

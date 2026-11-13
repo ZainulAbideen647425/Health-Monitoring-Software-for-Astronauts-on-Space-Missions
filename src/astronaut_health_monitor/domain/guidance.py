@@ -143,6 +143,47 @@ GUIDANCE: dict[tuple[HealthIndicatorType, ValueDirection], GuidanceEntry] = {
             "Feeling hopeless, losing interest in everything, or thoughts of harming yourself."
         ),
     ),
+    (HealthIndicatorType.FATIGUE_LEVEL, _ABOVE): GuidanceEntry(
+        explanation="You feel more tired than expected.",
+        likely_causes=("Short or broken sleep", "Heavy workload", "Low activity", "Low mood"),
+        recommended_actions=(
+            "Protect your next scheduled sleep period.",
+            "Take a short rest and drink water.",
+            "Note what changed today, such as sleep, workload or illness.",
+        ),
+        warning_signs_requiring_escalation=(
+            "Difficulty staying alert during critical tasks, or exhaustion that continues for several days."
+        ),
+    ),
+    (HealthIndicatorType.STRESS_LEVEL, _ABOVE): GuidanceEntry(
+        explanation="Your stress level is higher than expected. Stress is common on long missions.",
+        likely_causes=("Workload", "Isolation and confinement", "Poor sleep", "Distance from family"),
+        recommended_actions=(
+            "Take a short break and slow your breathing for a few minutes.",
+            "Talk with a crewmate or schedule a call home.",
+            "Protect your sleep and keep up your exercise.",
+        ),
+        warning_signs_requiring_escalation=(
+            "Stress that keeps you from sleeping or working, or feeling unable to cope."
+        ),
+    ),
+    (HealthIndicatorType.PHYSICAL_ACTIVITY, _BELOW): GuidanceEntry(
+        explanation="You exercised less than expected today. Exercise protects bone, muscle and heart health in space.",
+        likely_causes=("Schedule conflicts", "Tiredness", "Equipment unavailable", "Pain or injury"),
+        recommended_actions=(
+            "Fit in a shorter session as soon as the schedule allows.",
+            "Follow the mission exercise plan for tomorrow.",
+        ),
+        warning_signs_requiring_escalation=(
+            "New bone, joint or back pain, or being unable to exercise for several days."
+        ),
+    ),
+    (HealthIndicatorType.PHYSICAL_ACTIVITY, _ABOVE): GuidanceEntry(
+        explanation="You exercised more than the expected range today.",
+        likely_causes=("Extra sessions", "Spacewalk preparation", "Recording error"),
+        recommended_actions=("Check the minutes you entered.", "Allow recovery time and drink water."),
+        warning_signs_requiring_escalation="Pain, dizziness or unusual tiredness after exercise.",
+    ),
 }
 
 

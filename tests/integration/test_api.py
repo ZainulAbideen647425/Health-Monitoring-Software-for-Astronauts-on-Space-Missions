@@ -29,7 +29,7 @@ def test_health_endpoint_reports_ok(api_client: TestClient) -> None:
 
 def test_health_indicator_reference_lists_all_indicators(api_client: TestClient) -> None:
     body = api_client.get("/health-indicators").json()
-    assert len(body) == 7
+    assert len(body) == 10
     assert {item["indicator_type"] for item in body} >= {"heart_rate", "blood_glucose", "mood_score"}
 
 
