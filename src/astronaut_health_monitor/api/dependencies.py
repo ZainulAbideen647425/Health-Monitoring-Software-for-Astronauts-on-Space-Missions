@@ -19,6 +19,7 @@ from astronaut_health_monitor.repositories.user_repository import UserRepository
 from astronaut_health_monitor.services.astronaut_service import AstronautService
 from astronaut_health_monitor.services.audit_service import AuditService
 from astronaut_health_monitor.services.authentication_service import AuthenticationService
+from astronaut_health_monitor.services.health_analytics_service import HealthAnalyticsService
 from astronaut_health_monitor.services.health_assessment_service import HealthAssessmentService
 from astronaut_health_monitor.services.measurement_batch_service import MeasurementBatchService
 from astronaut_health_monitor.services.measurement_service import MeasurementService
@@ -56,11 +57,16 @@ def get_health_assessment_service(session: DatabaseSession) -> HealthAssessmentS
     return HealthAssessmentService(MeasurementRepository(session), AstronautRepository(session))
 
 
+def get_health_analytics_service(session: DatabaseSession) -> HealthAnalyticsService:
+    return HealthAnalyticsService(MeasurementRepository(session), AstronautRepository(session))
+
+
 MissionServiceDependency = Annotated[MissionService, Depends(get_mission_service)]
 AstronautServiceDependency = Annotated[AstronautService, Depends(get_astronaut_service)]
 MeasurementServiceDependency = Annotated[MeasurementService, Depends(get_measurement_service)]
 MeasurementBatchServiceDependency = Annotated[MeasurementBatchService, Depends(get_measurement_batch_service)]
 HealthAssessmentServiceDependency = Annotated[HealthAssessmentService, Depends(get_health_assessment_service)]
+HealthAnalyticsServiceDependency = Annotated[HealthAnalyticsService, Depends(get_health_analytics_service)]
 
 
 SESSION_COOKIE_NAME = "astronaut_health_session"

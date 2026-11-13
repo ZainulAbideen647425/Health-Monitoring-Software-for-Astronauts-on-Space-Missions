@@ -10,7 +10,7 @@ Start: `ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true python -m uvicorn astronaut_heal
 | 1:15 | "Body map links readings to body systems and to spaceflight effects." | **Body intelligence**: click Chest, then the Cardiovascular system. |
 | 1:35 | "Trends show slow changes that a single reading hides." | **Health trends**: switch 7D / 30D, show Pattern to review. |
 | 1:55 | "A daily check-in covers vitals, mood, stress, activity and a private note, saved in one go and encrypted." | **Daily assessment**: fill 3 values, Save, watch the overview update. |
-| 2:15 | "Guidance comes from transparent rules, not a black box. It says so." | **Health intelligence**: ask "how is my sleep". |
+| 2:15 | "Rules decide the status. Machine-learning models trained on this astronaut's own history flag unusual days and forecast risk three days ahead." | **Health intelligence**: show **Model flags** (unusual days, 3-day forecast), then ask "how is my sleep". |
 | 2:30 | "It works with no link to Earth. Readings queue locally and sync without duplicates." | Open `docs/resilience.md` table or run `pytest tests/integration/test_resilience.py -q`. |
 | 2:45 | "Roles, encrypted data and a tamper-evident audit log protect crew privacy." | **Audit log** shows "The log is intact". |
 | 2:55 | "Open source, 274 tests, built solo." | Show GitHub repo. |

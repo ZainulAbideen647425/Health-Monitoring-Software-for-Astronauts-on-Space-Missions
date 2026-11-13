@@ -270,7 +270,9 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <p class="hint">Use approved instruments and mission procedures for clinical measurements. A single reading cannot determine a diagnosis.</p></div>
 <div data-view="assistant" hidden style="display:grid;gap:20px">
 <div class="sechead"><div><p class="eyebrow">CREW SUPPORT &middot; STRUCTURED HEALTH INTELLIGENCE</p><h1>Health intelligence</h1><p>A guided review of your health signals and the mission context. It is not a diagnostic chatbot.</p></div><span class="chip">OBSERVATIONS ONLY</span></div>
-<div class="notice-strip"><span><strong>Not a medical decision-maker.</strong> It does not diagnose, prescribe or replace the flight surgeon. Answers come from the app's built-in rules and your recorded readings, with no AI model involved.</span></div>
+<div class="notice-strip"><span><strong>Not a medical decision-maker.</strong> It does not diagnose, prescribe or replace the flight surgeon. Observations and answers come from built-in rules and your recorded readings. The model flags come from small scikit-learn models trained only on your own history. Both are prompts for review, never diagnoses.</span></div>
+<section class="panel" id="mlPanel"><div class="ph"><div><p class="eyebrow">MACHINE LEARNING &middot; YOUR OWN HISTORY</p><h2>Model flags</h2></div><span class="chip">SCIKIT-LEARN</span></div>
+<p class="hint" id="mlMethod">Loading.</p><div class="twocol"><div><h3>Unusual days</h3><div id="mlDays"></div></div><div><h3>Three-day risk forecast</h3><div id="mlForecast"></div></div></div></section>
 <div class="twocol"><section class="panel chat"><p class="eyebrow">CREW HEALTH REVIEW</p><h2 id="obsTitle">Mission health observations</h2><div class="obs" id="obs"></div><div id="answer" role="status"></div>
 <form id="askForm"><input id="askInput" placeholder="Ask about your recorded readings, for example sleep" aria-label="Your question" maxlength="200"><button type="submit">Ask</button></form></section>
 <aside style="display:grid;gap:20px;align-content:start"><section class="panel"><p class="eyebrow">GUIDED REVIEW</p><h2>Explore a question</h2><div class="prompts" id="prompts"></div></section>
@@ -659,6 +661,23 @@ $('#downloadCsv').addEventListener('click',()=>download('crew-health-readings.cs
 $('#profileForm').addEventListener('submit',e=>{e.preventDefault();try{localStorage.setItem('dn:'+S.user.username,$('#setDisplay').value.trim());localStorage.setItem('cs:'+S.user.username,$('#setCallsign').value.trim())}catch(x){}
  $('#profileSaved').textContent='Saved on this device.';renderBrief();renderSettings();renderOverview()});
 $('#replayTour').addEventListener('click',openTour);$('#settingsSignOut').addEventListener('click',signOut);
+
+/* ---- machine-learning flags (scikit-learn on the server) ---- */
+S.ml=null;
+async function loadAnalytics(){try{S.ml=await api('/astronauts/'+cur()+'/health-analytics')}catch(e){S.ml=null}}
+function renderMl(){const m=S.ml,d=$('#mlDays'),f=$('#mlForecast');d.replaceChildren();f.replaceChildren();
+ if(!m){$('#mlMethod').textContent='Model results could not be loaded.';return}
+ $('#mlMethod').textContent=m.method+' Days analysed: '+m.days_analyzed+'.';
+ if(!m.has_enough_data_for_unusual_days)d.append(el('p','hint','Needs at least 10 days of readings. Keep recording.'));
+ else if(!m.unusual_days.length)d.append(el('p','hint','No unusual days found.'));
+ m.unusual_days.slice(0,5).forEach(u=>{const x=el('div','alert caution');const b=el('div','');b.append(el('b','','\u25B2 '+new Date(u.day).toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'})),el('p','','Unusual mix of: '+u.main_contributors.map(name).join(', ')+'.'));x.append(b);d.append(x)});
+ if(!m.has_enough_data_for_forecast)f.append(el('p','hint','Needs at least 7 days of readings.'));
+ m.forecasts.filter(x=>x.risk!=='none').forEach(x=>{const a=el('div','alert '+(x.risk==='high'?'critical':'caution'));const b=el('div','');b.append(el('b','',(x.risk==='high'?'\u25A0 HIGH. ':'\u25B2 WATCH. ')+name(x.indicator_type)),el('p','',x.message));a.append(b);f.append(a)});
+ if(m.has_enough_data_for_forecast&&!m.forecasts.some(x=>x.risk!=='none'))f.append(el('p','hint','No indicator is projected to leave its healthy range in the next 3 days.'))}
+const _ra=renderAssistant;renderAssistant=function(){_ra();renderMl()};
+const _col=collectAlerts;collectAlerts=function(){const out=_col(),ack=getAck();
+ if(S.ml)S.ml.forecasts.filter(x=>x.risk!=='none').forEach(x=>{const id='f:'+x.indicator_type;if(!ack.includes(id))out.push({id,sev:x.risk==='high'?'critical':'caution',t:'Forecast: '+name(x.indicator_type),d:x.message})});return out};
+const _rf2=refresh;refresh=async function(){await loadAnalytics();await _rf2();renderAlerts()};
 </script>
 </body>
 </html>

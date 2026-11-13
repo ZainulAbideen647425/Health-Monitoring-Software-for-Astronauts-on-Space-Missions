@@ -16,6 +16,7 @@ from astronaut_health_monitor.api.dependencies import (
     AuditServiceDependency,
     CurrentUser,
     DatabaseSession,
+    HealthAnalyticsServiceDependency,
     HealthAssessmentServiceDependency,
     MeasurementBatchServiceDependency,
     MeasurementServiceDependency,
@@ -27,6 +28,7 @@ from astronaut_health_monitor.api.schemas import (
     AstronautCreateRequest,
     AstronautHealthSummaryResponse,
     AstronautResponse,
+    HealthAnalyticsResponse,
     HealthAssessmentResponse,
     HealthIndicatorReferenceResponse,
     HealthStatusRuleResponse,
@@ -295,3 +297,15 @@ def summarize_astronaut_health(
     """Latest assessment of every indicator, with an overall status for the astronaut."""
     authorize_health_data_read(user, astronaut_id, audit_service)
     return AstronautHealthSummaryResponse.model_validate(service.summarize_astronaut_health(astronaut_id))
+
+
+@router.get("/astronauts/{astronaut_id}/health-analytics", response_model=HealthAnalyticsResponse, tags=["analytics"])
+def analyze_astronaut_health(
+    astronaut_id: int,
+    user: CurrentUser,
+    service: HealthAnalyticsServiceDependency,
+    audit_service: AuditServiceDependency,
+) -> HealthAnalyticsResponse:
+    """Machine-learning flags: unusual days and a three-day risk forecast, from this astronaut's own history."""
+    authorize_health_data_read(user, astronaut_id, audit_service)
+    return HealthAnalyticsResponse.model_validate(service.analyze_astronaut(astronaut_id))

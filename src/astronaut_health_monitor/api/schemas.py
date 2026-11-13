@@ -1,6 +1,6 @@
 """Request and response shapes of the HTTP API."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
@@ -219,3 +219,38 @@ class AuditLogResponse(BaseModel):
     checked_event_count: int
     first_broken_event_id: int | None
     events: list[AuditEventResponse]
+
+
+class UnusualDayResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    day: date
+    anomaly_score: float
+    main_contributors: list[str]
+
+
+class IndicatorForecastResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    indicator_type: HealthIndicatorType
+    slope_per_day: float
+    current_value: float
+    projected_value: float
+    horizon_days: int
+    fit_quality: float
+    risk: str
+    message: str
+
+
+class HealthAnalyticsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    days_analyzed: int
+    has_enough_data_for_unusual_days: bool
+    has_enough_data_for_forecast: bool
+    unusual_days: list[UnusualDayResponse]
+    forecasts: list[IndicatorForecastResponse]
+    method: str = (
+        "Isolation Forest (unusual days) and linear regression (3-day risk forecast), trained only on this "
+        "astronaut's own readings with scikit-learn. These are flags for review, not diagnoses."
+    )
