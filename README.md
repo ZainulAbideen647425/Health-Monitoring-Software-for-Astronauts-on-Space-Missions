@@ -178,7 +178,7 @@ tests/            unit and integration tests
 docs/             architecture documentation
 ```
 
-See [docs/architecture.md](docs/architecture.md), [docs/security.md](docs/security.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [docs/architecture.md](docs/architecture.md), [docs/security.md](docs/security.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md), [docs/resilience.md](docs/resilience.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Acknowledgements
 

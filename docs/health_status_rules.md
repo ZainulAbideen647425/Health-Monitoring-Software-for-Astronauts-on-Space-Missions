@@ -28,8 +28,11 @@
 | Body temperature (C) | 36.1 to 37.5 | below 35.0 or above 37.9 | 0.5 |
 | Sleep (hours in 24 h) | 7 to 9 | below 4 | 1.5 |
 | Mood (1 to 10) | 6 to 10 | below 4 | 2 |
+| Fatigue (1 none to 10 exhausted) | 1 to 5 | above 8 | 2 |
+| Stress (1 calm to 10 extreme) | 1 to 5 | above 8 | 2 |
+| Physical activity (minutes today) | 30 to 240 | none | 30 |
 
-Values between the normal and critical limits are *caution*.
+Values between the normal and critical limits are *caution*. Fatigue and stress are self-rated scores and exercise minutes follow the WHO activity guidance; they are never an urgent reading on their own.
 
 ## Sources and honesty about them
 
