@@ -103,3 +103,9 @@ def test_dashboard_has_a_sign_in_screen_and_sign_out(api_client: TestClient) -> 
         assert f'id="{element_id}"' in page
     assert 'type="password"' in page
     assert 'autocomplete="current-password"' in page
+
+
+def test_empty_dashboard_points_to_the_add_reading_tab(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    assert 'id="firstReading"' in page
+    assert "Add my first reading" in page

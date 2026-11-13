@@ -96,7 +96,7 @@ kbd{background:var(--panel2);border:1px solid #2c3d6d;border-radius:5px;padding:
 </section>
 <div id="app" hidden>
 <div data-view="today" style="display:grid;gap:20px">
-<div id="banner" class="s-none"><span class="icon" id="bannerIcon"></span><div><h2 id="bannerTitle"></h2><p id="bannerText"></p></div></div>
+<div id="banner" class="s-none"><span class="icon" id="bannerIcon"></span><div><h2 id="bannerTitle"></h2><p id="bannerText"></p><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
 <section class="panel" id="todo"><h2>What to do now</h2><ol id="actions"></ol></section>
 <section class="panel"><h2>Your readings</h2><p class="legend">&#10003; Good &nbsp; &#9650; Watch &nbsp; &#9632; Urgent. Worst first.</p><div id="cards"></div></section>
 </div>
@@ -177,6 +177,7 @@ async function renderAudit(){const t=$('#auditTable');t.replaceChildren();
  catch(e){$('#auditStatus').textContent='Could not load the audit log: '+e.message}}
 function showView(v){document.querySelectorAll('[data-view]').forEach(e=>e.hidden=e.dataset.view!==v);
  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.go===v)))}
+$('#firstReading').addEventListener('click',()=>showView('add'));
 document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{showView(b.dataset.go);if(b.dataset.go==='audit')renderAudit()}));
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 const cur=()=>$('#crew').value,name=i=>S.ref[i]?S.ref[i].display_name:i;
@@ -199,7 +200,8 @@ function renderBanner(){const s=S.sum,k=s.assessments.length?s.overall_status:'n
  $('#banner').className='s-'+k;
  $('#bannerIcon').textContent=k==='none'?'\u2022':ST[k].i;
  $('#bannerTitle').textContent=k==='none'?'No readings yet':HERO[k][0];
- $('#bannerText').textContent=k==='none'?'Add your first reading below.':HERO[k][1]}
+ $('#bannerText').textContent=k==='none'?'Press the button to enter your first reading. Your dashboard fills in as you add readings.':HERO[k][1];
+ $('#firstReading').hidden=k!=='none'}
 function sorted(){return S.sum.assessments.slice().sort((a,b)=>ORDER[a.final_status]-ORDER[b.final_status])}
 function renderActions(){const ul=$('#actions');ul.replaceChildren();
  const need=sorted().filter(a=>a.final_status!=='normal').slice(0,3);
