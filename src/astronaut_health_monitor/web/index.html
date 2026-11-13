@@ -154,6 +154,53 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 .bell{position:relative;min-width:44px;padding:0 10px}.bell svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;display:block}.bell b{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:99px;background:var(--warn);color:var(--accent-ink);font:700 .7rem var(--mono);display:grid;place-items:center;padding:0 4px}
 .foot{display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between;margin-top:8px;padding-top:16px;border-top:1px solid var(--line);font:.66rem var(--mono);letter-spacing:.06em;color:var(--faint);text-transform:uppercase}
 @media print{.overlay,.seg,.systems,.wfoot,.cta button,.foot{display:none!important}}
+/* ---- redesign to match the reference screenshots ---- */
+#banner{display:grid;grid-template-columns:2.2fr 1fr .6fr;gap:0;padding:0;border:1px solid var(--line);border-left:1px solid var(--line);border-radius:var(--r);background:var(--panel);align-items:stretch}
+#banner>div{padding:26px 28px;min-width:0}
+#banner>div+div{border-left:1px solid var(--line)}
+.rb-main{display:flex;gap:28px;align-items:center}
+.rb-main .ring{width:150px;height:150px;flex:0 0 auto}#banner .rb-text .eyebrow{font-size:.7rem;letter-spacing:.1em;color:var(--faint)}.rb-main .ring circle{stroke-width:7}.rb-main .ring .num{font-size:2.4rem}.twocol{align-items:start}
+.rb-text{flex:1;min-width:0}.rb-text .eyebrow{margin:0 0 8px}
+#bannerTitle{font-size:1.65rem;margin:0;color:var(--text)}#bannerTitle span{color:var(--c)}
+#banner p#bannerText{font-size:.98rem;color:var(--muted);margin:10px 0 16px;max-width:46ch}
+.rb-bar .track{height:5px;border-radius:3px;background:var(--inset);overflow:hidden}.rb-bar .track span{display:block;height:100%;background:var(--c);transition:width .5s}
+.rb-barlab{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font:.66rem var(--mono);letter-spacing:.08em;color:var(--faint)}.rb-barlab b{color:var(--muted);font-weight:500}
+.rb-mid{display:grid;gap:22px;align-content:center}
+.lab{display:block;font:.68rem var(--mono);letter-spacing:.1em;color:var(--faint);margin-bottom:6px}
+.rb-mid strong,.rb-end b{display:block}.rb-mid strong{font-size:1.05rem;font-weight:700}.rb-mid small,.rb-end small{display:block;color:var(--muted);margin-top:6px;font-size:.92rem}
+#stAssess::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:10px;background:var(--ok)}#stAssess.pend::before{background:var(--warn)}
+.rb-end{display:flex;flex-direction:column;justify-content:center}.rb-end b{font-size:3rem;font-weight:500;line-height:1.1;letter-spacing:-.02em}.rb-end small{font:.66rem var(--mono);letter-spacing:.08em;color:var(--faint)}
+@media(max-width:1100px){#banner{grid-template-columns:1fr}#banner>div+div{border-left:0;border-top:1px solid var(--line)}.rb-main{flex-direction:column;align-items:flex-start}}
+/* indicator cards */
+.ph .upd{font:.68rem var(--mono);letter-spacing:.08em;color:var(--muted);display:inline-flex;gap:8px;align-items:center}.upd::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
+#cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.mcard{all:unset;box-sizing:border-box;display:block;cursor:pointer;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px 14px;color:var(--text);transition:border-color .15s,background .15s}
+.mcard:hover{border-color:var(--faint)}.mcard:focus-visible{outline:3px solid oklch(0.94 0.014 92);outline-offset:2px}
+.mcard>span{display:block}
+.mc-top{display:flex!important;justify-content:space-between;align-items:center}
+.mc-ic{width:40px;height:40px;border:1px solid var(--line);border-radius:6px;display:grid!important;place-items:center;color:var(--c);background:var(--panel)}.mc-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.mc-tag{font:.68rem var(--mono);letter-spacing:.1em;color:var(--c);display:inline-flex!important;align-items:center;gap:8px}.mc-tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.mc-name{margin-top:18px;color:var(--muted);font-size:.98rem}
+.mc-val{display:flex!important;align-items:baseline;gap:8px;margin-top:4px}.mc-val b{font:500 2.35rem/1.1 var(--mono);letter-spacing:-.02em}.mc-val small{color:var(--muted);font-size:.92rem}
+.mc-delta{margin-left:auto;font:.78rem var(--mono);color:var(--muted)}
+.mc-spark{margin:10px 0 12px}.mc-spark svg{display:block;width:100%;height:30px;overflow:visible}.mc-spark path{fill:none;stroke:var(--c);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linecap:round}
+.mc-foot{display:flex!important;justify-content:space-between;font:.66rem var(--mono);letter-spacing:.08em;color:var(--faint);text-transform:uppercase}
+/* seven-day signal */
+.sig{position:relative}.sig-legend{display:flex;gap:18px;flex-wrap:wrap;font:.74rem var(--mono);color:var(--muted);margin:2px 0 6px}.sig-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}
+.sig svg{display:block;width:100%;height:auto}.sig svg text{font:11px var(--mono);fill:var(--faint)}.sig .grid{stroke:var(--line);stroke-dasharray:3 4}
+.sig-tip{position:absolute;pointer-events:none;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 12px;font:.74rem var(--mono);min-width:150px;z-index:2;box-shadow:0 6px 20px oklch(0 0 0/.35)}
+.sig-tip b{display:block;color:var(--muted);margin-bottom:6px;font-weight:500}.sig-tip div{display:flex;justify-content:space-between;gap:14px;margin-top:3px}
+.sig-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:10px;padding-top:12px;font:.68rem var(--mono);letter-spacing:.08em;color:var(--faint)}
+.sig-foot button,.al button{all:unset;cursor:pointer;color:var(--ok);font-weight:600}.sig-foot button{font:.68rem var(--mono);letter-spacing:.08em}
+.sig-foot button:focus-visible,.al button:focus-visible{outline:3px solid oklch(0.94 0.014 92);outline-offset:3px}
+/* attention list */
+.al{display:block;padding:16px 0 14px;border-top:1px solid var(--line);border-left:3px solid var(--c);padding-left:16px;margin-left:0}.al:first-child{border-top:0}
+.al-head{display:flex;justify-content:space-between;font:.66rem var(--mono);letter-spacing:.1em}.al-head b{color:var(--c);font-weight:500}.al-head span{color:var(--faint)}
+.al h3{margin:6px 0 4px;font-size:1.02rem}.al p{margin:0;color:var(--muted);font-size:.9rem}
+.al-foot{display:flex;justify-content:space-between;margin-top:12px;font-size:.88rem}.al-foot .ack{color:var(--muted)}
+.al.reminder{--c:var(--ok)}.al.caution{--c:var(--warn)}.al.critical{--c:var(--bad)}
+/* CTA icon */
+.cta .ico{width:44px;height:44px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;color:var(--ok);flex:0 0 auto}.cta .ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -211,13 +258,14 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <div data-view="today" style="display:grid;gap:20px">
 <div class="sechead"><div><p class="eyebrow" id="todayEyebrow">CREW HEALTH STATUS</p><h1 id="greeting">Hello.</h1><p id="todayDesc">Your health overview for today.</p></div><button type="button" id="goAssessment">Daily assessment &rarr;</button></div>
 <div class="strip" id="simBanner" hidden><div><strong>SIMULATED SAMPLE DATA</strong><br><span>These readings are made up for demonstration. They are not from a real person and not clinically validated.</span></div></div>
-<div id="banner" class="s-none"><div class="ring" aria-hidden="false" role="img" id="ringBox" aria-label="Readings in the healthy range"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="51"/><circle class="fg" id="ringFg" cx="60" cy="60" r="51" stroke-dasharray="320.4" stroke-dashoffset="320.4"/></svg><div class="num"><div><span id="ringNum">0</span>%<small>IN RANGE</small></div></div></div><span class="icon" id="bannerIcon"></span><div><h2 id="bannerTitle"></h2><p id="bannerText"></p><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
-<div class="stats" id="stats"><div class="stat"><span>ASSESSMENT</span><strong id="stAssess">-</strong><small id="stAssessNote"></small></div><div class="stat"><span>LAST RECORDED</span><strong id="stLast">-</strong><small id="stLastNote"></small></div><div class="stat"><span>INDICATORS TRACKED</span><strong id="stTracked">-</strong><small>of all indicators in this app</small></div></div>
+<div id="banner" class="s-none"><div class="rb-main"><div class="ring" aria-hidden="false" role="img" id="ringBox" aria-label="Readings in the healthy range"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="51"/><circle class="fg" id="ringFg" cx="60" cy="60" r="51" stroke-dasharray="320.4" stroke-dashoffset="320.4"/></svg><div class="num"><div><span id="ringNum">0</span>%<small>IN RANGE</small></div></div></div><span class="icon" id="bannerIcon"></span><div class="rb-text"><p class="eyebrow" id="rbEyebrow">MISSION READINESS</p><h2 id="bannerTitle">Health status <span id="bannerWord">not known yet</span></h2><p id="bannerText"></p><div class="rb-bar"><div class="track"><span id="rbFill"></span></div><div class="rb-barlab"><span>SHARE OF READINGS IN HEALTHY RANGE</span><b id="rbPct">0 / 100</b></div></div><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
+<div class="rb-mid"><div><span class="lab">ASSESSMENT</span><strong id="stAssess" class="pend">Pending today</strong><small id="stAssessNote">Complete your daily check-in</small></div><div><span class="lab">LAST RECORDED</span><strong id="stLast">-</strong><small id="stLastNote"></small></div></div>
+<div class="rb-end"><span class="lab">DAYS OF DATA</span><b id="stDays">0</b><small id="stTracked"></small></div></div>
 <section class="panel" id="todo"><h2>What to do now</h2><ol id="actions"></ol></section>
-<section class="panel"><p class="eyebrow">CREW TELEMETRY</p><h2>Health indicators</h2><p class="legend">&#10003; Good &nbsp; &#9650; Watch &nbsp; &#9632; Urgent. Worst first. Open a card for the full detail.</p><div id="cards"></div></section>
-<div class="twocol"><section class="panel"><div class="ph"><div><p class="eyebrow">PERSONAL SERIES</p><h2>Recent signal</h2></div><button class="quiet" type="button" id="allTrends">All trends &rarr;</button></div><div id="signals"></div></section>
+<section class="panel"><div class="ph"><div><p class="eyebrow">CREW TELEMETRY</p><h2>Health indicators</h2></div><span class="upd" id="updTag">UPDATED --</span></div><p class="legend">STEADY, MONITOR or URGENT on every card. Most urgent first. Select a card for the full detail.</p><div id="cards"></div></section>
+<div class="twocol"><section class="panel"><div class="ph"><div><p class="eyebrow">PERSONAL SERIES</p><h2>Seven-day signal</h2></div><button class="quiet" type="button" id="allTrends">All trends &rarr;</button></div><div id="signals"></div></section>
 <section class="panel" id="alertsPanel"><div class="ph"><div><p class="eyebrow">OBSERVATIONS</p><h2>Attention &amp; reminders</h2></div><span class="count" id="alertCount">00</span></div><div id="alerts"></div></section></div>
-<section class="panel cta"><div><p class="eyebrow">CONNECTED SYSTEMS</p><h3>Explore body intelligence</h3><p>See how spaceflight conditions connect to health signals and prevention.</p></div><button class="quiet" type="button" id="goBody">Explore body &rarr;</button></section>
+<section class="panel cta"><div style="display:flex;gap:16px;align-items:center"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><div><p class="eyebrow">CONNECTED SYSTEMS</p><h3>Explore body intelligence</h3><p>See how spaceflight conditions connect to health signals and prevention.</p></div></div><button class="quiet" type="button" id="goBody">Explore body &rarr;</button></section>
 </div>
 <div data-view="body" hidden style="display:grid;gap:20px">
 <div class="two"><section class="panel"><h2>Your body</h2><p class="hint">Hover or tap a part. Tap again for full context. Keys <kbd>1</kbd> to <kbd>5</kbd>, <kbd>Esc</kbd> closes.</p>
@@ -297,7 +345,7 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 </div>
 <div class="foot" id="appFoot" hidden><span>ASTRONAUT HEALTH MONITOR &middot; EDUCATIONAL PROTOTYPE</span><span>NOT A CLINICAL DEVICE &middot; FLIGHT SURGEON GUIDANCE TAKES PRECEDENCE</span></div>
 </main>
-<div class="overlay" id="metricDialog" role="dialog" aria-modal="true" aria-labelledby="mdTitle" hidden><div class="box"><p class="eyebrow" id="mdGroup"></p><h2 id="mdTitle"></h2><div class="big-v" id="mdValue"></div><p id="mdStatus"></p><div id="mdChart"></div><dl class="sysbox" id="mdInfo" style="display:grid;gap:10px"></dl><div class="row" style="margin-top:14px"><button type="button" id="mdHistory">Open in trends</button><button type="button" class="quiet" id="mdClose">Close</button></div></div></div>
+<div class="overlay" id="metricDialog" role="dialog" aria-modal="true" aria-labelledby="mdTitle" hidden><div class="box"><p class="eyebrow" id="mdGroup"></p><h2 id="mdTitle"></h2><div class="big-v" id="mdValue"></div><p id="mdStatus"></p><div id="mdChart"></div><h3>Why, and what to do</h3><dl class="sysbox" id="mdInfo" style="display:grid;gap:10px"></dl><div class="row" style="margin-top:14px"><button type="button" id="mdHistory">Open in trends</button><button type="button" class="quiet" id="mdClose">Close</button></div></div></div>
 <div id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden><div class="box"><h2 id="tourTitle"></h2><p id="tourText"></p>
 <div class="row"><button id="tourNext" type="button">Next</button><button id="tourSkip" class="quiet" type="button">Skip</button></div></div></div>
 <script>
@@ -678,6 +726,86 @@ const _ra=renderAssistant;renderAssistant=function(){_ra();renderMl()};
 const _col=collectAlerts;collectAlerts=function(){const out=_col(),ack=getAck();
  if(S.ml)S.ml.forecasts.filter(x=>x.risk!=='none').forEach(x=>{const id='f:'+x.indicator_type;if(!ack.includes(id))out.push({id,sev:x.risk==='high'?'critical':'caution',t:'Forecast: '+name(x.indicator_type),d:x.message})});return out};
 const _rf2=refresh;refresh=async function(){await loadAnalytics();await _rf2();renderAlerts()};
+
+/* ---- redesign: readiness card, indicator cards, seven-day signal, attention list ---- */
+const ICON={heart_rate:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>',bp:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',blood_glucose:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>',body_temperature:'<path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/>',sleep_duration:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',mood_score:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',fatigue_level:'<rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2M6 11v2"/>',stress_level:'<path d="M13 2L3 14h9l-1 8 10-12h-9z"/>',physical_activity:'<path d="M6 6v12M18 6v12M2 9v6M22 9v6M6 12h12"/>'};
+const TAGW={normal:'STEADY',caution:'MONITOR',critical:'URGENT'},WORD={none:'not known yet',normal:'Stable',caution:'Watch',critical:'Urgent'};
+const utc=t=>new Date(t).toISOString().slice(11,16)+' UTC';
+function when(t){const d=new Date(t);return d.toDateString()===new Date().toDateString()?'Today · '+utc(t):d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+utc(t)}
+function smooth(p){if(p.length<2)return '';let d='M'+p[0][0]+','+p[0][1];for(let i=1;i<p.length;i++){const m=(p[i-1][0]+p[i][0])/2;d+=' C'+m+','+p[i-1][1]+' '+m+','+p[i][1]+' '+p[i][0]+','+p[i][1]}return d}
+function sparkSvg(rows){if(rows.length<2)return '<svg viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,15 L200,15" stroke-dasharray="3 4"/></svg>';
+ const v=rows.map(r=>r.measured_value),lo=Math.min(...v),hi=Math.max(...v),sp=hi-lo||1;
+ return '<svg viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true"><path d="'+smooth(v.map((x,i)=>[i/(v.length-1)*200,27-(x-lo)/sp*24]))+'"/></svg>'}
+renderBanner=function(){const s=S.sum,n=s.assessments.length,k=n?s.overall_status:'none',ok=s.assessments.filter(a=>a.final_status==='normal').length,pc=n?Math.round(ok/n*100):0;
+ $('#banner').className='s-'+k;$('#bannerWord').textContent=WORD[k];
+ $('#rbEyebrow').textContent='MISSION READINESS'+(S.simulated?' · SIMULATED':'');
+ $('#ringNum').textContent=pc;$('#ringFg').style.strokeDashoffset=String(320.4*(1-pc/100));$('#ringBox').setAttribute('aria-label',n?ok+' of '+n+' readings are in the healthy range':'No readings yet');
+ $('#rbFill').style.width=pc+'%';$('#rbPct').textContent=pc+' / 100';
+ $('#bannerText').textContent=k==='none'?'Press the button to enter your first reading. Your dashboard fills in as you add readings.':HERO[k][0]+'. '+HERO[k][1];
+ $('#firstReading').hidden=k!=='none'};
+const _ro=renderOverview;renderOverview=function(){_ro();const done=assessedToday();
+ $('#stAssess').textContent=done?'Recorded today':'Pending today';$('#stAssess').className=done?'':'pend';$('#stAssessNote').textContent=done?'Your check-in is up to date':'Complete your daily check-in';
+ const all=Object.values(S.hist).flat(),last=all.length?all.reduce((m,r)=>r.measured_at>m.measured_at?r:m):null;
+ $('#stLast').textContent=last?when(last.measured_at):'None yet';$('#stLastNote').textContent=last?(S.simulated?'Local demonstration record':name(last.indicator_type)):'No readings yet';
+ $('#stDays').textContent=String(new Set(all.map(r=>dayKey(r.measured_at))).size);$('#stTracked').textContent=Object.keys(S.hist).length+' OF '+Object.keys(S.ref).length+' INDICATORS TRACKED';
+ $('#updTag').textContent='UPDATED '+(last?utc(last.measured_at):'--')};
+const SHORT={mood_score:'/ 10',fatigue_level:'/ 10',stress_level:'/ 10',physical_activity:'min today',sleep_duration:'hours',heart_rate:'bpm',body_temperature:'\u00B0C'};
+function cardEntries(){const list=sorted(),sys=list.find(a=>a.indicator_type==='systolic_blood_pressure'),dia=list.find(a=>a.indicator_type==='diastolic_blood_pressure'),out=[];
+ list.forEach(a=>{if(a===dia&&sys)return;
+  if(a===sys&&dia){const w=ORDER[sys.final_status]<=ORDER[dia.final_status]?sys:dia;out.push({ind:sys.indicator_type,icon:'bp',name:'Blood pressure',val:fmt(sys.measured_value)+'/'+fmt(dia.measured_value),unit:'mmHg',st:w.final_status,at:sys.measured_at});return}
+  out.push({ind:a.indicator_type,icon:a.indicator_type,name:a.indicator_display_name,val:fmt(a.measured_value),unit:SHORT[a.indicator_type]||a.measurement_unit,st:a.final_status,at:a.measured_at})});
+ return out}
+renderCards=function(){const box=$('#cards');box.replaceChildren();
+ cardEntries().forEach(e=>{const rows=S.hist[e.ind]||[],b=el('button','mcard s-'+e.st);b.type='button';b.setAttribute('aria-label',e.name+' '+e.val+' '+e.unit+', '+TAGW[e.st].toLowerCase()+'. Open detail.');
+  const top=el('span','mc-top'),ic=el('span','mc-ic');ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+(ICON[e.icon]||ICON.bp)+'</svg>';top.append(ic,el('span','mc-tag',TAGW[e.st]));
+  const val=el('span','mc-val');val.append(el('b','',e.val),el('small','',e.unit));
+  if(rows.length>1){const d=rows[rows.length-1].measured_value-rows[rows.length-2].measured_value,z=Math.abs(d)<1e-9;val.append(el('span','mc-delta',(z?'—':d>0?'↗':'↘')+' '+(z?'0':(d>0?'+':'')+fmt(d))))}
+  const sp=el('span','mc-spark');sp.innerHTML=sparkSvg(rows.slice(-10));
+  const ft=el('span','mc-foot');ft.append(el('span','',S.simulated?'Demo series':'Your readings'),el('span','',utc(e.at)+' →'));
+  b.append(top,el('span','mc-name',e.name),val,sp,ft);b.addEventListener('click',()=>openMetric(e.ind));box.append(b)})};
+/* seven-day signal with dual axes and a hover read-out */
+function dailySeries(ind,days){const m=new Map();(S.hist[ind]||[]).forEach(r=>{const k=new Date(r.measured_at).toISOString().slice(0,10),o=m.get(k)||{s:0,n:0};o.s+=r.measured_value;o.n++;m.set(k,o)});
+ return [...m.entries()].sort((a,b)=>a[0]<b[0]?-1:1).slice(-days).map(([k,o])=>({day:k,v:o.s/o.n}))}
+renderSignals=function(){const box=$('#signals');box.replaceChildren();
+ const cand=['heart_rate','sleep_duration','mood_score','stress_level'].filter(i=>dailySeries(i,7).length>=2).slice(0,2);
+ if(cand.length<1){box.append(el('p','hint','Record readings on two or more days to see the seven-day signal.'));return}
+ const A=dailySeries(cand[0],7),B=cand[1]?dailySeries(cand[1],7):null,days=[...new Set(A.concat(B||[]).map(x=>x.day))].sort(),W=700,H=250,L=44,R=B?44:12,T=12,Bt=30;
+ const range=s=>{const v=s.map(x=>x.v),lo=Math.min(...v),hi=Math.max(...v),pad=(hi-lo)*.25||1;return [lo-pad,hi+pad]},ra=range(A),rb=B?range(B):null;
+ const X=d=>L+(days.length>1?days.indexOf(d)/(days.length-1):.5)*(W-L-R),Ya=v=>H-Bt-(v-ra[0])/(ra[1]-ra[0])*(H-Bt-T),Yb=v=>H-Bt-(v-rb[0])/(rb[1]-rb[0])*(H-Bt-T);
+ const CA='oklch(0.77 0.075 158)',CB='oklch(0.8 0.115 77)';let g='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Seven-day signal of '+name(cand[0])+(B?' and '+name(cand[1]):'')+'">';
+ for(let i=0;i<4;i++){const y=T+i*(H-Bt-T)/3;g+='<line class="grid" x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end">'+Math.round(ra[1]-(ra[1]-ra[0])*i/3)+'</text>';if(B)g+='<text x="'+(W-R+8)+'" y="'+(y+4)+'">'+Math.round(rb[1]-(rb[1]-rb[0])*i/3)+'</text>'}
+ days.forEach(d=>{g+='<text x="'+X(d)+'" y="'+(H-8)+'" text-anchor="middle">'+new Date(d+'T00:00:00Z').toLocaleDateString('en-GB',{day:'2-digit',month:'short',timeZone:'UTC'}).toUpperCase()+'</text>'});
+ g+='<path d="'+smooth(A.map(p=>[X(p.day),Ya(p.v)]))+'" fill="none" stroke="'+CA+'" stroke-width="2.2"/>';if(B)g+='<path d="'+smooth(B.map(p=>[X(p.day),Yb(p.v)]))+'" fill="none" stroke="'+CB+'" stroke-width="2.2"/>';
+ g+='<line id="sgX" y1="'+T+'" y2="'+(H-Bt)+'" stroke="oklch(0.94 0.014 92)" visibility="hidden"/><circle id="sgA" r="6" fill="'+CA+'" stroke="#fff" stroke-width="2" visibility="hidden"/>'+(B?'<circle id="sgB" r="6" fill="'+CB+'" stroke="#fff" stroke-width="2" visibility="hidden"/>':'')+'</svg>';
+ const w=el('div','sig'),lg=el('div','sig-legend');[[cand[0],CA],[cand[1],CB]].forEach(([i,c])=>{if(!i)return;const s=el('span','');const d=el('i');d.style.background=c;s.append(d,document.createTextNode(name(i)+' · '+S.ref[i].unit));lg.append(s)});
+ const holder=el('div','');holder.style.position='relative';holder.innerHTML=g;const tip=el('div','sig-tip');tip.hidden=true;holder.append(tip);w.append(lg,holder);
+ const foot=el('div','sig-foot');foot.append(el('span','',S.simulated?'HISTORICAL SERIES FOR CONTEXT ONLY':'FROM YOUR RECORDED READINGS'));const ob=el('button','','OPEN TRENDS →');ob.type='button';ob.addEventListener('click',()=>showView('history'));foot.append(ob);w.append(foot);box.append(w);
+ const svg=holder.querySelector('svg');
+ holder.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*W;let best=0,bd=1e9;days.forEach((d,i)=>{const dd=Math.abs(X(d)-px);if(dd<bd){bd=dd;best=i}});const d=days[best],a=A.find(p=>p.day===d),b=B&&B.find(p=>p.day===d),x=X(d);
+  const sx=holder.querySelector('#sgX');sx.setAttribute('x1',x);sx.setAttribute('x2',x);sx.setAttribute('visibility','visible');
+  const ca=holder.querySelector('#sgA');if(a){ca.setAttribute('cx',x);ca.setAttribute('cy',Ya(a.v));ca.setAttribute('visibility','visible')}else ca.setAttribute('visibility','hidden');
+  if(B){const cb=holder.querySelector('#sgB');if(b){cb.setAttribute('cx',x);cb.setAttribute('cy',Yb(b.v));cb.setAttribute('visibility','visible')}else cb.setAttribute('visibility','hidden')}
+  tip.replaceChildren(el('b','',new Date(d+'T00:00:00Z').toLocaleDateString('en-GB',{day:'2-digit',month:'short',timeZone:'UTC'}).toUpperCase()));
+  [[cand[0],a,CA],[cand[1],b,CB]].forEach(([i,p,c])=>{if(!i||!p)return;const row=el('div','');row.append(el('span','',name(i)+' · '+S.ref[i].unit),el('b','',fmt(Math.round(p.v*10)/10)));row.firstChild.style.color=c;tip.append(row)});
+  tip.hidden=false;const lx=x/W*r.width;tip.style.left=Math.min(lx+14,r.width-170)+'px';tip.style.top='10px'});
+ holder.addEventListener('pointerleave',()=>{tip.hidden=true;['#sgX','#sgA','#sgB'].forEach(s=>{const n=holder.querySelector(s);if(n)n.setAttribute('visibility','hidden')})})};
+/* attention and reminders */
+renderAlerts=function(){const box=$('#alerts');box.replaceChildren();const list=collectAlerts();
+ $('#alertCount').textContent=n2(list.length);const bc=$('#bellCount');bc.textContent=String(list.length);bc.hidden=!list.length;
+ if(!list.length)box.append(el('p','hint','Nothing needs attention right now.'));
+ const shown=S.alertsAll?list:list.slice(0,4);
+ shown.forEach(x=>{const f=x.id.startsWith('f:'),ind=x.ind||(f?x.id.slice(2):null),a=ind&&S.sum?S.sum.assessments.find(z=>z.indicator_type===ind):null;
+  const lab=x.sev==='critical'?'URGENT':x.sev==='caution'?(f?'FORECAST':'WATCH'):'REMINDER',at=f?'Next 3 days':a&&!x.go?when(a.measured_at):'Today';
+  const d=el('div','al '+x.sev),h=el('div','al-head');h.append(el('b','',lab),el('span','',at));d.append(h,el('h3','',x.t.replace(/^(.+?): \1/,'$1')),el('p','',x.d));
+  const ft=el('div','al-foot'),go=el('button','',(x.go?'Begin assessment':'View trend')+' →');go.type='button';go.addEventListener('click',()=>{if(x.go)showView(x.go);else{$('#chartIndicator').value=ind;showView('history')}});
+  const ak=el('button','ack','✓ Acknowledge');ak.type='button';ak.addEventListener('click',()=>{setAck(getAck().concat(x.id));renderAlerts()});ft.append(go,ak);d.append(ft);box.append(d)});
+ if(list.length>4){const t=el('button','quiet',S.alertsAll?'Show fewer':'Show all '+list.length);t.type='button';t.style.marginTop='12px';t.addEventListener('click',()=>{S.alertsAll=!S.alertsAll;renderAlerts()});box.append(t)}};
+/* detail dialog: blood pressure shows both numbers; escalation text is included */
+const _om=openMetric;openMetric=function(ind){_om(ind);const a=S.sum.assessments.find(z=>z.indicator_type===ind);
+ const sy=S.sum.assessments.find(z=>z.indicator_type==='systolic_blood_pressure'),di=S.sum.assessments.find(z=>z.indicator_type==='diastolic_blood_pressure');
+ if((ind==='systolic_blood_pressure'||ind==='diastolic_blood_pressure')&&sy&&di){$('#mdTitle').textContent='Blood pressure';$('#mdValue').textContent=fmt(sy.measured_value)+'/'+fmt(di.measured_value)+' mmHg'}
+ const info=$('#mdInfo');if(a.contact_flight_surgeon){const d=el('div','');d.append(el('dt','','Contact the flight surgeon'),el('dd','','Now. This reading needs medical guidance.'));info.prepend(d)}
+ if(a.warning_signs_requiring_escalation){const d=el('div','');d.append(el('dt','','Get help if you notice'),el('dd','',a.warning_signs_requiring_escalation));info.append(d)}};
 </script>
 </body>
 </html>
