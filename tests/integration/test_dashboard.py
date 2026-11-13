@@ -128,7 +128,18 @@ def test_revamped_dashboard_has_sidebar_hazards_and_readiness_ring(api_client: T
 
 def test_dashboard_has_every_planned_view_and_feature(api_client: TestClient) -> None:
     page = api_client.get("/").text
-    for view in ("today", "body", "history", "assessment", "add", "assistant", "hazards", "reports", "settings", "audit"):
+    for view in (
+        "today",
+        "body",
+        "history",
+        "assessment",
+        "add",
+        "assistant",
+        "hazards",
+        "reports",
+        "settings",
+        "audit",
+    ):
         assert f'data-view="{view}"' in page and f'data-go="{view}"' in page
     for element in ("metricDialog", "systemButtons", "trendGrid", "rangeButtons", "wizard", "askForm", "bellCount"):
         assert f'id="{element}"' in page
