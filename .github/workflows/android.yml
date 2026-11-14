@@ -5,6 +5,9 @@ on:
   push:
     paths: ["android/**", ".github/workflows/android.yml"]
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -23,3 +26,10 @@ jobs:
         with:
           name: astro-health-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish the APK as a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk astro-health.apk
+          gh release delete android-latest --yes --cleanup-tag || true
+          gh release create android-latest astro-health.apk --title "Astro Health Android app" --notes "Debug-signed APK. Install it by opening this page on your Android phone and downloading astro-health.apk. Educational prototype, not a medical device." --target ${{ github.sha }}
