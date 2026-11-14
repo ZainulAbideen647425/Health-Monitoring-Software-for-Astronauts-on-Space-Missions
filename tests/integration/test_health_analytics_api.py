@@ -66,3 +66,24 @@ def test_analytics_needs_sign_in_and_unknown_astronauts_are_404(
     assert api_client.get("/astronauts/999999/health-analytics").status_code == 404
     with TestClient(create_application("sqlite://", test_settings)) as anonymous:
         assert anonymous.get("/astronauts/1/health-analytics").status_code == 401
+
+
+def test_sample_data_differs_by_mission_environment(api_client: TestClient) -> None:
+    from astronaut_health_monitor.domain.enumerations import HealthIndicatorType
+    from astronaut_health_monitor.services.demo_data_service import _simulated_value
+
+    stress = HealthIndicatorType.STRESS_LEVEL
+    assert _simulated_value(3, stress, "mars") > _simulated_value(3, stress, "station")
+    assert 1 <= _simulated_value(13, HealthIndicatorType.MOOD_SCORE, "mars") <= 10
+
+
+def test_demo_endpoint_creates_a_named_sample_for_each_environment(test_settings: ApplicationSettings) -> None:
+    from astronaut_health_monitor.services.demo_data_service import DEMO_PASSWORD
+
+    settings = test_settings.model_copy(update={"demo_mode": True})
+    with TestClient(create_application("sqlite://", settings)) as client:
+        client.post("/auth/login", json={"username": "control.demo", "password": DEMO_PASSWORD})
+        for key, suffix in (("mars", " (Mars base)"), ("station", "")):
+            reply = client.post(f"/demo/sample-crew?environment={key}")
+            assert reply.status_code == 201 and reply.json()["full_name"] == f"Demo Astronaut{suffix}"
+        assert client.post("/demo/sample-crew?environment=venus").status_code == 422
