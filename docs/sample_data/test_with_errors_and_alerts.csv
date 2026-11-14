@@ -1,0 +1,8 @@
+indicator,value,measured_at
+heart_rate,64,2026-11-14T09:00:00Z
+radiation_dose,6.2,2026-11-14T09:00:00Z
+blood_glucose,260,2026-11-14T09:00:00Z
+mood_score,3,2026-11-14T09:00:00Z
+heart_rate,fast,2026-11-14T09:00:00Z
+unknown_thing,5,2026-11-14T09:00:00Z
+heart_rate,70,not-a-date
