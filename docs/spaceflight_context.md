@@ -7,7 +7,7 @@ Code: `domain/spaceflight_context.py`. Radiation is **not** measured by any indi
 
 ## Mission environments
 Space station (low Earth orbit), deep-space transit vehicle, pressurized rover, Lunar base and Mars base. Each rates the five hazards Lower, Moderate or High with a one-line reason, and lists a health focus. Gravity, message delay and return time are shown.
-The ratings are **qualitative orientation aids** written for this prototype, not mission requirements. The choice is saved per user in the browser and shown in:
+The ratings are **qualitative orientation aids** written for this prototype, not mission requirements. Changing it never alters a measured value. It changes how readings are interpreted: each indicator card shows its environment attention level, the readiness card and "What to do now" name the environment and its focus, and the hazard ratings change. The choice is saved per user in the browser and shown in:
 - Mission overview (selector and facts),
 - Spaceflight hazards (environment panel and a chip on every hazard card),
 - the indicator detail window ("In your environment"),
