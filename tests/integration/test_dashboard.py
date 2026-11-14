@@ -171,3 +171,10 @@ def test_dashboard_has_environments_schedule_and_routine(api_client: TestClient)
     for element in ("envSelect", "envFacts", "envPanel", "schedule", "schedulePanel", "routine", "badges", "gameStats"):
         assert f'id="{element}"' in page
     assert "/spaceflight-context" in page and "never the values" in page
+
+
+def test_dashboard_has_a_mobile_menu_and_environment_aware_readings(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element in ("menuBtn", "navScrim"):
+        assert f'id="{element}"' in page
+    assert "navopen" in page and "mc-env" in page and "never the measured values" in page
