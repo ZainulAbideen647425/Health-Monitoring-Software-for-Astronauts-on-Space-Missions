@@ -3,35 +3,42 @@ package com.astronaut.healthmonitor;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.webkit.CookieManager;
-import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-/** A thin shell around the dashboard: the app runs on a server whose address the user enters once. */
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
+
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
+/** Runs the whole app on the phone: a Python server on 127.0.0.1 and a WebView showing it. */
 public class MainActivity extends Activity {
-    private static final String START_PAGE = "file:///android_asset/start.html";
+    private static final String HOME = "http://localhost:8000/";
     private static final int REQ_CAMERA = 1, REQ_FILE = 2;
     private WebView web;
-    private SharedPreferences prefs;
     private PermissionRequest pendingPermission;
     private ValueCallback<Uri[]> pendingChooser;
+    private static boolean serverStarted = false;
+
+    private static String page(String title, String body) {
+        return "<html><body style='margin:0;padding:28px;background:#0e1416;color:#eee;font-family:sans-serif'>"
+                + "<h2>" + title + "</h2><p style='color:#aab;line-height:1.5'>" + body + "</p></body></html>";
+    }
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-        prefs = getSharedPreferences("astro", MODE_PRIVATE);
         web = new WebView(this);
         setContentView(web);
         WebSettings s = web.getSettings();
@@ -39,13 +46,7 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setMediaPlaybackRequiresUserGesture(false);
         CookieManager.getInstance().setAcceptCookie(true);
-        web.addJavascriptInterface(new Bridge(), "Android");
-        web.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
-                if (r.isForMainFrame() && !v.getUrl().startsWith("file:")) v.loadUrl(START_PAGE + "?error=1");
-            }
-        });
+        web.setWebViewClient(new WebViewClient());
         web.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
@@ -70,8 +71,53 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
-        String server = prefs.getString("server", null);
-        web.loadUrl(server == null ? START_PAGE : server);
+        web.loadData(page("Astro Health", "Starting the health monitor on your phone. The first start can take up to a minute."), "text/html", "utf-8");
+        new Thread(this::startServerAndOpen).start();
+    }
+
+    private void show(final String html) {
+        runOnUiThread(() -> web.loadDataWithBaseURL(null, html, "text/html", "utf-8", null));
+    }
+
+    private boolean portOpen() {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress("127.0.0.1", 8000), 300);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void startServerAndOpen() {
+        PyObject entry;
+        try {
+            if (!Python.isStarted()) Python.start(new AndroidPlatform(this));
+            entry = Python.getInstance().getModule("android_entry");
+            if (!serverStarted && !portOpen()) {
+                entry.callAttr("start", getFilesDir().getAbsolutePath());
+                serverStarted = true;
+            }
+        } catch (Throwable t) {
+            show(page("Could not start", "The built-in server failed to start:<br><pre style='white-space:pre-wrap;font-size:12px'>" + escape(String.valueOf(t)) + "</pre>"));
+            return;
+        }
+        for (int i = 0; i < 180; i++) {
+            if (portOpen()) {
+                runOnUiThread(() -> web.loadUrl(HOME));
+                return;
+            }
+            String error = entry.callAttr("last_error").toString();
+            if (!error.isEmpty()) {
+                show(page("Could not start", "The built-in server stopped:<br><pre style='white-space:pre-wrap;font-size:11px'>" + escape(error) + "</pre>"));
+                return;
+            }
+            try { Thread.sleep(500); } catch (InterruptedException e) { return; }
+        }
+        show(page("Still starting", "The server did not answer in time. Close the app completely and open it again."));
+    }
+
+    private static String escape(String text) {
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     @Override
@@ -99,17 +145,5 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (web.canGoBack()) web.goBack(); else super.onBackPressed();
-    }
-
-    private class Bridge {
-        @JavascriptInterface
-        public void saveServer(final String url) {
-            runOnUiThread(() -> {
-                if (!web.getUrl().startsWith("file:")) return;  // only the start page may change the address
-                if (url == null || !url.matches("^https?://[^\\s]+$")) return;
-                prefs.edit().putString("server", url).apply();
-                web.loadUrl(url);
-            });
-        }
     }
 }
