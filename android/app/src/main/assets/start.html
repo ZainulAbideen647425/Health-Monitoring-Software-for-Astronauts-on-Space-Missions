@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0;padding:28px;background:#0e1416;color:#eee;font-family:sans-serif}h1{font-size:22px}p{color:#aab;line-height:1.5}
+input{width:100%;box-sizing:border-box;padding:14px;font-size:16px;border-radius:10px;border:1px solid #345;background:#162024;color:#fff;margin:10px 0}
+button{width:100%;padding:14px;font-size:17px;border:0;border-radius:10px;background:#8fd3b0;color:#0e1416;font-weight:700}.err{color:#f5a97f}</style></head>
+<body><h1>Astro Health</h1>
+<p id="msg">Enter the address of your Astronaut Health Monitor server, for example the https address your tunnel or host printed.</p>
+<input id="u" type="url" placeholder="https://your-server-address" autocapitalize="none" autocomplete="off">
+<button id="go">Connect</button>
+<p>Educational prototype, not a medical device.</p>
+<script>
+if(location.search.indexOf('error')>=0){var m=document.getElementById('msg');m.className='err';m.textContent='Could not reach the server. Check the address and that the server and tunnel are running, then try again.'}
+document.getElementById('go').onclick=function(){var v=document.getElementById('u').value.trim();if(!/^https?:\/\//i.test(v)){v='https://'+v}Android.saveServer(v)};
+</script></body></html>
