@@ -254,3 +254,47 @@ class HealthAnalyticsResponse(BaseModel):
         "Isolation Forest (unusual days) and linear regression (3-day risk forecast), trained only on this "
         "astronaut's own readings with scikit-learn. These are flags for review, not diagnoses."
     )
+
+
+class SpaceflightSourceResponse(BaseModel):
+    title: str
+    url: str
+
+
+class IndicatorSpaceContextResponse(BaseModel):
+    indicator_type: HealthIndicatorType
+    hazards: list[str]
+    hazard_names: list[str]
+    how_hazards_change_it: str
+    why_it_needs_checking: str
+    how_it_is_measured_on_board: str
+    suggested_interval_hours: int
+    source: SpaceflightSourceResponse
+
+
+class MissionEnvironmentHazardResponse(BaseModel):
+    hazard: str
+    hazard_name: str
+    level: int
+    level_word: str
+    note: str
+
+
+class MissionEnvironmentResponse(BaseModel):
+    key: str
+    name: str
+    gravity: str
+    one_way_message_delay: str
+    return_to_earth: str
+    hazards: list[MissionEnvironmentHazardResponse]
+    health_focus: list[str]
+
+
+class SpaceflightContextResponse(BaseModel):
+    indicators: list[IndicatorSpaceContextResponse]
+    environments: list[MissionEnvironmentResponse]
+    radiation_note: str
+    disclaimer: str = (
+        "Hazard names follow NASA's Human Research Program. Environment ratings are qualitative orientation aids "
+        "written for this prototype, not mission requirements. Follow your mission protocol."
+    )

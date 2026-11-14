@@ -11,6 +11,9 @@ Astronaut Health Monitor is an offline-first web app that helps crew members wat
 ## What it does
 Readiness overview, body map and systems, trends and pattern detection, daily check-in, machine-learning flags (Isolation Forest unusual-day detection and a 3-day linear-regression risk forecast, scikit-learn, pandas, NumPy), printable reports, offline queue with safe sync, self-registration with strong passwords.
 
+## NASA grounding
+The five hazards follow NASA's Human Research Program (https://www.nasa.gov/hrp/hazards). Each indicator shows which hazards change it, why it needs checking, how it is measured on board and a NASA source link. A mission-environment selector (space station, deep-space transit, pressurized rover, Lunar base, Mars base) re-rates the hazards and adjusts the health focus. Measurement schedules and streak badges support the daily routine.
+
 ## How it was built
 Python, FastAPI, SQLAlchemy, SQLite, Pydantic, scikit-learn, pandas, NumPy; single-file dashboard with no external resources; pytest, ruff, mypy, GitHub Actions.
 

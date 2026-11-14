@@ -164,3 +164,10 @@ def test_overview_matches_the_reference_design(api_client: TestClient) -> None:
         assert f'id="{element}"' in page
     for phrase in ("MISSION READINESS", "Health status", "Seven-day signal", "Acknowledge", "STEADY", "MONITOR"):
         assert phrase in page
+
+
+def test_dashboard_has_environments_schedule_and_routine(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element in ("envSelect", "envFacts", "envPanel", "schedule", "schedulePanel", "routine", "badges", "gameStats"):
+        assert f'id="{element}"' in page
+    assert "/spaceflight-context" in page and "never the values" in page
