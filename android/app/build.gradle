@@ -16,6 +16,7 @@ android {
         python {
             version '3.12'
             pip {
+                options '--only-binary=:all:'
                 install 'fastapi'
                 install 'uvicorn'
                 install 'sqlalchemy'
