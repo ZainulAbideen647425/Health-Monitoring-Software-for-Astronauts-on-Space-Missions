@@ -29,6 +29,7 @@ ENVIRONMENT_SHORT_NAMES: dict[str, str] = {
 _ENVIRONMENT_SHIFTS: dict[str, dict[HealthIndicatorType, float]] = {
     "station": {},
     "transit": {
+        HealthIndicatorType.RADIATION_DOSE: 1.3,
         HealthIndicatorType.STRESS_LEVEL: 1.5,
         HealthIndicatorType.FATIGUE_LEVEL: 1.0,
         HealthIndicatorType.SLEEP_DURATION: -0.5,
@@ -37,6 +38,7 @@ _ENVIRONMENT_SHIFTS: dict[str, dict[HealthIndicatorType, float]] = {
         HealthIndicatorType.HEART_RATE: 2,
     },
     "rover": {
+        HealthIndicatorType.RADIATION_DOSE: 0.1,
         HealthIndicatorType.STRESS_LEVEL: 1.0,
         HealthIndicatorType.FATIGUE_LEVEL: 1.5,
         HealthIndicatorType.SLEEP_DURATION: -0.3,
@@ -45,6 +47,7 @@ _ENVIRONMENT_SHIFTS: dict[str, dict[HealthIndicatorType, float]] = {
         HealthIndicatorType.BODY_TEMPERATURE: 0.2,
     },
     "moon": {
+        HealthIndicatorType.RADIATION_DOSE: 0.6,
         HealthIndicatorType.STRESS_LEVEL: 0.5,
         HealthIndicatorType.FATIGUE_LEVEL: 0.5,
         HealthIndicatorType.SLEEP_DURATION: -0.3,
@@ -52,6 +55,7 @@ _ENVIRONMENT_SHIFTS: dict[str, dict[HealthIndicatorType, float]] = {
         HealthIndicatorType.HEART_RATE: 1,
     },
     "mars": {
+        HealthIndicatorType.RADIATION_DOSE: 0.1,
         HealthIndicatorType.STRESS_LEVEL: 2.0,
         HealthIndicatorType.FATIGUE_LEVEL: 1.5,
         HealthIndicatorType.SLEEP_DURATION: -0.6,
@@ -82,6 +86,7 @@ def _simulated_value(day_index: int, indicator: HealthIndicatorType, environment
         HealthIndicatorType.FATIGUE_LEVEL: 3 + late,
         HealthIndicatorType.STRESS_LEVEL: 3 + (day_index % 2) + (late // 2),
         HealthIndicatorType.PHYSICAL_ACTIVITY: 120 - late * 10 + (day_index % 3) * 5,
+        HealthIndicatorType.RADIATION_DOSE: 0.5 + (day_index % 3) / 20,
     }
     value = float(values[indicator]) + _ENVIRONMENT_SHIFTS[environment].get(indicator, 0.0)
     if indicator in _SCORE_INDICATORS:

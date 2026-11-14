@@ -42,6 +42,7 @@ class IndicatorSpaceContext:
     source_url: str = NASA_HAZARDS_URL
 
 
+_RADIATION = SpaceflightHazard.SPACE_RADIATION
 _GRAVITY = SpaceflightHazard.GRAVITY_FIELDS
 _ISOLATION = SpaceflightHazard.ISOLATION_AND_CONFINEMENT
 _DISTANCE = SpaceflightHazard.DISTANCE_FROM_EARTH
@@ -136,11 +137,19 @@ INDICATOR_SPACE_CONTEXT: dict[HealthIndicatorType, IndicatorSpaceContext] = {
         "An exercise log or the minutes counted by a wearable.",
         24,
     ),
+    HealthIndicatorType.RADIATION_DOSE: IndicatorSpaceContext(
+        HealthIndicatorType.RADIATION_DOSE,
+        (_RADIATION,),
+        "Deep space and surfaces without an atmosphere give far less protection than Earth, and solar storms add more.",
+        "Each astronaut has a lifetime dose limit, so the running total matters more than any single day.",
+        "A personal dosimeter. The crew member types in the daily reading; a laptop cannot sense radiation.",
+        24,
+    ),
 }
 
 HAZARD_NOTE_FOR_RADIATION = (
-    "No indicator in this app measures radiation. Crews track exposure with dosimeters, so ask the flight surgeon "
-    "about your dose."
+    "This app cannot sense radiation. It records the daily dose you read from your dosimeters and judges it against "
+    "NASA's published limits, so ask the flight surgeon about your running total."
 )
 
 

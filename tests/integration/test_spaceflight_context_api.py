@@ -6,7 +6,7 @@ from astronaut_health_monitor.core.configuration import ApplicationSettings
 
 def test_spaceflight_context_lists_indicators_environments_and_sources(api_client: TestClient) -> None:
     body = api_client.get("/spaceflight-context").json()
-    assert len(body["indicators"]) == 10 and len(body["environments"]) == 5
+    assert len(body["indicators"]) == 11 and len(body["environments"]) == 5
     heart = next(item for item in body["indicators"] if item["indicator_type"] == "heart_rate")
     assert heart["source"]["url"] == "https://www.nasa.gov/hrp/hazards" and heart["hazard_names"]
     mars = next(item for item in body["environments"] if item["key"] == "mars")

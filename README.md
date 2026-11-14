@@ -53,7 +53,7 @@ people who are not technical:
 - **History chart** with the healthy range shaded and a one-line summary.
 - **Add a reading in three steps**, with how-to-measure help and an immediate plain-language result.
 
-Not yet included: multiple mission environments, gamification, report export, and a bone reading for the legs. Readings come from what the user enters or from clearly labelled simulated sample data; no NASA datasets are connected.
+Not included: a bone reading, and radiation sensing by the app itself (the dose is typed in from a dosimeter). Readings come from what the user enters or from clearly labelled simulated sample data; no NASA datasets are connected.
 
 ## What phases 1 and 2 provide
 

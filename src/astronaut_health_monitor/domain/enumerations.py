@@ -16,6 +16,7 @@ class HealthIndicatorType(StrEnum):
     FATIGUE_LEVEL = "fatigue_level"
     STRESS_LEVEL = "stress_level"
     PHYSICAL_ACTIVITY = "physical_activity"
+    RADIATION_DOSE = "radiation_dose"
 
 
 class MissionEnvironment(StrEnum):

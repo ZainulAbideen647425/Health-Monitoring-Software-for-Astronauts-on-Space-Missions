@@ -205,6 +205,27 @@ HEALTH_STATUS_RULES: dict[HealthIndicatorType, HealthStatusRule] = {
         ),
         source_urls=("https://www.who.int/news-room/fact-sheets/detail/physical-activity",),
     ),
+    HealthIndicatorType.RADIATION_DOSE: HealthStatusRule(
+        indicator_type=HealthIndicatorType.RADIATION_DOSE,
+        normal_minimum=0,
+        normal_maximum=1.3,
+        critical_below=None,
+        critical_above=5,
+        minimum_meaningful_change=0.3,
+        measurement_conditions="Read from the crew member's personal dosimeter: the dose for the last 24 hours in mSv.",
+        source_notes=(
+            "NASA's technical brief on radiation protection sets a career limit of less than 600 mSv, requires "
+            "galactic cosmic ray dose rates below 1.3 mSv/day in free space and 0.9 mSv/day on planetary surfaces, "
+            "and 250 mSv as the limit for a solar particle event. This prototype treats up to 1.3 mSv/day as normal, "
+            "above that as caution, and above 5 mSv/day as critical because that suggests a solar particle event. "
+            "Curiosity's RAD instrument measured about 1.84 mSv/day on the way to Mars and 0.64 mSv/day on the "
+            "surface. These are prototype thresholds, not NASA medical limits for a single day."
+        ),
+        source_urls=(
+            "https://www.nasa.gov/sites/default/files/atoms/files/radiation_protection_technical_brief_ochmo.pdf",
+            "https://www.space.com/23875-mars-radiation-life-manned-mission.html",
+        ),
+    ),
 }
 
 

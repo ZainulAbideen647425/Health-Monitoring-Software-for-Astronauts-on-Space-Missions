@@ -371,7 +371,17 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <div class="steps"><div><label for="formIndicator">1. What did you measure?</label><select id="formIndicator"></select></div>
 <div><label for="formValue">2. What was the result? <span id="unit" class="hint"></span></label><input id="formValue" type="number" step="any" inputmode="decimal"></div>
 <div><label>3. Save it</label><button id="record" type="button">Save reading</button></div></div>
-<p id="help" class="hint" style="margin-top:14px"></p><div id="result" role="status" hidden></div></section></div>
+<p id="help" class="hint" style="margin-top:14px"></p><div id="result" role="status" hidden></div></section>
+<section class="panel" style="margin-top:16px"><p class="eyebrow">CAMERA</p><h2>Measure your pulse with the camera</h2>
+<p class="hint">Cover the camera lens (and flash, if there is one) with a fingertip and keep still for 15 seconds. The app reads the tiny colour changes with each heartbeat. It is a rough estimate, not a medical device, and it is saved as a camera reading.</p>
+<div class="row" style="margin-top:12px"><button id="camStart" type="button">Start 15-second pulse check</button></div>
+<video id="camVideo" muted playsinline style="width:1px;height:1px;opacity:0;position:absolute"></video>
+<p id="camStatus" class="hint" role="status" style="margin-top:12px"></p></section>
+<section class="panel" style="margin-top:16px"><p class="eyebrow">IMPORT</p><h2>Import readings from a file</h2>
+<p class="hint">Load readings from a CSV file with the columns <b>indicator, value, measured_at</b>, for example a Mission reports export or data you prepared from a public NASA dataset. Readings already saved are skipped, and imported ones are marked as imported.</p>
+<div class="row" style="margin-top:12px"><label for="impFile" class="hint" style="margin:0">Choose a CSV file</label><input id="impFile" type="file" accept=".csv,text/csv"><button class="quiet" id="impTemplate" type="button">Download a template</button></div>
+<p id="impStatus" class="hint" role="status" style="margin-top:12px"></p></section></div>
+
 </div>
 <div class="foot" id="appFoot" hidden><span>ASTRONAUT HEALTH MONITOR &middot; EDUCATIONAL PROTOTYPE</span><span>NOT A CLINICAL DEVICE &middot; FLIGHT SURGEON GUIDANCE TAKES PRECEDENCE</span></div>
 </main>
@@ -492,7 +502,7 @@ function renderRegion(){
  if(!full){data.replaceChildren();return}
  box.append(el('p','hint','Why it matters in space: '+r.h));renderSafety();renderRegionData()}
 const SRC={manual_entry:'Entered by you',wearable_device:'Wearable sensor',medical_device:'Medical device',camera_analysis:'Camera analysis'};
-const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':(SRC[m.measurement_source]||m.measurement_source);
+const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':m.notes==='Imported from file'?'Imported from file':(SRC[m.measurement_source]||m.measurement_source);
 let regionToken=0;
 async function renderRegionData(){const box=$('#regionData'),mine=++regionToken,r=REGIONS[S.region];
  box.replaceChildren();if(!r.i.length){box.append(el('p','hint','No readings are tracked for this body part yet.'));return}
@@ -528,7 +538,7 @@ function showHelp(){const i=$('#formIndicator').value,r=S.ref[i];
  $('#unit').textContent='('+r.unit+')';$('#help').textContent='How to measure: '+r.how_to_measure+' Best conditions: '+S.rules[i].measurement_conditions}
 async function record(){const box=$('#result'),v=parseFloat($('#formValue').value);box.hidden=false;
  if(Number.isNaN(v)){box.style.setProperty('--c','var(--warn)');box.textContent='Please type the result as a number first.';return}
- try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:$('#formIndicator').value,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString()});
+ try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:$('#formIndicator').value,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString(),...(S.camPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.camPulse?{measurement_source:'camera_analysis',notes:'Camera pulse estimate'}:{})});S.camPulse=null;
   const a=await api('/measurements/'+m.id+'/assessment');box.style.setProperty('--c','var(--'+({normal:'ok',caution:'warn',critical:'bad'})[a.final_status]+')');
   box.textContent=tag(a)+'. '+a.headline+'. '+a.recommended_actions[0];$('#formValue').value='';await refresh()}
  catch(e){box.style.setProperty('--c','var(--bad)');box.textContent='Not saved: '+e.message}}
@@ -692,7 +702,7 @@ function observations(){const o=[];if(!S.sum)return o;
  if(!assessedToday())o.push('No check-in recorded today.');
  if(!o.length)o.push('All recorded readings are in the healthy range and no strong patterns stand out.');return o}
 const PROMPTS=[['Review my sleep','sleep_duration'],['How is my mood?','mood_score'],['Stress and fatigue','stress_level'],['Heart and blood pressure','heart_rate'],['What needs attention?','attention']];
-function answer(q){q=q.toLowerCase();const map=[[/sleep|rest|tired/,'sleep_duration'],[/mood|feel|sad|low/,'mood_score'],[/stress|anx/,'stress_level'],[/fatigue/,'fatigue_level'],[/heart|pulse/,'heart_rate'],[/pressure|bp/,'systolic_blood_pressure'],[/glucose|sugar/,'blood_glucose'],[/temp|fever/,'body_temperature'],[/exercise|activity|workout/,'physical_activity']];
+function answer(q){q=q.toLowerCase();const map=[[/sleep|rest|tired/,'sleep_duration'],[/mood|feel|sad|low/,'mood_score'],[/stress|anx/,'stress_level'],[/fatigue/,'fatigue_level'],[/heart|pulse/,'heart_rate'],[/pressure|bp/,'systolic_blood_pressure'],[/glucose|sugar/,'blood_glucose'],[/temp|fever/,'body_temperature'],[/exercise|activity|workout/,'physical_activity'],[/radiation|dose|dosimeter|msv/,'radiation_dose']];
  if(/attention|urgent|worry|concern|wrong/.test(q)||q==='attention')return observations().join(' ');
  for(const [re,i] of map)if(re.test(q)){const a=S.sum&&S.sum.assessments.find(z=>z.indicator_type===i),rows=S.hist[i]||[];if(!a)return 'No '+name(i).toLowerCase()+' reading is recorded yet. Add one in Daily assessment.';
   const t=trendOf(rows,i);return name(i)+': latest '+fmt(a.measured_value)+' '+a.measurement_unit+' ('+ST[a.final_status].w+', '+t.w+'). '+a.explanation+' '+a.recommended_actions[0]}
@@ -932,6 +942,81 @@ function syncEnvButtonOnly(){const btn=$('#envLoad');if(!btn)return;btn.hidden=t
 const _re2=renderEnvBar;renderEnvBar=function(){_re2();const e=curEnv();if(!e||!S.ctx)return;const f=$('#envFacts'),old=f.querySelector('.impact');if(old)old.remove();
  const hi=Object.keys(S.ctx).filter(i=>i!=='diastolic_blood_pressure').filter(i=>{const h=envLevelFor(i);return h&&h.level===3}).map(i=>i==='systolic_blood_pressure'?'Blood pressure':name(i));
  const s2=el('span','focus impact');s2.append(document.createTextNode('Needs closest attention here: '),el('b','',hi.length?hi.join(', ')+' ('+hi.length+' of 9)':'none rated high'));f.append(s2)};
+
+/* ---- radiation, camera pulse, file import ---- */
+GROUPS.radiation_dose='Radiation';
+ICON.radiation_dose='<circle cx="12" cy="12" r="2"/><path d="M12 10V3.5M10.3 13l-5.6 3.2M13.7 13l5.6 3.2"/><circle cx="12" cy="12" r="9.5"/>';
+SHORT.radiation_dose='mSv / day';
+SYSTEMS.push({k:'rad',t:'Radiation exposure',i:['radiation_dose'],txt:'Space radiation cannot be felt or sensed by this app. Type in the daily dose from your personal dosimeter and the app compares it with NASA limits.',do:['Read your dosimeter at the same time each day.','During a solar storm warning, stay in the best-shielded area.','Ask the flight surgeon for your running career total.']});
+function estimatePulse(raw){
+ if(!raw||raw.length<60)return{ok:false,why:'Not enough camera frames were captured.'};
+ const t0=raw[0].t,dur=(raw[raw.length-1].t-t0)/1000;if(dur<8)return{ok:false,why:'The recording was too short.'};
+ const hz=30,n=Math.floor(dur*hz),x=new Array(n);let j=0;
+ for(let i=0;i<n;i++){const t=t0+i*1000/hz;while(j<raw.length-2&&raw[j+1].t<t)j++;const a=raw[j],b=raw[j+1],f=b.t===a.t?0:Math.min(1,Math.max(0,(t-a.t)/(b.t-a.t)));x[i]=a.v+(b.v-a.v)*f}
+ const avg=(arr,w)=>{const o=new Array(arr.length);let s=0;const q=[];for(let i=0;i<arr.length;i++){q.push(arr[i]);s+=arr[i];if(q.length>w)s-=q.shift();o[i]=s/q.length}return o};
+ const sm=avg(x,4),base=avg(x,30),y=sm.map((v,i)=>v-base[i]).slice(30);
+ const sd=Math.sqrt(y.reduce((s,v)=>s+v*v,0)/y.length);if(!(sd>0.05))return{ok:false,why:'No pulse signal was found. Cover the camera lens completely with your fingertip and keep still.'};
+ const peaks=[];const minGap=Math.round(hz*0.3);
+ for(let i=1;i<y.length-1;i++){if(y[i]>y[i-1]&&y[i]>=y[i+1]&&y[i]>0.4*sd){if(peaks.length&&i-peaks[peaks.length-1]<minGap){if(y[i]>y[peaks[peaks.length-1]])peaks[peaks.length-1]=i}else peaks.push(i)}}
+ if(peaks.length<8)return{ok:false,why:'Too few beats were detected. Press gently and keep your finger still.'};
+ const gaps=peaks.slice(1).map((p,k)=>(p-peaks[k])/hz).sort((a,b)=>a-b),med=gaps[Math.floor(gaps.length/2)];
+ const good=gaps.filter(g=>Math.abs(g-med)<=0.25*med);if(good.length<0.7*gaps.length)return{ok:false,why:'The signal was too uneven to trust. Try again and keep still.'};
+ const bpm=Math.round(60/(good.reduce((s,g)=>s+g,0)/good.length));
+ if(bpm<40||bpm>200)return{ok:false,why:'The estimate ('+bpm+' bpm) is outside the believable range. Try again.'};
+ return{ok:true,bpm}}
+let camRun=false;
+async function measurePulse(){
+ const st=$('#camStatus'),btn=$('#camStart');if(camRun)return;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){st.textContent='This browser cannot use the camera here. Camera access needs localhost or a secure page.';return}
+ camRun=true;btn.disabled=true;let stream;
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:320},height:{ideal:240}},audio:false});
+  const track=stream.getVideoTracks()[0];try{if(track.getCapabilities&&track.getCapabilities().torch)await track.applyConstraints({advanced:[{torch:true}]})}catch(e){}
+  const v=$('#camVideo');v.srcObject=stream;await v.play();
+  const cv=document.createElement('canvas');cv.width=24;cv.height=24;const cx=cv.getContext('2d',{willReadFrequently:true}),raw=[];let covered=0,total=0;const T=15000,start=performance.now();
+  await new Promise(done=>{const tick=()=>{const now=performance.now(),el0=now-start;
+   if(v.videoWidth){cx.drawImage(v,0,0,24,24);const d=cx.getImageData(0,0,24,24).data;let r=0,g=0;for(let i=0;i<d.length;i+=4){r+=d[i];g+=d[i+1]}r/=576;g/=576;raw.push({t:now,v:r});total++;if(r>90&&r>1.4*g)covered++}
+   st.textContent='Keep your fingertip over the camera lens... '+Math.max(0,Math.ceil((T-el0)/1000))+' s';
+   if(el0>=T)done();else requestAnimationFrame(tick)};tick()});
+  if(total<30||covered<0.8*total){st.textContent='The lens did not look covered by a fingertip. Cover it fully and try again.';return}
+  const res=estimatePulse(raw);
+  if(!res.ok){st.textContent=res.why;return}
+  $('#formIndicator').value='heart_rate';showHelp();$('#formValue').value=res.bpm;S.camPulse=res.bpm;
+  st.textContent='Camera estimate: about '+res.bpm+' beats per minute. Press Save reading to keep it. This is a rough estimate, not a medical device.'
+ }catch(e){st.textContent=(e&&e.name==='NotAllowedError')?'Camera permission was refused.':'The camera could not be used: '+((e&&e.message)||e)}
+ finally{if(stream)stream.getTracks().forEach(t=>t.stop());$('#camVideo').srcObject=null;camRun=false;btn.disabled=false}}
+function parseCsv(text){const rows=[];let row=[],cell='',q=false;text=text.replace(/^﻿/,'');
+ for(let i=0;i<text.length;i++){const c=text[i];
+  if(q){if(c==='"'){if(text[i+1]==='"'){cell+='"';i++}else q=false}else cell+=c}
+  else if(c==='"')q=true;else if(c===','){row.push(cell);cell=''}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>x.trim()!==''))rows.push(row);row=[]}
+  else cell+=c}
+ row.push(cell);if(row.some(x=>x.trim()!==''))rows.push(row);return rows}
+const fnv=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)};
+function prepareImport(text,astronautId){
+ const rows=parseCsv(text);if(rows.length<2)return{items:[],skipped:['The file has no data rows.']};
+ const head=rows[0].map(h=>h.trim().toLowerCase()),ix=n=>head.indexOf(n),ci=ix('indicator'),cv=ix('value'),ct=ix('measured_at');
+ if(ci<0||cv<0||ct<0)return{items:[],skipped:['The first row must name the columns indicator, value and measured_at.']};
+ const items=[],skipped=[];
+ rows.slice(1,2001).forEach((r,k)=>{const line=k+2,ind=(r[ci]||'').trim(),val=parseFloat((r[cv]||'').replace(/^'/,'')),when=new Date((r[ct]||'').trim().replace(/^'/,''));
+  if(!S.ref[ind]){skipped.push('Line '+line+': unknown indicator "'+ind+'".');return}
+  if(Number.isNaN(val)){skipped.push('Line '+line+': the value is not a number.');return}
+  if(Number.isNaN(when.getTime())){skipped.push('Line '+line+': the date could not be read.');return}
+  const iso=when.toISOString();
+  items.push({astronaut_id:astronautId,indicator_type:ind,measured_value:val,measured_at:iso,measurement_source:'manual_entry',notes:'Imported from file',client_reference:'imp-'+astronautId+'-'+fnv(ind+'|'+val+'|'+iso)})});
+ return{items,skipped}}
+async function importFile(file){
+ const st=$('#impStatus');st.textContent='Reading the file...';
+ try{
+  const {items,skipped}=prepareImport(await file.text(),+cur());let created=0,dup=0,rej=0;const why=skipped.slice();
+  for(let i=0;i<items.length;i+=400){const res=await post('/measurements/batch',{measurements:items.slice(i,i+400)});created+=res.created_count;dup+=res.duplicate_count;rej+=res.rejected_count;res.results.forEach(x=>{if(x.rejection_reason)why.push(x.rejection_reason)})}
+  st.textContent='Imported '+created+' readings'+(dup?', '+dup+' already saved':'')+((rej+skipped.length)?', '+(rej+skipped.length)+' skipped':'')+'.'+(why.length?' '+why.slice(0,3).join(' '):'');
+  await refresh()}
+ catch(e){st.textContent='Import failed: '+e.message}}
+
+$('#camStart').addEventListener('click',measurePulse);
+$('#impFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)importFile(f).finally(()=>{e.target.value=''})});
+$('#impTemplate').addEventListener('click',()=>download('readings_template.csv','indicator,value,measured_at\nheart_rate,62,2026-11-01T08:00:00Z\nradiation_dose,0.55,2026-11-01T08:00:00Z\n','text/csv'));
 </script>
 </body>
 </html>
