@@ -20,3 +20,6 @@ Each indicator has a suggested interval (24 hours, or 72 hours for blood glucose
 Calculated in the browser from stored readings: current and best streak, days logged, points (10 per day logged and 25 per badge) and eight badges. Points reward logging only. They never depend on whether a value is good, so a poor reading cannot lose points.
 
 Tests: `tests/unit/test_spaceflight_context.py`, `tests/integration/test_spaceflight_context_api.py`, `tests/integration/test_dashboard.py`.
+
+## Environment-specific sample data
+`POST /demo/sample-crew?environment=station|transit|rover|moon|mars` (demo mode only) creates a simulated crew member whose 14 days of readings are shifted for that environment, for example more stress and less sleep for Mars. The shifts are **qualitative and illustrative**, not physiological predictions, and the data stays labelled as simulated. On the overview, switching the environment while viewing sample data jumps to that environment's sample crew member, or offers a button to load one. Choosing a crew member named for an environment also sets the environment. Real measured values are never changed by the selector.

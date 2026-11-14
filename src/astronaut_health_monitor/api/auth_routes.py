@@ -1,7 +1,7 @@
 """Sign-in, sign-out, user management, the audit log and demo data."""
 
 import logging
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, Response
 
@@ -135,12 +135,13 @@ def add_sample_crew_member(
     measurement_service: MeasurementServiceDependency,
     authentication_service: AuthenticationServiceDependency,
     audit_service: AuditServiceDependency,
+    environment: Literal["station", "transit", "rover", "moon", "mars"] = "station",
 ) -> AstronautResponse:
     """Create a simulated astronaut with 14 days of readings. Only available when demo mode is on."""
     if not request.app.state.settings.demo_mode:
         raise DemoModeDisabledError("Demo mode is switched off.")
-    astronaut = DemoDataService(
-        astronaut_service, measurement_service, authentication_service
-    ).seed_sample_crew_member()
+    astronaut = DemoDataService(astronaut_service, measurement_service, authentication_service).seed_sample_crew_member(
+        environment
+    )
     audit_service.record("demo.sample_crew_created", user=manager, target=f"astronaut:{astronaut.id}")
     return AstronautResponse.model_validate(astronaut)

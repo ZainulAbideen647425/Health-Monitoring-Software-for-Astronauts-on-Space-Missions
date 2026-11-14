@@ -283,7 +283,7 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <div class="crumbs" id="crumbs"><span id="crumbPath">MISSION &rsaquo; MISSION OVERVIEW</span><span class="chip" id="dataTag">YOUR READINGS</span></div>
 <div data-view="today" style="display:grid;gap:20px">
 <div class="sechead"><div><p class="eyebrow" id="todayEyebrow">CREW HEALTH STATUS</p><h1 id="greeting">Hello.</h1><p id="todayDesc">Your health overview for today.</p></div><button type="button" id="goAssessment">Daily assessment &rarr;</button></div>
-<div class="envbar" id="envBar" hidden><div><label class="lab" for="envSelect">MISSION ENVIRONMENT</label><select id="envSelect" aria-describedby="envFacts"></select></div><div class="envfacts" id="envFacts"></div></div>
+<div class="envbar" id="envBar" hidden><div><label class="lab" for="envSelect">MISSION ENVIRONMENT</label><select id="envSelect" aria-describedby="envFacts"></select><button type="button" id="envLoad" class="quiet" hidden style="margin-top:10px;width:100%"></button><p class="hint" id="envLoadNote" role="status" style="margin:8px 0 0"></p></div><div class="envfacts" id="envFacts"></div></div>
 <div class="strip" id="simBanner" hidden><div><strong>SIMULATED SAMPLE DATA</strong><br><span>These readings are made up for demonstration. They are not from a real person and not clinically validated.</span></div></div>
 <div id="banner" class="s-none"><div class="rb-main"><div class="ring" aria-hidden="false" role="img" id="ringBox" aria-label="Readings in the healthy range"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="51"/><circle class="fg" id="ringFg" cx="60" cy="60" r="51" stroke-dasharray="320.4" stroke-dashoffset="320.4"/></svg><div class="num"><div><span id="ringNum">0</span>%<small>IN RANGE</small></div></div></div><span class="icon" id="bannerIcon"></span><div class="rb-text"><p class="eyebrow" id="rbEyebrow">MISSION READINESS</p><h2 id="bannerTitle">Health status <span id="bannerWord">not known yet</span></h2><p id="bannerText"></p><div class="rb-bar"><div class="track"><span id="rbFill"></span></div><div class="rb-barlab"><span>SHARE OF READINGS IN HEALTHY RANGE</span><b id="rbPct">0 / 100</b></div></div><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
 <div class="rb-mid"><div><span class="lab">ASSESSMENT</span><strong id="stAssess" class="pend">Pending today</strong><small id="stAssessNote">Complete your daily check-in</small></div><div><span class="lab">LAST RECORDED</span><strong id="stLast">-</strong><small id="stLastNote"></small></div></div>
@@ -532,7 +532,7 @@ async function record(){const box=$('#result'),v=parseFloat($('#formValue').valu
   const a=await api('/measurements/'+m.id+'/assessment');box.style.setProperty('--c','var(--'+({normal:'ok',caution:'warn',critical:'bad'})[a.final_status]+')');
   box.textContent=tag(a)+'. '+a.headline+'. '+a.recommended_actions[0];$('#formValue').value='';await refresh()}
  catch(e){box.style.setProperty('--c','var(--bad)');box.textContent='Not saved: '+e.message}}
-async function demo(){const a=await post('/demo/sample-crew',{});await loadCrew();$('#crew').value=a.id;await refresh()}
+async function demo(){const a=await post('/demo/sample-crew?environment='+(S.env||'station'),{});await loadCrew();$('#crew').value=a.id;await refresh()}
 const TOUR=[['Welcome','Use the menu on the left. Mission overview shows how you are doing, Body intelligence explains each part, Health trends shows changes, and Daily assessment or Add reading saves new readings.'],['Read the symbols','\u2713 Good, \u25B2 Watch, \u25A0 Urgent. Every status has a symbol and a word, not just a color.'],['Add readings','Use Daily assessment for a full check-in or Add reading for one value. The top of Mission overview always tells you what to do next. Press ? any time for help.']];
 let tourStep=0;
 function showTour(){const t=$('#tour');if(tourStep>=TOUR.length){t.hidden=true;try{localStorage.setItem('tourSeen','1')}catch(e){}return}
@@ -549,7 +549,7 @@ for(const k in REGIONS){const e=$('#r-'+k),pick=()=>{if(S.detail==='full'&&S.reg
  press=()=>{S.detail=(S.region===k&&S.detail==='reading')?'full':'reading';S.region=k;if(S.sum)renderRegion()};
  e.addEventListener('mouseenter',pick);e.addEventListener('focus',pick);e.addEventListener('click',press);
  e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();press()}})}
-$('#crew').addEventListener('change',refresh);$('#chartIndicator').addEventListener('change',renderChart);
+$('#crew').addEventListener('change',()=>refresh());$('#chartIndicator').addEventListener('change',renderChart);
 $('#formIndicator').addEventListener('change',showHelp);$('#record').addEventListener('click',record);
 $('#formValue').addEventListener('keydown',e=>{if(e.key==='Enter')record()});
 const runDemo=()=>demo().catch(e=>alert('Could not add sample data: '+e.message+' (sample data needs demo mode).'));
@@ -915,6 +915,23 @@ const _ra2=renderActions;renderActions=function(){_ra2();const e=curEnv();if(!e)
  e.hazards.filter(h=>h.level===3).slice(0,2).forEach(h=>ul.append(el('li','',h.hazard_name+' is high here. '+h.note)))};
 const _rb2=renderBanner;renderBanner=function(){_rb2();const e=curEnv();if(e)$('#rbEyebrow').textContent+=' \u00B7 '+e.name.split(' (')[0].toUpperCase()};
 const _re=renderEnvBar;renderEnvBar=function(){_re();if(S.sum){renderBanner();renderActions();renderCards()}};
+
+/* ---- environment-shaped sample data ---- */
+const SAMPLE_SUFFIX={station:'',transit:' (Deep-space transit)',rover:' (Pressurized rover)',moon:' (Lunar base)',mars:' (Mars base)'};
+const sampleName=k=>'Demo Astronaut'+(SAMPLE_SUFFIX[k]||'');
+async function syncSampleToEnv(){const e=curEnv(),btn=$('#envLoad');if(!e)return;btn.hidden=true;$('#envLoadNote').textContent='';if(!S.simulated)return;
+ const found=S.crew.find(a=>a.full_name===sampleName(S.env));
+ if(found){if(String(found.id)!==cur()){$('#crew').value=found.id;await refresh()}return}
+ btn.hidden=false;btn.textContent='Load simulated readings for '+e.name.split(' (')[0];$('#envLoadNote').textContent='Simulated readings for this environment are illustrative only. Switching environment never changes a real measured value.'}
+$('#envLoad').addEventListener('click',async()=>{const b=$('#envLoad');b.disabled=true;try{const a=await post('/demo/sample-crew?environment='+S.env,{});await loadCrew();$('#crew').value=a.id;await refresh()}catch(x){$('#envLoadNote').textContent='Could not load sample data: '+x.message}b.disabled=false});
+$('#envSelect').addEventListener('change',()=>{syncSampleToEnv()});
+const _rf4=refresh;refresh=async function(){const name_=(S.crew.find(a=>String(a.id)===cur())||{}).full_name,k=Object.keys(SAMPLE_SUFFIX).find(x=>sampleName(x)===name_);
+ if(k&&k!==S.env&&S.envs.some(x=>x.key===k)){S.env=k;try{localStorage.setItem('env:'+S.user.username,k)}catch(e){}}
+ await _rf4();syncEnvButtonOnly()};
+function syncEnvButtonOnly(){const btn=$('#envLoad');if(!btn)return;btn.hidden=true;if(!S.simulated||!curEnv())return;if(!S.crew.some(a=>a.full_name===sampleName(S.env))){btn.hidden=false;btn.textContent='Load simulated readings for '+curEnv().name.split(' (')[0]}}
+const _re2=renderEnvBar;renderEnvBar=function(){_re2();const e=curEnv();if(!e||!S.ctx)return;const f=$('#envFacts'),old=f.querySelector('.impact');if(old)old.remove();
+ const hi=Object.keys(S.ctx).filter(i=>i!=='diastolic_blood_pressure').filter(i=>{const h=envLevelFor(i);return h&&h.level===3}).map(i=>i==='systolic_blood_pressure'?'Blood pressure':name(i));
+ const s2=el('span','focus impact');s2.append(document.createTextNode('Needs closest attention here: '),el('b','',hi.length?hi.join(', ')+' ('+hi.length+' of 9)':'none rated high'));f.append(s2)};
 </script>
 </body>
 </html>

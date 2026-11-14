@@ -13,7 +13,7 @@ On a Mars mission, a message to Earth takes up to 22 minutes each way. Astronaut
 4. **Grounded in NASA's five hazards**: every indicator says which hazard changes it, why it needs checking and how it is measured on board, with a link to NASA's Human Research Program. A mission-environment selector (station, deep-space transit, rover, Moon, Mars) re-rates the hazards.
 5. **Engaging**: streaks and badges reward logging (never values), and a measurement schedule shows what is due.
 6. **Accessible**: symbol and word beside every colour, keyboard and screen-reader friendly.
-7. **Tested**: 297 automated tests, 98% coverage, type-checked, CI on every push.
+7. **Tested**: 300 automated tests, 98% coverage, type-checked, CI on every push.
 
 ## Honest limits
 Educational prototype using reference ranges. Not a medical device. The models are small and trained on one person's own history, so they need about 7 to 10 days of readings before they speak. They have not been clinically validated.

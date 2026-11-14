@@ -178,3 +178,10 @@ def test_dashboard_has_a_mobile_menu_and_environment_aware_readings(api_client: 
     for element in ("menuBtn", "navScrim"):
         assert f'id="{element}"' in page
     assert "navopen" in page and "mc-env" in page and "never the measured values" in page
+
+
+def test_dashboard_loads_environment_specific_sample_data(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for element in ("envLoad", "envLoadNote"):
+        assert f'id="{element}"' in page
+    assert "/demo/sample-crew?environment=" in page and "Needs closest attention here" in page
