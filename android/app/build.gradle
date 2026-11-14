@@ -16,8 +16,15 @@ android {
         python {
             version '3.12'
             pip {
-                install 'fastapi', 'uvicorn', 'sqlalchemy', 'pydantic', 'pydantic-settings', 'cryptography'
-                install 'numpy', 'pandas', 'scikit-learn'
+                install 'fastapi'
+                install 'uvicorn'
+                install 'sqlalchemy'
+                install 'pydantic'
+                install 'pydantic-settings'
+                install 'cryptography'
+                install 'numpy'
+                install 'pandas'
+                install 'scikit-learn'
             }
             extractPackages 'astronaut_health_monitor'
         }
