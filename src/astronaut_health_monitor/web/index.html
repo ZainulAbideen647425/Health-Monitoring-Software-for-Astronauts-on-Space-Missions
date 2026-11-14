@@ -201,6 +201,22 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 .al.reminder{--c:var(--ok)}.al.caution{--c:var(--warn)}.al.critical{--c:var(--bad)}
 /* CTA icon */
 .cta .ico{width:44px;height:44px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;color:var(--ok);flex:0 0 auto}.cta .ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* environment, schedule, routine, hazard context */
+.envbar{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:12px 28px;align-items:center;padding:14px 18px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+.envbar select{width:100%}.envfacts{display:flex;flex-wrap:wrap;gap:6px 22px;color:var(--muted);font-size:.9rem}.envfacts b{color:var(--text);font-weight:600}.envfacts .focus{flex-basis:100%}
+@media(max-width:760px){.envbar{grid-template-columns:1fr}}
+.lvl{display:inline-block;font:.66rem var(--mono);letter-spacing:.1em;padding:3px 8px;border:1px solid var(--c);border-radius:4px;color:var(--c)}.lvl.l3{--c:var(--warn)}.lvl.l2{--c:var(--muted)}.lvl.l1{--c:var(--ok)}
+.envx{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:.88rem;color:var(--muted)}.envx p{margin:6px 0 0}
+.envrow{display:grid;grid-template-columns:200px auto 1fr;gap:6px 14px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}.envrow:first-of-type{border-top:0}
+@media(max-width:760px){.envrow{grid-template-columns:1fr}}
+.sched{display:grid;gap:0}.sched .srow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.sched .srow:first-child{border-top:0}.sched small{color:var(--faint);display:block}
+.st{font:.66rem var(--mono);letter-spacing:.08em;white-space:nowrap;color:var(--c)}.st::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:7px}.st.ok{--c:var(--ok)}.st.soon,.st.due{--c:var(--warn)}.st.never{--c:var(--faint)}
+.game{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px}.gstat{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--panel2)}.gstat span{font:.64rem var(--mono);letter-spacing:.1em;color:var(--faint)}.gstat b{display:block;font:500 1.8rem/1.2 var(--mono)}
+.lvlbar{height:5px;background:var(--inset);border-radius:3px;overflow:hidden;margin:0 0 16px}.lvlbar span{display:block;height:100%;background:var(--ok)}
+.badges{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}.badge{display:flex;gap:12px;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--panel2)}.badge.locked{opacity:.6}
+.badge .bi{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--ok);color:var(--ok);font-weight:700;flex:0 0 auto}.badge.locked .bi{border-color:var(--faint);color:var(--faint)}
+.badge small,.badge em{display:block;margin-top:3px}.badge b{display:block;font-size:.92rem}.badge small{color:var(--muted)}.badge em{font:normal .64rem var(--mono);letter-spacing:.08em;color:var(--ok)}.badge.locked em{color:var(--faint)}
+#mdInfo a{color:var(--ok)}
 </style>
 </head>
 <body>
@@ -257,6 +273,7 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <div class="crumbs" id="crumbs"><span id="crumbPath">MISSION &rsaquo; MISSION OVERVIEW</span><span class="chip" id="dataTag">YOUR READINGS</span></div>
 <div data-view="today" style="display:grid;gap:20px">
 <div class="sechead"><div><p class="eyebrow" id="todayEyebrow">CREW HEALTH STATUS</p><h1 id="greeting">Hello.</h1><p id="todayDesc">Your health overview for today.</p></div><button type="button" id="goAssessment">Daily assessment &rarr;</button></div>
+<div class="envbar" id="envBar" hidden><div><label class="lab" for="envSelect">MISSION ENVIRONMENT</label><select id="envSelect" aria-describedby="envFacts"></select></div><div class="envfacts" id="envFacts"></div></div>
 <div class="strip" id="simBanner" hidden><div><strong>SIMULATED SAMPLE DATA</strong><br><span>These readings are made up for demonstration. They are not from a real person and not clinically validated.</span></div></div>
 <div id="banner" class="s-none"><div class="rb-main"><div class="ring" aria-hidden="false" role="img" id="ringBox" aria-label="Readings in the healthy range"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="51"/><circle class="fg" id="ringFg" cx="60" cy="60" r="51" stroke-dasharray="320.4" stroke-dashoffset="320.4"/></svg><div class="num"><div><span id="ringNum">0</span>%<small>IN RANGE</small></div></div></div><span class="icon" id="bannerIcon"></span><div class="rb-text"><p class="eyebrow" id="rbEyebrow">MISSION READINESS</p><h2 id="bannerTitle">Health status <span id="bannerWord">not known yet</span></h2><p id="bannerText"></p><div class="rb-bar"><div class="track"><span id="rbFill"></span></div><div class="rb-barlab"><span>SHARE OF READINGS IN HEALTHY RANGE</span><b id="rbPct">0 / 100</b></div></div><button type="button" id="firstReading" hidden>Add my first reading</button></div></div>
 <div class="rb-mid"><div><span class="lab">ASSESSMENT</span><strong id="stAssess" class="pend">Pending today</strong><small id="stAssessNote">Complete your daily check-in</small></div><div><span class="lab">LAST RECORDED</span><strong id="stLast">-</strong><small id="stLastNote"></small></div></div>
@@ -265,6 +282,7 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <section class="panel"><div class="ph"><div><p class="eyebrow">CREW TELEMETRY</p><h2>Health indicators</h2></div><span class="upd" id="updTag">UPDATED --</span></div><p class="legend">STEADY, MONITOR or URGENT on every card. Most urgent first. Select a card for the full detail.</p><div id="cards"></div></section>
 <div class="twocol"><section class="panel"><div class="ph"><div><p class="eyebrow">PERSONAL SERIES</p><h2>Seven-day signal</h2></div><button class="quiet" type="button" id="allTrends">All trends &rarr;</button></div><div id="signals"></div></section>
 <section class="panel" id="alertsPanel"><div class="ph"><div><p class="eyebrow">OBSERVATIONS</p><h2>Attention &amp; reminders</h2></div><span class="count" id="alertCount">00</span></div><div id="alerts"></div></section></div>
+<section class="panel" id="routine"><div class="ph"><div><p class="eyebrow">CREW ROUTINE</p><h2>Streaks and badges</h2></div><span class="chip" id="levelChip">LEVEL 1</span></div><div class="game" id="gameStats"></div><div class="lvlbar" aria-hidden="true"><span id="lvlFill"></span></div><div class="badges" id="badges"></div><p class="hint">Points reward logging your health, never the values themselves. A poor reading never loses points.</p></section>
 <section class="panel cta"><div style="display:flex;gap:16px;align-items:center"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><div><p class="eyebrow">CONNECTED SYSTEMS</p><h3>Explore body intelligence</h3><p>See how spaceflight conditions connect to health signals and prevention.</p></div></div><button class="quiet" type="button" id="goBody">Explore body &rarr;</button></section>
 </div>
 <div data-view="body" hidden style="display:grid;gap:20px">
@@ -300,6 +318,7 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <circle class="node" cx="170" cy="150" r="34"/><text x="170" y="154" text-anchor="middle">CREW</text>
 <g><circle class="node" cx="170" cy="40" r="26"/><text x="170" y="44" text-anchor="middle">01</text><circle class="node" cx="285" cy="115" r="26"/><text x="285" y="119" text-anchor="middle">02</text><circle class="node" cx="245" cy="240" r="26"/><text x="245" y="244" text-anchor="middle">03</text><circle class="node" cx="95" cy="240" r="26"/><text x="95" y="244" text-anchor="middle">04</text><circle class="node" cx="55" cy="115" r="26"/><text x="55" y="119" text-anchor="middle">05</text></g></svg>
 <div><p class="eyebrow">CONNECTED RISK MODEL</p><h2>Mission conditions, seen through the crew member.</h2><p class="hint">The hazards are not separate. Sleep, mood, heart signals, activity and symptoms give context, never a diagnosis. Numbers 01 to 05 match the cards below.</p></div></section>
+<section class="panel" id="envPanel"></section>
 <section class="panel"><h2>The five spaceflight hazards</h2>
 <p class="hint">NASA's Human Research Program groups the risks of human spaceflight into five hazards. This page explains each one in plain words and says what this app does about it. It gives general information and does not diagnose anything.</p>
 <div class="hazards">
@@ -315,6 +334,7 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <div class="notice-strip"><span>This is not a medical device. Follow mission protocols and contact the flight surgeon about any health concern.</span></div>
 <div class="wiz"><section class="panel"><p class="eyebrow">CHECK-IN PROGRESS</p><h2 id="wizCount">01 / 03</h2><div class="progress"><span id="wizBar" style="width:33%"></span></div><div class="wsteps" id="wizSteps"></div></section>
 <section class="panel" id="wizard"></section></div>
+<section class="panel" id="schedulePanel"><p class="eyebrow">MEASUREMENT SCHEDULE</p><h2>What is due</h2><div class="sched" id="schedule"></div><p class="hint">Suggested by this prototype from the type of indicator. Your mission protocol sets the real schedule.</p></section>
 <p class="hint">Use approved instruments and mission procedures for clinical measurements. A single reading cannot determine a diagnosis.</p></div>
 <div data-view="assistant" hidden style="display:grid;gap:20px">
 <div class="sechead"><div><p class="eyebrow">CREW SUPPORT &middot; STRUCTURED HEALTH INTELLIGENCE</p><h1>Health intelligence</h1><p>A guided review of your health signals and the mission context. It is not a diagnostic chatbot.</p></div><span class="chip">OBSERVATIONS ONLY</span></div>
@@ -806,6 +826,66 @@ const _om=openMetric;openMetric=function(ind){_om(ind);const a=S.sum.assessments
  if((ind==='systolic_blood_pressure'||ind==='diastolic_blood_pressure')&&sy&&di){$('#mdTitle').textContent='Blood pressure';$('#mdValue').textContent=fmt(sy.measured_value)+'/'+fmt(di.measured_value)+' mmHg'}
  const info=$('#mdInfo');if(a.contact_flight_surgeon){const d=el('div','');d.append(el('dt','','Contact the flight surgeon'),el('dd','','Now. This reading needs medical guidance.'));info.prepend(d)}
  if(a.warning_signs_requiring_escalation){const d=el('div','');d.append(el('dt','','Get help if you notice'),el('dd','',a.warning_signs_requiring_escalation));info.append(d)}};
+
+/* ---- spaceflight context, environments, schedule and routine ---- */
+S.ctx=null;S.envs=[];S.env='station';
+const HZ=['space_radiation','isolation_and_confinement','distance_from_earth','gravity_fields','hostile_closed_environment'];
+async function loadContext(){if(S.ctx)return;S.ctx={};try{const c=await api('/spaceflight-context');c.indicators.forEach(i=>{S.ctx[i.indicator_type]=i});S.envs=c.environments;S.radNote=c.radiation_note}catch(e){S.envs=[]}
+ let k='';try{k=localStorage.getItem('env:'+S.user.username)||''}catch(e){}if(S.envs.some(x=>x.key===k))S.env=k}
+const curEnv=()=>S.envs.find(e=>e.key===S.env)||S.envs[0]||null;
+function renderEnvBar(){const sel=$('#envSelect'),e=curEnv();if(!e){$('#envBar').hidden=true;return}$('#envBar').hidden=false;
+ if(sel.options.length!==S.envs.length){sel.replaceChildren();S.envs.forEach(x=>{const o=document.createElement('option');o.value=x.key;o.textContent=x.name;sel.append(o)})}
+ sel.value=e.key;const f=$('#envFacts');f.replaceChildren();
+ [['Gravity',e.gravity],['One-way message delay',e.one_way_message_delay],['Return to Earth',e.return_to_earth]].forEach(([k,v])=>{const s=el('span','');s.append(document.createTextNode(k+': '),el('b','',v));f.append(s)});
+ const fo=el('span','focus');fo.append(document.createTextNode('Health focus here: '),el('b','',e.health_focus.join(' · ')));f.append(fo)}
+const lvl=h=>{const s=el('span','lvl l'+h.level,h.level_word.toUpperCase());return s};
+function renderHazards(){const e=curEnv();if(!e||!S.ctx)return;const p=$('#envPanel');p.replaceChildren(el('p','eyebrow','YOUR MISSION ENVIRONMENT'),el('h2','',e.name),el('p','hint','Qualitative ratings for orientation only. Change the environment on the Mission overview. Your mission protocol decides the real plan.'));
+ e.hazards.forEach(h=>{const r=el('div','envrow');r.append(el('b','',h.hazard_name),lvl(h),el('span','',h.note));p.append(r)});
+ document.querySelectorAll('.hazard').forEach((card,i)=>{const key=HZ[i],h=e.hazards.find(x=>x.hazard===key);if(!h)return;const old=card.querySelector('.envx');if(old)old.remove();
+  const x=el('div','envx'),top=el('div','');top.append(document.createTextNode('In this environment: '),lvl(h));x.append(top,el('p','',h.note));
+  const names=[...new Set(Object.values(S.ctx).filter(c=>c.hazards.includes(key)).map(c=>/blood_pressure/.test(c.indicator_type)?'Blood pressure':name(c.indicator_type)))];
+  x.append(el('p','',names.length?'Indicators it affects: '+names.join(', ')+'.':S.radNote));card.append(x)})}
+/* metric dialog: spaceflight context */
+const _om2=openMetric;openMetric=function(ind){_om2(ind);const c=S.ctx&&S.ctx[ind];if(!c)return;const info=$('#mdInfo'),e=curEnv();
+ const add=(k,v)=>{const d=el('div','');d.append(el('dt','',k),el('dd','',v));info.append(d);return d};
+ add('How spaceflight changes it',c.how_hazards_change_it+' Hazards: '+c.hazard_names.join(', ')+'.');add('Why it needs checking',c.why_it_needs_checking);add('How it is measured on board',c.how_it_is_measured_on_board);
+ if(e){const hs=e.hazards.filter(h=>c.hazards.includes(h.hazard)).sort((a,b)=>b.level-a.level)[0];if(hs)add('In your environment ('+e.name+')',hs.hazard_name+' is '+hs.level_word.toLowerCase()+'. '+hs.note)}
+ const sd=add('Source','');const a=document.createElement('a');a.href=c.source.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=c.source.title;sd.lastChild.append(a);
+ add('Suggested schedule','About every '+(c.suggested_interval_hours>=48?Math.round(c.suggested_interval_hours/24)+' days':c.suggested_interval_hours+' hours')+'. Your mission protocol decides.')};
+/* measurement schedule */
+function dueState(ind){const iv=(S.ctx[ind]||{}).suggested_interval_hours||24,rows=S.hist[ind]||[];
+ if(!rows.length)return{k:'never',t:'NEVER RECORDED',iv,sub:'Add a first reading'};
+ const left=new Date(rows[rows.length-1].measured_at).getTime()+iv*36e5-Date.now(),h=Math.abs(Math.round(left/36e5));
+ if(left<=0)return{k:'due',t:'DUE NOW',iv,sub:'Overdue by about '+h+' h'};
+ if(left<iv*36e5*.25)return{k:'soon',t:'DUE SOON',iv,sub:'Due in about '+h+' h'};
+ return{k:'ok',t:'ON SCHEDULE',iv,sub:'Next in about '+h+' h'}}
+const schedInds=()=>Object.keys(S.ref).filter(i=>i!=='diastolic_blood_pressure');
+function renderSchedule(){const box=$('#schedule');box.replaceChildren();if(!S.ctx)return;
+ schedInds().forEach(i=>{const d=dueState(i),r=el('div','srow'),l=el('div','');l.append(el('b','',i==='systolic_blood_pressure'?'Blood pressure':name(i)),el('small','','Every '+(d.iv>=48?Math.round(d.iv/24)+' days':d.iv+' h')+' · '+d.sub));r.append(l,el('span','st '+d.k,d.t));box.append(r)})}
+const _col2=collectAlerts;collectAlerts=function(){const out=_col2(),ack=getAck();
+ const due=schedInds().filter(i=>S.ctx&&S.ctx[i]&&dueState(i).k==='due');
+ if(due.length&&!out.some(x=>x.id==='r:daily')&&!ack.includes('r:due'))out.push({id:'r:due',sev:'reminder',t:'Measurements due',d:'Due now: '+due.map(i=>i==='systolic_blood_pressure'?'blood pressure':name(i).toLowerCase()).slice(0,5).join(', ')+'.',go:'assessment'});return out};
+/* gamification */
+const dayOf=t=>new Date(t).toLocaleDateString('en-CA');
+function routine(){const days=new Map();Object.entries(S.hist).forEach(([i,rows])=>rows.forEach(r=>{const k=dayOf(r.measured_at);if(!days.has(k))days.set(k,new Set());days.get(k).add(i)}));
+ const keys=[...days.keys()].sort(),dd=k=>new Date(k+'T12:00:00'),oneDay=864e5;
+ let best=0,run=0;keys.forEach((k,x)=>{run=x>0&&Math.round((dd(k)-dd(keys[x-1]))/oneDay)===1?run+1:1;best=Math.max(best,run)});
+ let cur=0,d=new Date();d.setHours(12);if(!days.has(dayOf(d)))d=new Date(d-oneDay);while(days.has(dayOf(d))){cur++;d=new Date(d-oneDay)}
+ const last7=[...Array(7)].map((_,x)=>dayOf(new Date(Date.now()-x*oneDay))),cnt=i=>last7.filter(k=>days.has(k)&&days.get(k).has(i)).length,all=Object.keys(S.ref);
+ const B=[['first','First reading','Record any reading.',keys.length>0,keys.length+' day(s) logged'],
+  ['s3','3-day streak','Log on 3 days in a row.',best>=3,'Best streak '+best],['s7','7-day streak','Log on 7 days in a row.',best>=7,'Best streak '+best],['s14','14-day streak','Log on 14 days in a row.',best>=14,'Best streak '+best],
+  ['full','Full check-in','Log every indicator on one day.',keys.some(k=>all.every(i=>days.get(k).has(i))),'Use the Daily assessment'],
+  ['well','Wellbeing check','Log mood, stress and fatigue on one day.',keys.some(k=>['mood_score','stress_level','fatigue_level'].every(i=>days.get(k).has(i))),'Mood, stress and fatigue'],
+  ['move','Active week','Log exercise on 5 of the last 7 days.',cnt('physical_activity')>=5,cnt('physical_activity')+' of 5 days'],
+  ['rest','Sleep log week','Log sleep on 5 of the last 7 days.',cnt('sleep_duration')>=5,cnt('sleep_duration')+' of 5 days']];
+ const got=B.filter(b=>b[3]).length,pts=keys.length*10+got*25;return{cur,best,days:keys.length,B,got,pts,level:Math.floor(pts/100)+1}}
+function renderRoutine(){const g=routine(),gs=$('#gameStats'),bd=$('#badges');gs.replaceChildren();bd.replaceChildren();
+ [['CURRENT STREAK',g.cur+(g.cur===1?' day':' days')],['BEST STREAK',g.best+(g.best===1?' day':' days')],['DAYS LOGGED',String(g.days)],['POINTS',String(g.pts)]].forEach(([k,v])=>{const d=el('div','gstat');d.append(el('span','',k),el('b','',v));gs.append(d)});
+ $('#levelChip').textContent='LEVEL '+g.level+' · '+g.badges+' '.trim();$('#levelChip').textContent='LEVEL '+g.level+' · '+g.got+' / '+g.B.length+' BADGES';$('#lvlFill').style.width=(g.pts%100)+'%';
+ g.B.forEach(b=>{const d=el('div','badge'+(b[3]?'':' locked'));d.append(el('span','bi',b[3]?'✓':'•'));const t=el('div','');t.append(el('b','',b[1]),el('small','',b[2]),el('em','',b[3]?'EARNED':'LOCKED · '+b[4]));d.append(t);bd.append(d)})}
+$('#envSelect').addEventListener('change',e=>{S.env=e.target.value;try{localStorage.setItem('env:'+S.user.username,S.env)}catch(x){}renderEnvBar();renderHazards()});
+const _rf3=refresh;refresh=async function(){await loadContext();await _rf3();renderEnvBar();renderRoutine();renderSchedule();renderHazards()};
+const _rt=reportText;reportText=function(){const e=curEnv();return e?_rt().replace('\n\n','\nEnvironment: '+e.name+'\n\n'):_rt()};
 </script>
 </body>
 </html>

@@ -32,20 +32,32 @@ from astronaut_health_monitor.api.schemas import (
     HealthAssessmentResponse,
     HealthIndicatorReferenceResponse,
     HealthStatusRuleResponse,
+    IndicatorSpaceContextResponse,
     MeasurementBatchItemResponse,
     MeasurementBatchRequest,
     MeasurementBatchResponse,
     MeasurementCreateRequest,
     MeasurementResponse,
     MissionCreateRequest,
+    MissionEnvironmentHazardResponse,
+    MissionEnvironmentResponse,
     MissionResponse,
     QueuedMeasurementItem,
+    SpaceflightContextResponse,
+    SpaceflightSourceResponse,
 )
 from astronaut_health_monitor.domain.authenticated_user import AuthenticatedUser
 from astronaut_health_monitor.domain.enumerations import BatchItemOutcome, HealthIndicatorType
 from astronaut_health_monitor.domain.health_indicator_reference import HEALTH_INDICATOR_REFERENCES
 from astronaut_health_monitor.domain.health_status_rules import HEALTH_STATUS_RULES
 from astronaut_health_monitor.domain.permissions import Permission, can_write_health_data_of, has_permission
+from astronaut_health_monitor.domain.spaceflight_context import (
+    HAZARD_DISPLAY_NAMES,
+    HAZARD_NOTE_FOR_RADIATION,
+    INDICATOR_SPACE_CONTEXT,
+    LEVEL_WORDS,
+    MISSION_ENVIRONMENTS,
+)
 from astronaut_health_monitor.services.measurement_batch_service import BatchMeasurementInput, InvalidBatchItem
 
 logger = logging.getLogger(__name__)
@@ -309,3 +321,45 @@ def analyze_astronaut_health(
     """Machine-learning flags: unusual days and a three-day risk forecast, from this astronaut's own history."""
     authorize_health_data_read(user, astronaut_id, audit_service)
     return HealthAnalyticsResponse.model_validate(service.analyze_astronaut(astronaut_id))
+
+
+@router.get("/spaceflight-context", response_model=SpaceflightContextResponse, tags=["reference"])
+def get_spaceflight_context(_: CurrentUser) -> SpaceflightContextResponse:
+    """Which NASA hazard affects which indicator, why each is checked, and how mission environments differ."""
+    indicators = [
+        IndicatorSpaceContextResponse(
+            indicator_type=context.indicator_type,
+            hazards=[hazard.value for hazard in context.hazards],
+            hazard_names=[HAZARD_DISPLAY_NAMES[hazard] for hazard in context.hazards],
+            how_hazards_change_it=context.how_hazards_change_it,
+            why_it_needs_checking=context.why_it_needs_checking,
+            how_it_is_measured_on_board=context.how_it_is_measured_on_board,
+            suggested_interval_hours=context.suggested_interval_hours,
+            source=SpaceflightSourceResponse(title=context.source_title, url=context.source_url),
+        )
+        for context in INDICATOR_SPACE_CONTEXT.values()
+    ]
+    environments = [
+        MissionEnvironmentResponse(
+            key=environment.key,
+            name=environment.name,
+            gravity=environment.gravity,
+            one_way_message_delay=environment.one_way_message_delay,
+            return_to_earth=environment.return_to_earth,
+            hazards=[
+                MissionEnvironmentHazardResponse(
+                    hazard=hazard.value,
+                    hazard_name=HAZARD_DISPLAY_NAMES[hazard],
+                    level=level,
+                    level_word=LEVEL_WORDS[level],
+                    note=environment.hazard_notes[hazard],
+                )
+                for hazard, level in environment.hazard_levels.items()
+            ],
+            health_focus=list(environment.health_focus),
+        )
+        for environment in MISSION_ENVIRONMENTS.values()
+    ]
+    return SpaceflightContextResponse(
+        indicators=indicators, environments=environments, radiation_note=HAZARD_NOTE_FOR_RADIATION
+    )
