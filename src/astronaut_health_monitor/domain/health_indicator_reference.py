@@ -139,6 +139,17 @@ HEALTH_INDICATOR_REFERENCES: dict[HealthIndicatorType, HealthIndicatorReference]
             "In low gravity bones and muscles weaken without regular loading, so crews exercise every day."
         ),
     ),
+    HealthIndicatorType.RADIATION_DOSE: HealthIndicatorReference(
+        indicator_type=HealthIndicatorType.RADIATION_DOSE,
+        display_name="Radiation dose",
+        unit="mSv in the last 24 hours (from your dosimeter)",
+        minimum_plausible_value=0,
+        maximum_plausible_value=300,
+        how_to_measure="Read the daily dose from your personal dosimeter. This app cannot measure radiation itself.",
+        why_it_matters_in_spaceflight=(
+            "Space radiation raises long-term cancer and other risks, so NASA limits each astronaut's career dose."
+        ),
+    ),
 }
 
 

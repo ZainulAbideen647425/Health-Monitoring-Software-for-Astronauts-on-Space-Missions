@@ -3,7 +3,7 @@
 ## Hazards and indicators
 `GET /spaceflight-context` (sign-in required) returns, for every indicator: which of NASA's five hazards change it, how they change it, why it needs checking, how it is measured on board, a suggested interval, and a source link.
 Hazard names follow NASA's Human Research Program: <https://www.nasa.gov/hrp/hazards>.
-Code: `domain/spaceflight_context.py`. Radiation is **not** measured by any indicator (crews use dosimeters), and the app says so.
+Code: `domain/spaceflight_context.py`. Radiation cannot be sensed by the app. The **radiation dose** indicator records the daily dose the crew member reads from a personal dosimeter and judges it against NASA's published figures (see `docs/real_data_and_inputs.md`).
 
 ## Mission environments
 Space station (low Earth orbit), deep-space transit vehicle, pressurized rover, Lunar base and Mars base. Each rates the five hazards Lower, Moderate or High with a one-line reason, and lists a health focus. Gravity, message delay and return time are shown.

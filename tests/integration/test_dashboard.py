@@ -185,3 +185,42 @@ def test_dashboard_loads_environment_specific_sample_data(api_client: TestClient
     for element in ("envLoad", "envLoadNote"):
         assert f'id="{element}"' in page
     assert "/demo/sample-crew?environment=" in page and "Needs closest attention here" in page
+
+
+def test_dashboard_has_camera_pulse_check_file_import_and_radiation(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for text in ("estimatePulse", 'id="camStart"', 'id="impFile"', "radiation_dose", "camera_analysis", "getUserMedia"):
+        assert text in page
+
+
+def test_camera_pulse_reading_and_imported_radiation_are_stored_with_their_source(api_client: TestClient) -> None:
+    astronaut = api_client.post("/astronauts", json={"full_name": "Cam Test", "mission_role": "Pilot"}).json()["id"]
+    when = "2026-10-01T08:00:00+00:00"
+    camera = api_client.post(
+        "/measurements",
+        json={
+            "astronaut_id": astronaut,
+            "indicator_type": "heart_rate",
+            "measured_value": 72,
+            "measured_at": when,
+            "measurement_source": "camera_analysis",
+            "notes": "Camera pulse estimate",
+        },
+    )
+    assert camera.status_code == 201 and camera.json()["measurement_source"] == "camera_analysis"
+    batch = api_client.post(
+        "/measurements/batch",
+        json={
+            "measurements": [
+                {
+                    "astronaut_id": astronaut,
+                    "indicator_type": "radiation_dose",
+                    "measured_value": 0.6,
+                    "measured_at": when,
+                    "notes": "Imported from file",
+                    "client_reference": f"imp-{astronaut}-abc12345",
+                }
+            ]
+        },
+    )
+    assert batch.json()["created_count"] == 1

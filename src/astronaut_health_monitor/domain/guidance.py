@@ -184,6 +184,23 @@ GUIDANCE: dict[tuple[HealthIndicatorType, ValueDirection], GuidanceEntry] = {
         recommended_actions=("Check the minutes you entered.", "Allow recovery time and drink water."),
         warning_signs_requiring_escalation="Pain, dizziness or unusual tiredness after exercise.",
     ),
+    (HealthIndicatorType.RADIATION_DOSE, _ABOVE): GuidanceEntry(
+        explanation="Your dosimeter shows a higher radiation dose than the normal daily range.",
+        likely_causes=(
+            "Travel through deep space, where there is less shielding",
+            "Time spent outside the best-shielded area",
+            "A solar particle event",
+            "A dosimeter reading or recording error",
+        ),
+        recommended_actions=(
+            "Check the value against your dosimeter again.",
+            "Spend time in the best-shielded area of the vehicle until mission control says otherwise.",
+            "Tell the flight surgeon so your running total can be tracked against the career limit.",
+        ),
+        warning_signs_requiring_escalation=(
+            "A radiation alarm, or nausea, vomiting or unusual tiredness after a high dose."
+        ),
+    ),
 }
 
 
