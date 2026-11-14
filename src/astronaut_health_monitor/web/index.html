@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Astronaut Health Monitor</title>
+<link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#0e1416">
+<link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Astro Health">
 <style>:root{color-scheme:dark;
 --bg:oklch(0.205 0.012 218);--side:oklch(0.177 0.012 218);--panel:oklch(0.242 0.013 218);--panel2:oklch(0.285 0.014 216);--inset:oklch(0.222 0.012 216);
 --line:oklch(0.35 0.014 214);--text:oklch(0.94 0.014 92);--muted:oklch(0.74 0.014 150);--faint:oklch(0.6 0.012 155);
@@ -365,7 +368,7 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <form id="profileForm" class="fields"><label>Display name<input id="setDisplay" maxlength="60" autocomplete="off"></label><label>Callsign<input id="setCallsign" maxlength="30" autocomplete="off" placeholder="Optional"></label><div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="submit">Save profile</button><span id="profileSaved" role="status" class="hint" style="margin:0"></span></div></form>
 <p class="hint">The display name and callsign are saved in this browser only. They do not change your account on the server.</p></section>
 <section class="panel"><p class="eyebrow">ACCOUNT</p><h2>Access and security</h2><table class="tbl" id="accountTable"></table>
-<div class="row" style="margin-top:16px"><button class="quiet" type="button" id="replayTour">Replay the tour</button><button class="quiet" type="button" id="settingsSignOut">Sign out</button></div></section></div></div>
+<div class="row" style="margin-top:16px"><button class="quiet" type="button" id="installApp" hidden>Install as app</button><button class="quiet" type="button" id="replayTour">Replay the tour</button><button class="quiet" type="button" id="settingsSignOut">Sign out</button></div></section></div></div>
 <div data-view="audit" hidden><section class="panel"><h2>Audit log</h2><p class="hint" id="auditStatus"></p><div id="auditTable" style="overflow-x:auto"></div></section></div>
 <div data-view="add" hidden><section class="panel"><h2>Add a new reading</h2>
 <div class="steps"><div><label for="formIndicator">1. What did you measure?</label><select id="formIndicator"></select></div>
@@ -1017,6 +1020,13 @@ async function importFile(file){
 $('#camStart').addEventListener('click',measurePulse);
 $('#impFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)importFile(f).finally(()=>{e.target.value=''})});
 $('#impTemplate').addEventListener('click',()=>download('readings_template.csv','indicator,value,measured_at\nheart_rate,62,2026-11-01T08:00:00Z\nradiation_dose,0.55,2026-11-01T08:00:00Z\n','text/csv'));
+
+/* ---- install as a phone app ---- */
+let installEvt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;$('#installApp').hidden=false});
+window.addEventListener('appinstalled',()=>{installEvt=null;$('#installApp').hidden=true});
+$('#installApp').addEventListener('click',async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch(e){}installEvt=null;$('#installApp').hidden=true});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{})});
 </script>
 </body>
 </html>

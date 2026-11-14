@@ -224,3 +224,21 @@ def test_camera_pulse_reading_and_imported_radiation_are_stored_with_their_sourc
         },
     )
     assert batch.json()["created_count"] == 1
+
+
+def test_dashboard_can_be_installed_as_a_phone_app(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    assert 'rel="manifest"' in page and "serviceWorker" in page and 'id="installApp"' in page
+    manifest = api_client.get("/manifest.webmanifest")
+    assert manifest.status_code == 200 and manifest.json()["display"] == "standalone"
+    for icon in manifest.json()["icons"]:
+        assert api_client.get(icon["src"]).headers["content-type"] == "image/png"
+    assert api_client.get("/icon-evil.png").status_code == 404
+
+
+def test_service_worker_only_caches_the_page_shell_never_health_data(api_client: TestClient) -> None:
+    worker = api_client.get("/sw.js")
+    assert worker.status_code == 200 and "javascript" in worker.headers["content-type"]
+    assert "SHELL.includes(u.pathname)" in worker.text
+    for private_path in ("/measurements", "/astronauts", "/auth", "/health-analytics"):
+        assert private_path not in worker.text

@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse
 from pydantic import ValidationError
 from sqlalchemy import text
@@ -79,6 +79,28 @@ ManageCrewUser = Annotated[AuthenticatedUser, Depends(require_permission(Permiss
 def show_body_map_image() -> FileResponse:
     """The anatomy illustration used behind the clickable body map."""
     return FileResponse(BODY_MAP_IMAGE, media_type="image/png")
+
+
+@router.get("/manifest.webmanifest", include_in_schema=False)
+def show_app_manifest() -> FileResponse:
+    """Lets phones install the dashboard as an app."""
+    return FileResponse(DASHBOARD_PAGE.parent / "manifest.webmanifest", media_type="application/manifest+json")
+
+
+@router.get("/sw.js", include_in_schema=False)
+def show_service_worker() -> FileResponse:
+    """The service worker keeps the page itself available offline. It never stores health data."""
+    return FileResponse(
+        DASHBOARD_PAGE.parent / "sw.js", media_type="text/javascript", headers={"Cache-Control": "no-cache"}
+    )
+
+
+@router.get("/{icon_name}.png", include_in_schema=False)
+def show_app_icon(icon_name: str) -> FileResponse:
+    allowed = {"icon-192", "icon-512", "icon-maskable-512"}
+    if icon_name not in allowed:
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(DASHBOARD_PAGE.parent / f"{icon_name}.png", media_type="image/png")
 
 
 @router.get("/", include_in_schema=False)

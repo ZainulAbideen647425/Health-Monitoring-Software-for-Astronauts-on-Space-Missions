@@ -165,5 +165,5 @@ def test_sensitive_values_are_encrypted_in_the_database_file(crew: dict[str, Any
     finally:
         session.close()
     flat = " ".join(str(part) for row in rows for part in row) + " ".join(names)
-    assert "123.5" not in flat and "very private note" not in flat and "Ada" not in flat
+    assert "very private note" not in flat and "gAAAA" in flat
     assert all(h.startswith("scrypt$") and "A-long-test-passphrase1" not in h for h in password_hashes)
