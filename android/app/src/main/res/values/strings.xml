@@ -1,0 +1,4 @@
+<resources>
+    <!-- Address of the hosted server. When filled in, the app opens it directly and asks for nothing. -->
+    <string name="default_server"></string>
+</resources>
