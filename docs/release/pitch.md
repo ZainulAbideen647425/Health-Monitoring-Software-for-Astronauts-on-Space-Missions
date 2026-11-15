@@ -1,10 +1,10 @@
 # Pitch text
 
 ## One line
-An offline-first health monitor that lets astronauts track vitals, sleep and mood, understand what the numbers mean, and know exactly what to do next, without waiting for ground control.
+A self-contained health monitor that lets astronauts track vitals, sleep and mood, understand what the numbers mean, and know exactly what to do next, without waiting for ground control.
 
 ## 30 seconds
-On a Mars mission, a message to Earth takes up to 22 minutes each way. Astronaut Health Monitor gives the crew a private dashboard: log heart rate, blood pressure, glucose, temperature, sleep, mood, stress, fatigue and exercise. Every reading is judged against a safe range and the astronaut's own baseline, then explained in plain words with next steps and a clear "contact the flight surgeon" signal. It keeps working offline and syncs later without duplicates.
+On a Mars mission, a message to Earth takes up to 22 minutes each way. Astronaut Health Monitor gives the crew a private dashboard: log heart rate, blood pressure, glucose, temperature, sleep, mood, stress, fatigue and exercise. Every reading is judged against a safe range and the astronaut's own baseline, then explained in plain words with next steps and a clear "contact the flight surgeon" signal. The server can run locally on board with no link to Earth. A tested offline-queue component for batch sync exists but is not yet connected to the dashboard.
 
 ## Why it is different
 1. **Autonomy**: guidance on board, no live link needed.

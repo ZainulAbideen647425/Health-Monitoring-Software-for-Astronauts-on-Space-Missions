@@ -42,7 +42,7 @@ environment.
 | **Spot problems early** | Documented health rules (normal, caution, critical), personal baselines and trend detection, plus ML that flags unusual days and forecasts risk |
 | **Say what to do** | For every out-of-range reading: a plain explanation, likely causes, recommended actions, warning signs, and a clear "contact the flight surgeon" trigger |
 | **Show it at a glance** | A dashboard with an anatomy body map, colour-and-symbol status, history charts and a ranked "what to do now" list |
-| **Keep working offline** | Readings taken with no connection are queued and synchronised later, with no duplicates |
+| **Run with no internet** | The server runs locally or on board with no link to Earth. The Render demo needs internet; readings entered while the page is offline are not saved |
 | **Protect the data** | Sign-in, three roles, tamper-evident audit log, encryption at rest |
 
 ## Screenshots
@@ -68,7 +68,7 @@ environment.
 - Per-astronaut Isolation Forest for unusual days and a linear-regression risk forecast. See [docs/analytics.md](docs/analytics.md).
 
 **Dashboard**
-- One offline page with four focused tabs: Today, Body, History, Add reading.
+- One self-contained page (no external fonts or scripts) with four focused tabs: Today, Body, History, Add reading.
 - Status is always a symbol plus a word, never colour alone.
 - Interactive body map with three levels of detail and keyboard support.
 - Works on phones: installable as an app (PWA) and available as an Android app.
@@ -92,7 +92,7 @@ src/astronaut_health_monitor/
   repositories/              database access and table definitions
   domain/                    indicators, reference data, errors
   core/                      configuration, database, encryption
-  offline_synchronization/   local queue that holds readings until a connection exists
+  offline_synchronization/   tested local queue and batch-sync component (not yet connected to the dashboard)
   web/                       the dashboard, PWA files and bundled OCR
 android/                     Android app (WebView shell with native Bluetooth)
 tests/                       unit and integration tests

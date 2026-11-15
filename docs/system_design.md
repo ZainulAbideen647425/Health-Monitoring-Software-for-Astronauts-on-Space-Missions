@@ -22,7 +22,7 @@ flowchart LR
         RP[repositories/ SQLAlchemy]
     end
     DB[(SQLite or PostgreSQL<br/>encrypted columns)]
-    Q[(Offline queue file)]
+    Q[(Offline queue file<br/>component, not wired to dashboard)]
     B --> API
     A --> API
     S -. Web Bluetooth .-> B
@@ -100,7 +100,7 @@ sequenceDiagram
     A-->>U: status, explanation, actions, warning signs
 ```
 
-### 4.2 Offline queue
+### 4.2 Offline queue (component, not yet connected to the dashboard)
 
 ```mermaid
 sequenceDiagram
@@ -155,7 +155,7 @@ flowchart LR
 | Idempotent writes (`client_reference`) | Retries after a dropped connection can never duplicate data | Clients must generate stable references |
 | Assessments computed on demand | No stale data and no migration when a rule changes | Slightly more work per request |
 | Encryption in column types | Services and repositories stay unchanged | Encrypted values cannot be searched or sorted in SQL |
-| Single-file dashboard, no build step, no external resources | Works offline, easy to audit and serve | Large file, and no browser-level automated tests yet |
+| Single-file dashboard, no build step, no external resources | Runs with no internet when the server is local, easy to audit and serve | Large file, and no browser-level automated tests yet |
 | Android app as a hosted-server shell | On-device Python was not possible (no Android build of the ML dependencies for Python 3.12) | The app needs the server to be reachable |
 | OCR runs in the browser | Report photos never leave the device | Larger download and lower accuracy than a cloud service |
 | PostgreSQL on Render | The free web tier has no persistent disk, so SQLite would lose accounts on restart | The free database expires after about 30 days |

@@ -6,10 +6,10 @@
 **Repository:** https://github.com/ZainulAbideen647425/Health-Monitoring-Software-for-Astronauts-on-Space-Missions
 
 ## Summary (about 100 words)
-Astronaut Health Monitor is an offline-first web app that helps crew members watch their own health on long missions, when ground control is minutes away. It records heart rate, blood pressure, glucose, temperature, sleep, mood, fatigue, stress and activity, compares each reading with a safe range and a personal baseline, and explains the result with plain-language steps and a flight-surgeon escalation signal. A dashboard shows readiness, body-system context, trends and spaceflight hazards. Data is encrypted, access is role-based, and every action is written to a tamper-evident audit log.
+Astronaut Health Monitor is a self-contained web app that can run locally with no internet that helps crew members watch their own health on long missions, when ground control is minutes away. It records heart rate, blood pressure, glucose, temperature, sleep, mood, fatigue, stress and activity, compares each reading with a safe range and a personal baseline, and explains the result with plain-language steps and a flight-surgeon escalation signal. A dashboard shows readiness, body-system context, trends and spaceflight hazards. Data is encrypted, access is role-based, and every action is written to a tamper-evident audit log.
 
 ## What it does
-Readiness overview, body map and systems, trends and pattern detection, daily check-in, machine-learning flags (Isolation Forest unusual-day detection and a 3-day linear-regression risk forecast, scikit-learn, pandas, NumPy), printable reports, offline queue with safe sync, self-registration with strong passwords.
+Readiness overview, body map and systems, trends and pattern detection, daily check-in, machine-learning flags (Isolation Forest unusual-day detection and a 3-day linear-regression risk forecast, scikit-learn, pandas, NumPy), printable reports, tested offline-queue component with idempotent batch sync (not yet connected to the dashboard), self-registration with strong passwords.
 
 ## NASA grounding
 The five hazards follow NASA's Human Research Program (https://www.nasa.gov/hrp/hazards). Each indicator shows which hazards change it, why it needs checking, how it is measured on board and a NASA source link. A mission-environment selector (space station, deep-space transit, pressurized rover, Lunar base, Mars base) re-rates the hazards and adjusts the health focus. Measurement schedules and streak badges support the daily routine.

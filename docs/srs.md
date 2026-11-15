@@ -16,7 +16,7 @@ person's own history, explains what to do, and shows the result on a simple dash
 
 ### 1.2 Scope
 In scope: recording and importing readings, status rules, personal baselines and trends, machine-learning analytics,
-guidance, a web and Android dashboard, offline queueing, sign-in with roles, audit log and encryption at rest.
+guidance, a web and Android dashboard, an offline-queue component (not yet connected to the dashboard), sign-in with roles, audit log and encryption at rest.
 Out of scope: diagnosis, treatment decisions, real NASA crew data, sensing radiation by the app itself, and any claim of
 being a medical device.
 
@@ -97,9 +97,11 @@ WebView app. The server needs no internet after installation.
 | FR-18 | The system shall run on phone screens, be installable as an app (PWA) and be available as an Android app. | `test_dashboard.py` |
 
 ### 2.4 Offline operation
+The server runs with no internet. The queue below is a tested Python component that is **not yet connected to the dashboard**: readings typed into the page while offline are not saved.
+
 | ID | Requirement | Verified by |
 |---|---|---|
-| FR-19 | The system shall store readings taken without a connection in a durable queue and send them later in batches of up to 500. | `test_offline_measurement_queue.py`, `test_offline_synchronization.py` |
+| FR-19 | The queue component shall store readings in a durable local file and send them later in batches of up to 500. | `test_offline_measurement_queue.py`, `test_offline_synchronization.py` |
 | FR-20 | The system shall never create duplicates when a batch is retried (unique client reference). | `test_measurement_idempotency.py`, `test_offline_synchronization.py` |
 | FR-21 | The system shall keep valid items when one item in a batch is bad, and report each item's result. | `test_measurement_batch_service.py`, `test_resilience.py` |
 | FR-22 | The system shall report a damaged queue file instead of silently discarding it. | `test_resilience.py` |

@@ -10,12 +10,12 @@ api/ (FastAPI routes, request/response schemas, error mapping)
 services/ (business rules: existence checks, plausibility, timestamp checks)
    |
    v
-repositories/ (queries) --> SQLite database (offline, single file)
+repositories/ (queries) --> SQLite database (single local file, no internet needed)
 
 domain/ (indicator types, reference data, status rules, guidance, baseline math, exceptions)
         is used by all layers and depends on nothing.
 
-offline_synchronization/ (local queue file) sits beside the API: it sends batches to POST /measurements/batch.
+offline_synchronization/ (local queue file) sits beside the API (a tested component, not yet wired into the dashboard): it sends batches to POST /measurements/batch.
 ```
 
 ## Key decisions
