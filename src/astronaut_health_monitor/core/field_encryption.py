@@ -3,6 +3,8 @@
 A wrong key or any change to the stored data is detected and reported; it is never silently accepted.
 """
 
+import base64
+import hashlib
 import os
 from pathlib import Path
 
@@ -52,10 +54,20 @@ def generate_encryption_key() -> str:
     return Fernet.generate_key().decode("ascii")
 
 
+def _as_fernet_key(configured_key: str) -> bytes:
+    """Use a real Fernet key as it is. Any other secret text (such as one a host generates) is stretched into a key."""
+    candidate = configured_key.strip().encode("ascii")
+    try:
+        Fernet(candidate)
+        return candidate
+    except ValueError:
+        return base64.urlsafe_b64encode(hashlib.sha256(candidate).digest())
+
+
 def load_or_create_encryption_key(configured_key: str | None, key_file_path: Path) -> bytes:
     """Use the key from settings if given; otherwise read (or create, readable by the owner only) a key file."""
     if configured_key:
-        return configured_key.encode("ascii")
+        return _as_fernet_key(configured_key)
     if key_file_path.exists():
         return key_file_path.read_bytes().strip()
     key = Fernet.generate_key()

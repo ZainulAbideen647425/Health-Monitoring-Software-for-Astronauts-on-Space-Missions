@@ -32,14 +32,23 @@ class UtcDateTime(TypeDecorator[datetime]):
         return None if value is None else value.replace(tzinfo=UTC)
 
 
+def normalise_database_url(database_url: str) -> str:
+    """Hosting services give plain postgres:// addresses; SQLAlchemy needs the driver named."""
+    for prefix in ("postgres://", "postgresql://"):
+        if database_url.startswith(prefix):
+            return "postgresql+psycopg://" + database_url[len(prefix) :]
+    return database_url
+
+
 def create_database_engine(database_url: str) -> Engine:
     """Create an engine; in-memory SQLite shares one connection so tests see one database."""
+    database_url = normalise_database_url(database_url)
     if database_url.startswith("sqlite"):
         options: dict[str, Any] = {"connect_args": {"check_same_thread": False}}
         if ":memory:" in database_url or database_url == "sqlite://":
             options["poolclass"] = StaticPool
         return create_engine(database_url, **options)
-    return create_engine(database_url)
+    return create_engine(database_url, pool_pre_ping=True)
 
 
 def create_session_factory(engine: Engine) -> sessionmaker[Session]:

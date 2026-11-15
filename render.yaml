@@ -1,6 +1,17 @@
+databases:
+  - name: astro-health-db
+    plan: free
+
 services:
   - type: web
     name: astro-health
     runtime: docker
     plan: free
     healthCheckPath: /health
+    envVars:
+      - key: ASTRONAUT_HEALTH_MONITOR_DATABASE_URL
+        fromDatabase:
+          name: astro-health-db
+          property: connectionString
+      - key: ASTRONAUT_HEALTH_MONITOR_ENCRYPTION_KEY
+        generateValue: true
