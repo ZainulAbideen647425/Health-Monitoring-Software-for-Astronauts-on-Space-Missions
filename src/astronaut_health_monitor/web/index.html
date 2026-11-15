@@ -389,7 +389,7 @@ input[type=file]{width:100%;max-width:100%;min-width:0;box-sizing:border-box;fon
 <div class="row" style="margin-top:10px"><button id="tapBtn" type="button" style="min-height:64px;min-width:220px;font-size:18px">Tap with each heartbeat</button><button class="quiet" id="tapDone" type="button" hidden>Finish</button></div>
 <p id="tapStatus" class="hint" role="status" style="margin-top:10px"></p>
 <h3 style="margin-top:18px">Bluetooth heart rate strap or watch</h3>
-<p class="hint">Put on a Bluetooth heart rate chest strap or a watch that can share its heart rate, then connect. The app reads it for 15 seconds and uses the middle value. Works in Chrome on Android and on computers, not in the installed Android app or on iPhone.</p>
+<p class="hint">Put on a Bluetooth heart rate chest strap or a watch that can share its heart rate, then connect. The app reads it for 15 seconds and uses the middle value. Works in the installed Android app, in Chrome on Android and on computers, not on iPhone.</p>
 <div class="row" style="margin-top:10px"><button id="bleStart" type="button">Connect and read (15 s)</button><span id="bleLive" class="hint"></span></div>
 <p id="bleStatus" class="hint" role="status" style="margin-top:10px"></p></section>
 <section class="panel" style="margin-top:16px"><p class="eyebrow">RADIATION</p><h2>Radiation estimate and running total</h2>
@@ -1139,11 +1139,23 @@ function bleSummary(samples){
  const s=ok.slice().sort((a,b)=>a-b),bpm=s.length%2?s[(s.length-1)/2]:Math.round((s[s.length/2-1]+s[s.length/2])/2);
  return{ok:true,bpm}}
 let bleBusy=false;
+function readNativeBluetooth(){
+ return new Promise((resolve,reject)=>{
+  const st=$('#bleStatus'),samples=[];let timer=null,began=0;
+  const finish=(err)=>{try{window.AndroidBle.stop()}catch(e){}window.onNativeHeartRate=null;window.onNativeBleStatus=null;clearInterval(timer);err?reject(err):resolve(samples)};
+  window.onNativeBleStatus=m=>{if(String(m).indexOf('error:')===0)finish(new Error(String(m).slice(6)));else st.textContent=m};
+  window.onNativeHeartRate=v=>{if(!began){began=performance.now();timer=setInterval(()=>{const left=Math.ceil((15000-(performance.now()-began))/1000);st.textContent='Reading from the sensor... '+Math.max(0,left)+' s. Stay still.';if(left<=0)finish()},250)}
+   samples.push(v);$('#bleLive').textContent='Live: '+v+' bpm'};
+  window.AndroidBle.start()})}
 async function readBluetoothPulse(){
  const st=$('#bleStatus'),btn=$('#bleStart');if(bleBusy)return;
- if(!navigator.bluetooth){st.textContent='This browser cannot use Bluetooth here. Use Chrome on Android or on a computer (it does not work in the installed Android app or on iPhone).';return}
+ const native=!!window.AndroidBle;
+ if(!native&&!navigator.bluetooth){st.textContent='This browser cannot use Bluetooth here. Use the Android app, or Chrome on Android or on a computer (not iPhone).';return}
  bleBusy=true;btn.disabled=true;let server=null;
  try{
+  if(native){const samples=await readNativeBluetooth(),res=bleSummary(samples);if(!res.ok){st.textContent=res.why;return}
+   $('#formIndicator').value='heart_rate';showHelp();$('#formValue').value=res.bpm;S.blePulse=res.bpm;S.camPulse=null;S.tapPulse=null;
+   st.textContent='Sensor reading: about '+res.bpm+' beats per minute (middle value of '+samples.length+' readings). Press Save reading to keep it.';return}
   st.textContent='Choose your heart rate sensor in the list that appears...';
   const device=await navigator.bluetooth.requestDevice({filters:[{services:['heart_rate']}]});
   st.textContent='Connecting to '+(device.name||'the sensor')+'...';
@@ -1159,7 +1171,7 @@ async function readBluetoothPulse(){
  }catch(e){st.textContent=(e&&e.name==='NotFoundError')?'No sensor was chosen.':'Bluetooth did not work: '+((e&&e.message)||e)}
  finally{try{if(server&&server.connected)server.disconnect()}catch(e){}bleBusy=false;btn.disabled=false}}
 $('#bleStart').addEventListener('click',readBluetoothPulse);
-if(!navigator.bluetooth)$('#bleStatus').textContent='Bluetooth is not available in this browser. Use Chrome on Android or a computer to use a heart rate sensor.';
+if(!navigator.bluetooth&&!window.AndroidBle)$('#bleStatus').textContent='Bluetooth is not available in this browser. Use the Android app, or Chrome on Android or a computer.';
 </script>
 </body>
 </html>

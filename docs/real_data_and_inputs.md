@@ -37,5 +37,5 @@ Add reading has a **Read a report from a photo** panel. Choose or take a photo o
 
 ## Bluetooth heart rate strap or watch
 The pulse panel can read a standard Bluetooth Low Energy heart rate sensor (a chest strap, or a watch that shares its heart rate) with Web Bluetooth. The person chooses the sensor, the page reads its heart rate notifications for 15 seconds, drops impossible values (under 30 or over 220) and uses the middle value. At least 5 valid readings are needed. The result is filled in for the person to save, with the source `wearable_device` and the note "Bluetooth heart rate sensor".
-- Works in Chrome on Android and on computers, over `https` or `localhost`. It does not work in the installed Android app (its embedded web view has no Web Bluetooth) or on iPhone.
+- Works in Chrome on Android and on computers, over `https` or `localhost`. It also works in the installed Android app: the app's embedded web view has no Web Bluetooth, so the app scans and connects itself (Heart Rate service) and passes the readings to the page. Reinstall the APK to get the new Bluetooth permissions. This path is not yet tested with real sensor hardware. It does not work on iPhone.
 - Tested only against a simulated sensor in the automated tests, because no real strap or watch was available. Please try it with real hardware.
