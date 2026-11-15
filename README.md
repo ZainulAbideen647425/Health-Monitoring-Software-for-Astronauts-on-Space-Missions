@@ -108,7 +108,8 @@ Requires Python 3.12 or newer.
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate          # Git Bash on Windows: source .venv/Scripts/activate
+                                   # PowerShell: .venv\Scripts\Activate.ps1
 pip install -e ".[development]"
 python -m astronaut_health_monitor
 ```
@@ -118,7 +119,7 @@ python -m astronaut_health_monitor
 Demo mode creates simulated data and three accounts. **Never use demo mode with real data: the password is public.**
 
 ```bash
-export ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true     # PowerShell: $env:ASTRONAUT_HEALTH_MONITOR_DEMO_MODE="true"
+export ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true     # PowerShell: $env:ASTRONAUT_HEALTH_MONITOR_DEMO_MODE="true"  (Git Bash uses export)
 python -m astronaut_health_monitor
 ```
 
