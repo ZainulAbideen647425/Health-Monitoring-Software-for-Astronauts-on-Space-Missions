@@ -187,7 +187,9 @@ Continuous integration runs these checks on every push. See [CONTRIBUTING.md](CO
 
 | Topic | File |
 |---|---|
-| Architecture | [docs/architecture.md](docs/architecture.md) |
+| Software requirements (SRS) | [docs/srs.md](docs/srs.md) |
+| System design (diagrams, data model, flows) | [docs/system_design.md](docs/system_design.md) |
+| Architecture decisions by phase | [docs/architecture.md](docs/architecture.md) |
 | Health status rules and sources | [docs/health_status_rules.md](docs/health_status_rules.md) |
 | Spaceflight hazards and context | [docs/spaceflight_context.md](docs/spaceflight_context.md) |
 | Analytics and machine learning | [docs/analytics.md](docs/analytics.md) |
