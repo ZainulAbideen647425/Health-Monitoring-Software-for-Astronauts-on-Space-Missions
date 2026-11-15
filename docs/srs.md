@@ -32,6 +32,28 @@ The software implements all three roles and tests them. In practice:
 - **Clinician and mission control accounts are not self-service.** Mission control creates users from the API (`POST /users`), the first mission control account is created from the command line, and demo mode creates one account for each role with simulated data.
 - The hosted demo therefore shows the astronaut experience. The role rules are checked by `test_permissions.py` and `test_role_access_api.py`.
 
+#### Primary user and optional oversight
+The **astronaut is the primary user**. An astronaut gets guidance straight after each reading and needs no one else to use the software. The clinician and mission control roles are an **optional oversight layer** for a real deployment.
+
+#### Intended set-up in a real deployment
+| Step | Who | What happens |
+|---|---|---|
+| 1 | Administrator (mission control) | The first mission control account is created on the server from the command line. There is normally one administrator, or a small number. |
+| 2 | Administrator | Signs in, then creates the mission and crew records. |
+| 3 | Administrator | Creates the clinician account (`POST /users`). A mission may have one or several clinicians. |
+| 4 | Astronaut | Registers or is given an account, linked to their own crew record, and records readings. Guidance appears immediately. |
+| 5 | Clinician | Reviews any crew member's readings and status, and adds readings for them. |
+| 6 | Administrator | Manages accounts and reads the audit log of who did what. |
+
+#### Why the duties are separate
+- **Astronaut privacy:** an astronaut can never see another crew member's data.
+- **Medical review:** the clinician has the crew-wide medical view but cannot manage users or read the audit log.
+- **Access control:** the administrator manages accounts and audits actions. Every sensitive action is recorded in a tamper-evident audit log that holds no health values, so access is accountable.
+
+#### How to try each role
+- **Demo mode (own computer, simulated data only):** sign in as `astronaut.demo`, `clinician.demo` or `control.demo`.
+- **Own accounts:** create a mission control account with `python -m astronaut_health_monitor.management create-user --username <name> --role mission_control`, sign in, then create a clinician with `POST /users` on the `/docs` page.
+
 ### 1.4 Operating environment
 Python 3.12 server (FastAPI) with SQLite or PostgreSQL; the dashboard runs in a modern browser and in an Android
 WebView app. The server needs no internet after installation.
