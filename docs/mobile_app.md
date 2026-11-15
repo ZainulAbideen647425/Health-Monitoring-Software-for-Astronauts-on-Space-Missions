@@ -5,7 +5,7 @@ The dashboard is an installable web app (a PWA). On a phone it opens full screen
 ## What it does
 - `manifest.webmanifest` gives the app its name, icons and colours.
 - `sw.js` (a service worker) keeps the page shell, icons and body map available offline. It never stores health data or any API response, and the test suite checks that.
-- The menu drawer, compact header and camera pulse check already work on phone screens.
+- The menu drawer, compact header and pulse input already work on phone screens.
 
 ## What it needs
 Phones only allow installing, service workers and camera access on a **secure page**: `https://...` or `localhost`.

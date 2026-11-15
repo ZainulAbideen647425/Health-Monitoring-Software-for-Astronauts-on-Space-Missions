@@ -187,9 +187,9 @@ def test_dashboard_loads_environment_specific_sample_data(api_client: TestClient
     assert "/demo/sample-crew?environment=" in page and "Needs closest attention here" in page
 
 
-def test_dashboard_has_camera_pulse_check_file_import_and_radiation(api_client: TestClient) -> None:
+def test_dashboard_has_sensor_and_tap_pulse_file_import_and_radiation(api_client: TestClient) -> None:
     page = api_client.get("/").text
-    for text in ("estimatePulse", 'id="camStart"', 'id="impFile"', "radiation_dose", "camera_analysis", "getUserMedia"):
+    for text in ('id="bleStart"', 'id="tapBtn"', 'id="impFile"', "radiation_dose"):
         assert text in page
 
 

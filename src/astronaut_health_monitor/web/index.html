@@ -379,19 +379,16 @@ input[type=file]{width:100%;max-width:100%;min-width:0;box-sizing:border-box;fon
 <div><label for="formValue">2. What was the result? <span id="unit" class="hint"></span></label><input id="formValue" type="number" step="any" inputmode="decimal"></div>
 <div><label>3. Save it</label><button id="record" type="button">Save reading</button></div></div>
 <p id="help" class="hint" style="margin-top:14px"></p><div id="result" role="status" hidden></div></section>
-<section class="panel" style="margin-top:16px"><p class="eyebrow">CAMERA</p><h2>Measure your pulse with the camera</h2>
-<p class="hint">Cover the camera lens (and flash, if there is one) with a fingertip and keep still for 15 seconds. The app reads the tiny colour changes with each heartbeat. It is a rough estimate, not a medical device, and it is saved as a camera reading.</p>
-<div class="row" style="margin-top:12px"><button id="camStart" type="button">Start 15-second pulse check</button></div>
-<video id="camVideo" muted playsinline style="width:1px;height:1px;opacity:0;position:absolute"></video>
-<p id="camStatus" class="hint" role="status" style="margin-top:12px"></p>
-<h3 style="margin-top:18px">No camera? Count your pulse by tapping</h3>
+<section class="panel" style="margin-top:16px"><p class="eyebrow">PULSE</p><h2>Measure your pulse</h2>
+<h3 style="margin-top:6px">Bluetooth heart rate strap or watch</h3>
+<p class="hint">Put on a Bluetooth heart rate chest strap or a watch that can share its heart rate, then connect. The app reads it for 15 seconds and uses the middle value. Works in the installed Android app, in Chrome on Android and on computers, not on iPhone.</p>
+<div class="row" style="margin-top:10px"><button id="bleStart" type="button">Connect and read (15 s)</button><span id="bleLive" class="hint"></span></div>
+<p id="bleStatus" class="hint" role="status" style="margin-top:10px"></p>
+<h3 style="margin-top:18px">No sensor? Count your pulse by tapping</h3>
 <p class="hint">Find your pulse at the wrist or neck. Tap the button with each beat for about 15 to 20 seconds. The app works out beats per minute.</p>
 <div class="row" style="margin-top:10px"><button id="tapBtn" type="button" style="min-height:64px;min-width:220px;font-size:18px">Tap with each heartbeat</button><button class="quiet" id="tapDone" type="button" hidden>Finish</button></div>
 <p id="tapStatus" class="hint" role="status" style="margin-top:10px"></p>
-<h3 style="margin-top:18px">Bluetooth heart rate strap or watch</h3>
-<p class="hint">Put on a Bluetooth heart rate chest strap or a watch that can share its heart rate, then connect. The app reads it for 15 seconds and uses the middle value. Works in the installed Android app, in Chrome on Android and on computers, not on iPhone.</p>
-<div class="row" style="margin-top:10px"><button id="bleStart" type="button">Connect and read (15 s)</button><span id="bleLive" class="hint"></span></div>
-<p id="bleStatus" class="hint" role="status" style="margin-top:10px"></p></section>
+</section>
 <section class="panel" style="margin-top:16px"><p class="eyebrow">RADIATION</p><h2>Radiation estimate and running total</h2>
 <p class="hint">This app cannot sense radiation. If you have no dosimeter reading, you can save an <b>estimate</b> for your mission environment. It is based on published NASA-related figures and is clearly marked as estimated, not measured. Your own dosimeter reading is always better.</p>
 <div class="row" style="margin-top:12px"><label for="radEnv" class="hint" style="margin:0">Environment</label><select id="radEnv"><option value="station">Space station</option><option value="transit">Deep-space transit</option><option value="rover">Pressurized rover</option><option value="moon">Lunar base</option><option value="mars">Mars base</option></select><button id="radSave" type="button">Save today&rsquo;s estimate</button></div>
@@ -974,43 +971,6 @@ GROUPS.radiation_dose='Radiation';
 ICON.radiation_dose='<circle cx="12" cy="12" r="2"/><path d="M12 10V3.5M10.3 13l-5.6 3.2M13.7 13l5.6 3.2"/><circle cx="12" cy="12" r="9.5"/>';
 SHORT.radiation_dose='mSv / day';
 SYSTEMS.push({k:'rad',t:'Radiation exposure',i:['radiation_dose'],txt:'Space radiation cannot be felt or sensed by this app. Type in the daily dose from your personal dosimeter and the app compares it with NASA limits.',do:['Read your dosimeter at the same time each day.','During a solar storm warning, stay in the best-shielded area.','Ask the flight surgeon for your running career total.']});
-function estimatePulse(raw){
- if(!raw||raw.length<60)return{ok:false,why:'Not enough camera frames were captured.'};
- const t0=raw[0].t,dur=(raw[raw.length-1].t-t0)/1000;if(dur<8)return{ok:false,why:'The recording was too short.'};
- const hz=30,n=Math.floor(dur*hz),x=new Array(n);let j=0;
- for(let i=0;i<n;i++){const t=t0+i*1000/hz;while(j<raw.length-2&&raw[j+1].t<t)j++;const a=raw[j],b=raw[j+1],f=b.t===a.t?0:Math.min(1,Math.max(0,(t-a.t)/(b.t-a.t)));x[i]=a.v+(b.v-a.v)*f}
- const avg=(arr,w)=>{const o=new Array(arr.length);let s=0;const q=[];for(let i=0;i<arr.length;i++){q.push(arr[i]);s+=arr[i];if(q.length>w)s-=q.shift();o[i]=s/q.length}return o};
- const sm=avg(x,4),base=avg(x,30),y=sm.map((v,i)=>v-base[i]).slice(30);
- const sd=Math.sqrt(y.reduce((s,v)=>s+v*v,0)/y.length);if(!(sd>0.05))return{ok:false,why:'No pulse signal was found. Cover the camera lens completely with your fingertip and keep still.'};
- const peaks=[];const minGap=Math.round(hz*0.3);
- for(let i=1;i<y.length-1;i++){if(y[i]>y[i-1]&&y[i]>=y[i+1]&&y[i]>0.4*sd){if(peaks.length&&i-peaks[peaks.length-1]<minGap){if(y[i]>y[peaks[peaks.length-1]])peaks[peaks.length-1]=i}else peaks.push(i)}}
- if(peaks.length<8)return{ok:false,why:'Too few beats were detected. Press gently and keep your finger still.'};
- const gaps=peaks.slice(1).map((p,k)=>(p-peaks[k])/hz).sort((a,b)=>a-b),med=gaps[Math.floor(gaps.length/2)];
- const good=gaps.filter(g=>Math.abs(g-med)<=0.25*med);if(good.length<0.7*gaps.length)return{ok:false,why:'The signal was too uneven to trust. Try again and keep still.'};
- const bpm=Math.round(60/(good.reduce((s,g)=>s+g,0)/good.length));
- if(bpm<40||bpm>200)return{ok:false,why:'The estimate ('+bpm+' bpm) is outside the believable range. Try again.'};
- return{ok:true,bpm}}
-let camRun=false;
-async function measurePulse(){
- const st=$('#camStatus'),btn=$('#camStart');if(camRun)return;
- if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){st.textContent='This browser cannot use the camera here. Camera access needs localhost or a secure page.';return}
- camRun=true;btn.disabled=true;let stream;
- try{
-  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:320},height:{ideal:240}},audio:false});
-  const track=stream.getVideoTracks()[0];try{if(track.getCapabilities&&track.getCapabilities().torch)await track.applyConstraints({advanced:[{torch:true}]})}catch(e){}
-  const v=$('#camVideo');v.srcObject=stream;await v.play();
-  const cv=document.createElement('canvas');cv.width=24;cv.height=24;const cx=cv.getContext('2d',{willReadFrequently:true}),raw=[];let covered=0,total=0;const T=15000,start=performance.now();
-  await new Promise(done=>{const tick=()=>{const now=performance.now(),el0=now-start;
-   if(v.videoWidth){cx.drawImage(v,0,0,24,24);const d=cx.getImageData(0,0,24,24).data;let r=0,g=0;for(let i=0;i<d.length;i+=4){r+=d[i];g+=d[i+1]}r/=576;g/=576;raw.push({t:now,v:r});total++;if(r>90&&r>1.4*g)covered++}
-   st.textContent='Keep your fingertip over the camera lens... '+Math.max(0,Math.ceil((T-el0)/1000))+' s';
-   if(el0>=T)done();else requestAnimationFrame(tick)};tick()});
-  if(total<30||covered<0.8*total){st.textContent='The lens did not look covered by a fingertip. Cover it fully and try again.';return}
-  const res=estimatePulse(raw);
-  if(!res.ok){st.textContent=res.why;return}
-  $('#formIndicator').value='heart_rate';showHelp();$('#formValue').value=res.bpm;S.camPulse=res.bpm;
-  st.textContent='Camera estimate: about '+res.bpm+' beats per minute. Press Save reading to keep it. This is a rough estimate, not a medical device.'
- }catch(e){st.textContent=(e&&e.name==='NotAllowedError')?'Camera permission was refused.':'The camera could not be used: '+((e&&e.message)||e)}
- finally{if(stream)stream.getTracks().forEach(t=>t.stop());$('#camVideo').srcObject=null;camRun=false;btn.disabled=false}}
 function parseCsv(text){const rows=[];let row=[],cell='',q=false;text=text.replace(/^﻿/,'');
  for(let i=0;i<text.length;i++){const c=text[i];
   if(q){if(c==='"'){if(text[i+1]==='"'){cell+='"';i++}else q=false}else cell+=c}
@@ -1040,7 +1000,6 @@ async function importFile(file){
   await refresh()}
  catch(e){st.textContent='Import failed: '+e.message}}
 
-$('#camStart').addEventListener('click',measurePulse);
 $('#impFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)importFile(f).finally(()=>{e.target.value=''})});
 $('#impTemplate').addEventListener('click',()=>download('readings_template.csv','indicator,value,measured_at\nheart_rate,62,2026-11-01T08:00:00Z\nradiation_dose,0.55,2026-11-01T08:00:00Z\n','text/csv'));
 
