@@ -27,6 +27,11 @@ being a medical device.
 | Clinician | A flight surgeon or medical officer | See and add readings for every crew member |
 | Mission control | An administrator | Everything above, plus manage missions, crew and users, and read the audit log |
 
+The software implements all three roles and tests them. In practice:
+- **Self-registration always creates an astronaut account**, and an astronaut sees only their own data. This is what the public web and Android demo offers.
+- **Clinician and mission control accounts are not self-service.** Mission control creates users from the API (`POST /users`), the first mission control account is created from the command line, and demo mode creates one account for each role with simulated data.
+- The hosted demo therefore shows the astronaut experience. The role rules are checked by `test_permissions.py` and `test_role_access_api.py`.
+
 ### 1.4 Operating environment
 Python 3.12 server (FastAPI) with SQLite or PostgreSQL; the dashboard runs in a modern browser and in an Android
 WebView app. The server needs no internet after installation.

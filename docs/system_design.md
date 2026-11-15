@@ -118,7 +118,7 @@ sequenceDiagram
 ### 4.3 Sign-in and authorization
 1. `POST /auth/login` checks the password hash. Five wrong passwords lock the account for 15 minutes; wrong username and wrong password give the same error.
 2. A random session token goes to the browser in an HTTP-only cookie. Only its hash is stored. Sessions end after 30 minutes idle or 8 hours total.
-3. Each request resolves the cookie to a user. `domain/permissions.py` decides what that role may do (pure functions, no database).
+3. Each request resolves the cookie to a user. `domain/permissions.py` decides what that role may do (pure functions, no database). Self-registration only creates astronaut accounts; clinician and mission control accounts are created by mission control, the command line, or demo mode.
 4. Every sensitive action is written to the audit log without health values.
 
 ### 4.4 Bluetooth in the Android app
