@@ -22,3 +22,10 @@ Add reading has a 15-second pulse check. The crew member covers the camera lens 
 Add reading can import a CSV file with the columns `indicator, value, measured_at` (a template can be downloaded, and a Mission reports export also works). Readings already saved are skipped, bad rows are listed and skipped, and imported readings are marked "Imported from file".
 
 **No real NASA dataset is bundled.** All sample data is simulated and labelled. To use real public data, such as data from the NASA Open Science Data Repository, convert it to this CSV format and import it. The indicator names are listed at `/health-indicators`.
+
+## Reading a report from a photo
+Add reading has a **Read a report from a photo** panel. Choose or take a photo of a printed report or device screen. The text is read in the browser with Tesseract.js (files in `web/ocr/`, Apache 2.0 licence), so the photo is not uploaded and no outside service is used. The first use downloads about 10 MB from the app's own server.
+- The app looks for heart rate, blood pressure, glucose (mg/dL or mmol/L), temperature (C or F), sleep hours and radiation dose in mSv. Numbers outside believable ranges are ignored.
+- **Nothing is saved automatically.** The found values are listed with checkboxes and editable numbers. The person confirms them, and they are saved with the source `camera_analysis`.
+- Accuracy depends on the photo. Printed text in good light works best; handwriting and seven-segment device displays are often misread. This is a convenience, not a medical measurement.
+- `docs/sample_data/simulated_report.png` is a made-up report for testing.

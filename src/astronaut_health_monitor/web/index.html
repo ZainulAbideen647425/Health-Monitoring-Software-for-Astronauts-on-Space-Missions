@@ -380,6 +380,11 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <div class="row" style="margin-top:12px"><button id="camStart" type="button">Start 15-second pulse check</button></div>
 <video id="camVideo" muted playsinline style="width:1px;height:1px;opacity:0;position:absolute"></video>
 <p id="camStatus" class="hint" role="status" style="margin-top:12px"></p></section>
+<section class="panel" style="margin-top:16px"><p class="eyebrow">PHOTO</p><h2>Read a report from a photo</h2>
+<p class="hint">Take or choose a photo of a printed or handwritten report or device screen. The text is read inside your browser (the photo is not uploaded), and known values such as heart rate, blood pressure, glucose, temperature, sleep and radiation dose are suggested. <b>Nothing is saved until you check the numbers and confirm.</b> Handwriting and blurry photos are often misread.</p>
+<div class="row" style="margin-top:12px"><label for="ocrFile" class="hint" style="margin:0">Choose a photo</label><input id="ocrFile" type="file" accept="image/*"></div>
+<p id="ocrStatus" class="hint" role="status" style="margin-top:12px"></p><div id="ocrFound"></div>
+<details id="ocrText" hidden style="margin-top:10px"><summary class="hint">Show the text that was read</summary><pre id="ocrRaw" style="white-space:pre-wrap;font-size:12px"></pre></details></section>
 <section class="panel" style="margin-top:16px"><p class="eyebrow">IMPORT</p><h2>Import readings from a file</h2>
 <p class="hint">Load readings from a CSV file with the columns <b>indicator, value, measured_at</b>, for example a Mission reports export or data you prepared from a public NASA dataset. Readings already saved are skipped, and imported ones are marked as imported.</p>
 <div class="row" style="margin-top:12px"><label for="impFile" class="hint" style="margin:0">Choose a CSV file</label><input id="impFile" type="file" accept=".csv,text/csv"><button class="quiet" id="impTemplate" type="button">Download a template</button></div>
@@ -1027,6 +1032,52 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=
 window.addEventListener('appinstalled',()=>{installEvt=null;$('#installApp').hidden=true});
 $('#installApp').addEventListener('click',async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch(e){}installEvt=null;$('#installApp').hidden=true});
 if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{})});
+
+/* ---- read a report from a photo (text recognition runs in the browser) ---- */
+const REPORT_RANGES={heart_rate:[20,250],systolic_blood_pressure:[60,260],diastolic_blood_pressure:[30,160],blood_glucose:[20,600],body_temperature:[30,45],sleep_duration:[0,24],radiation_dose:[0,300]};
+const REPORT_LABELS={heart_rate:'Heart rate',systolic_blood_pressure:'Systolic blood pressure',diastolic_blood_pressure:'Diastolic blood pressure',blood_glucose:'Blood glucose',body_temperature:'Body temperature',sleep_duration:'Sleep duration',radiation_dose:'Radiation dose'};
+function extractReadings(text){
+ const t=String(text).replace(/ /g,' ').replace(/[|]/g,'/'),out=[],seen={};
+ const add=(ind,v,from)=>{if(seen[ind]||!isFinite(v))return;const r=REPORT_RANGES[ind];if(v<r[0]||v>r[1])return;seen[ind]=1;out.push({ind,value:Math.round(v*100)/100,label:REPORT_LABELS[ind],from:from.trim()})};
+ let m;
+ const pair=[...t.matchAll(/(\d{2,3})\s*[\/\\]\s*(\d{2,3})/g)].find(x=>+x[1]>+x[2]&&+x[1]>=70&&+x[1]<=260&&+x[2]>=40&&+x[2]<=150);
+ if(pair){add('systolic_blood_pressure',+pair[1],pair[0]);add('diastolic_blood_pressure',+pair[2],pair[0])}
+ m=/(?:heart\s*rate|pulse(?:\s*rate)?|\bHR\b)[^0-9\n]{0,15}(\d{2,3})/i.exec(t)||/(\d{2,3})\s*bpm/i.exec(t);if(m)add('heart_rate',+m[1],m[0]);
+ m=/(?:glucose|blood\s*sugar|\bFBS\b|\bRBS\b|\bBSL\b|\bFBG\b)[^0-9\n]{0,20}(\d{1,3}(?:\.\d)?)\s*(mmol|mg)?/i.exec(t);
+ if(m){let v=+m[1];if((m[2]&&/mmol/i.test(m[2]))||(!m[2]&&v<35))v=v*18;add('blood_glucose',v,m[0])}
+ m=/(?:temp(?:erature)?)[^0-9\n]{0,15}(\d{2,3}(?:\.\d)?)\s*°?\s*([CF])?/i.exec(t);
+ if(m){let v=+m[1];if(/f/i.test(m[2]||'')||v>45)v=(v-32)*5/9;add('body_temperature',v,m[0])}
+ m=/sleep[^0-9\n]{0,15}(\d{1,2}(?:\.\d)?)/i.exec(t);if(m)add('sleep_duration',+m[1],m[0]);
+ m=/(?:radiation|dose)[^0-9\n]{0,20}(\d+(?:\.\d+)?)\s*msv/i.exec(t);if(m)add('radiation_dose',+m[1],m[0]);
+ return out}
+let ocrBusy=false,ocrFound=[];
+const loadOcr=()=>new Promise((ok,bad)=>{if(window.Tesseract)return ok();const s=document.createElement('script');s.src='/ocr/tesseract.min.js';s.onload=ok;s.onerror=()=>bad(new Error('The text reader could not be loaded.'));document.head.append(s)});
+async function readReport(file){
+ const st=$('#ocrStatus'),box=$('#ocrFound');if(ocrBusy)return;ocrBusy=true;box.replaceChildren();$('#ocrText').hidden=true;
+ try{
+  st.textContent='Loading the text reader (about 10 MB the first time)...';await loadOcr();
+  const worker=await Tesseract.createWorker('eng',1,{workerPath:'/ocr/worker.min.js',corePath:'/ocr/',langPath:'/ocr/',workerBlobURL:false,logger:m=>{if(m.status==='recognizing text')st.textContent='Reading the photo... '+Math.round(m.progress*100)+'%'}});
+  const res=await worker.recognize(file);await worker.terminate();
+  const text=res.data.text||'';$('#ocrRaw').textContent=text;$('#ocrText').hidden=false;
+  ocrFound=extractReadings(text);
+  if(!ocrFound.length){st.textContent='No known readings were found in the photo. Try a sharper, well-lit photo, or type the values in above.';return}
+  st.textContent='Found '+ocrFound.length+' possible reading'+(ocrFound.length>1?'s':'')+'. Check each number against your report, then save the ones that are right.';
+  ocrFound.forEach((f,i)=>{const row=el('div','row');row.style.cssText='gap:10px;align-items:center;margin:8px 0';
+   const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;cb.id='ocrC'+i;cb.setAttribute('aria-label','Save '+f.label);
+   const lab=el('label','',f.label);lab.htmlFor=cb.id;lab.style.margin='0';
+   const num=document.createElement('input');num.type='number';num.step='any';num.value=f.value;num.id='ocrV'+i;num.style.maxWidth='120px';num.setAttribute('aria-label',f.label+' value');
+   row.append(cb,lab,num,el('span','hint','from "'+f.from+'"'));box.append(row)});
+  const save=el('button','','Save the checked readings');save.type='button';save.addEventListener('click',saveReportReadings);box.append(save)}
+ catch(e){st.textContent='Could not read the photo: '+((e&&e.message)||e)}
+ finally{ocrBusy=false}}
+async function saveReportReadings(){
+ const st=$('#ocrStatus');let saved=0,flagged=[];
+ for(let i=0;i<ocrFound.length;i++){if(!$('#ocrC'+i).checked)continue;const v=parseFloat($('#ocrV'+i).value);if(Number.isNaN(v))continue;
+  try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:ocrFound[i].ind,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString(),measurement_source:'camera_analysis',notes:'Read from a report photo, confirmed by you'});
+   saved++;const a=await api('/measurements/'+m.id+'/assessment');if(a.final_status!=='normal')flagged.push(a.indicator_display_name+' '+a.final_status)}
+  catch(e){st.textContent='Not saved: '+e.message;return}}
+ st.textContent='Saved '+saved+' reading'+(saved===1?'':'s')+(flagged.length?'. Needs attention: '+flagged.join(', ')+'.':'.');$('#ocrFound').replaceChildren();await refresh()}
+$('#ocrFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)readReport(f).finally(()=>{e.target.value=''})});
 </script>
 </body>
 </html>

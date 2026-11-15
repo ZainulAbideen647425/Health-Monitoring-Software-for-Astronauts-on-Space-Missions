@@ -68,7 +68,7 @@ BODY_MAP_IMAGE = DASHBOARD_PAGE.parent / "body_map.png"
 DASHBOARD_SECURITY_HEADERS = {
     "Content-Security-Policy": (
         "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; "
-        "script-src 'self' 'unsafe-inline'; frame-ancestors 'none'"
+        "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; frame-ancestors 'none'"
     )
 }
 
@@ -79,6 +79,21 @@ ManageCrewUser = Annotated[AuthenticatedUser, Depends(require_permission(Permiss
 def show_body_map_image() -> FileResponse:
     """The anatomy illustration used behind the clickable body map."""
     return FileResponse(BODY_MAP_IMAGE, media_type="image/png")
+
+
+OCR_DIRECTORY = DASHBOARD_PAGE.parent / "ocr"
+
+
+@router.get("/ocr/{file_name}", include_in_schema=False)
+def show_text_reading_file(file_name: str) -> FileResponse:
+    """Files for reading text from a photo inside the browser. Only files that exist in the ocr folder are served."""
+    allowed = {entry.name for entry in OCR_DIRECTORY.iterdir() if entry.is_file()} if OCR_DIRECTORY.is_dir() else set()
+    if file_name not in allowed:
+        raise HTTPException(status_code=404, detail="Not found")
+    media_type = "text/javascript" if file_name.endswith(".js") else "application/octet-stream"
+    return FileResponse(
+        OCR_DIRECTORY / file_name, media_type=media_type, headers={"Cache-Control": "public, max-age=86400"}
+    )
 
 
 @router.get("/manifest.webmanifest", include_in_schema=False)
