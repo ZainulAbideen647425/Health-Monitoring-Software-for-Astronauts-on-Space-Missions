@@ -1,76 +1,94 @@
 # Astronaut Health Monitor
 
-Health monitoring software for astronauts on long space missions, built for the
-**2026 NASA Space Apps Challenge: "Create Health Monitoring Software for Astronauts on Space Missions"**.
+**Autonomous health monitoring for astronauts on long-duration space missions.**
 
-On long missions, astronauts carry much of the responsibility for spotting health changes in themselves.
-This software collects health indicators, helps the astronaut understand them, and (in later phases) shows
-their status at a glance and suggests actions.
+Built for the **2026 NASA Space Apps Challenge**: *Create Health Monitoring Software for Astronauts on Space Missions.*
 
-**Tech stack:** Python, FastAPI, SQLAlchemy/SQLite, Pydantic, scikit-learn, pandas, NumPy, and a single-file offline dashboard.
-**AI/ML:** per-astronaut Isolation Forest (unusual days) and linear-regression risk forecast. See [docs/analytics.md](docs/analytics.md).
+[![CI](https://github.com/ZainulAbideen647425/Health-Monitoring-Software-for-Astronauts-on-Space-Missions/actions/workflows/continuous_integration.yml/badge.svg)](https://github.com/ZainulAbideen647425/Health-Monitoring-Software-for-Astronauts-on-Space-Missions/actions)
+![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688)
+![Tests](https://img.shields.io/badge/tests-325%20passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)
 
-> **Disclaimer:** This is an educational prototype for a hackathon. It is not a medical device and must not be
+> **Disclaimer.** This is an educational prototype built for a hackathon. It is **not a medical device** and must not be
 > used for real medical decisions.
+
+![Mission overview](docs/screenshots/today.png)
+
+## The problem
+
+On a mission to the Moon or Mars, a message to Earth can take minutes each way, and a real-time call to a doctor may be
+impossible. The crew has to notice health changes in itself, understand them, and act. Spaceflight adds hazards that
+are hard to feel: radiation, isolation and confinement, distance from Earth, altered gravity, and a hostile closed
+environment.
+
+## What it does
+
+| Goal | How the software meets it |
+|---|---|
+| **Track vital indicators on board** | Heart rate, blood pressure, blood glucose, body temperature, sleep, mood and radiation dose, stored locally with no internet needed |
+| **Spot problems early** | Documented health rules (normal, caution, critical), personal baselines and trend detection, plus ML that flags unusual days and forecasts risk |
+| **Say what to do** | For every out-of-range reading: a plain explanation, likely causes, recommended actions, warning signs, and a clear "contact the flight surgeon" trigger |
+| **Show it at a glance** | A dashboard with an anatomy body map, colour-and-symbol status, history charts and a ranked "what to do now" list |
+| **Keep working offline** | Readings taken with no connection are queued and synchronised later, with no duplicates |
+| **Protect the data** | Sign-in, three roles, tamper-evident audit log, encryption at rest |
 
 ## Screenshots
 
-![Mission overview](docs/screenshots/today.png)
-![Body intelligence](docs/screenshots/body.png)
-![Health trends](docs/screenshots/history.png)
+| Body map | Health trends |
+|---|---|
+| ![Body map](docs/screenshots/body.png) | ![Health trends](docs/screenshots/history.png) |
 
-Release material: [demo script](docs/release/demo_script.md), [pitch](docs/release/pitch.md), [submission description](docs/release/submission_description.md).
+## Features
 
-## Project status
+**Health tracking**
+- Eleven indicators (vitals, sleep, mood, fatigue, stress, activity and radiation dose) with units, "how to measure" help and "why it matters in space" explanations.
+- Input validation that rejects impossible values and future timestamps.
+- Several ways to enter a pulse: a Bluetooth heart rate strap or watch, a tap counter, or typing a value.
+- Radiation: type in a dosimeter reading, or save a labelled estimate for the mission environment. The app keeps a
+  running total against the 600 mSv career limit.
+- Import many readings from a CSV file, or photograph a printed or handwritten report and review the values the app
+  reads (in-browser OCR, nothing is saved until you confirm).
 
-| Phase | Content | Status |
-|---|---|---|
-| 1 | Foundation: data model, ingestion API, reference data, tests, CI | **Done** |
-| 2 | Health status rules, personal baselines, guidance, offline queue | **Done** |
-| 3 | Dashboard and interactive body map | **Done** (core version) |
-| 4 | Security: sign-in, roles, audit log, encryption at rest | **Done** |
-| 5 | Resilience tests and full documentation | Planned |
-| 6 | Release and submission package | Planned |
+**Analysis**
+- Rule-based status for each indicator, with sources (NASA and published clinical ranges). The rules always decide the
+  safety-critical status.
+- Per-astronaut Isolation Forest for unusual days and a linear-regression risk forecast. See [docs/analytics.md](docs/analytics.md).
 
-## The dashboard (Phase 3)
+**Dashboard**
+- One offline page with four focused tabs: Today, Body, History, Add reading.
+- Status is always a symbol plus a word, never colour alone.
+- Interactive body map with three levels of detail and keyboard support.
+- Works on phones: installable as an app (PWA) and available as an Android app.
 
-One self-contained page, served by the app itself with no internet or external libraries. It is written for
-people who are not technical:
+**Security**
+- Password sign-in with lockout, sessions that store only a token hash, and roles (astronaut, clinician, mission control).
+- Fernet encryption of stored health data, and a hash-chained audit log. See [docs/security.md](docs/security.md).
 
-- **Four focused tabs** (Today, Body, History, Add reading) so only one thing is on screen at a time.
-- **Welcome screen** with three plain steps and one button to start with sample data.
-- **One big answer** at the top: "Everything looks good", "Some readings need attention" or "Get medical help now".
-- **What to do now:** at most three next steps, worst problem first.
-- **Simple cards** with the value, a plain status (Good, Watch, Urgent, always a symbol plus a word, never color alone)
-  and a "Why, and what to do" section that opens on tap.
-- **Anatomy body map** (an illustration with clickable hotspots on the head, chest, abdomen, arms and legs) with three
-  stages of detail: **collapsed** (nothing selected), **reading** (hover, focus or one tap: title, what the part does and
-  its current status) and **full context** (tap again or press Enter: readings with value, unit, healthy range, source,
-  last-updated time and data quality, why it matters in space, and the **Precautions and safety** panel with precautions,
-  spaceflight considerations and suggested actions). Keys 1 to 5 pick a part and Esc closes. Hotspot outlines are colored
-  by status. Parts with no tracked indicator (arms, legs) say so honestly.
-- **First-use tour** (press ? any time) and **notices** when the connection is offline or slow; the last data stays visible.
-- **History chart** with the healthy range shaded and a one-line summary.
-- **Add a reading in three steps**, with how-to-measure help and an immediate plain-language result.
+## Architecture
 
-Not included: a bone reading, and radiation sensing by the app itself (the dose is typed in from a dosimeter). Readings come from what the user enters or from clearly labelled simulated sample data; no NASA datasets are connected.
+```
+ Browser / Android app  ──►  FastAPI  ──►  Services  ──►  Repositories  ──►  SQLite or PostgreSQL
+ (single-file dashboard)     (api/)       (rules, ML,       (SQLAlchemy)
+                                           guidance)
+```
 
-## What phases 1 and 2 provide
+```
+src/astronaut_health_monitor/
+  api/                       HTTP endpoints and request/response shapes
+  services/                  business rules, assessment, analytics, demo data
+  repositories/              database access and table definitions
+  domain/                    indicators, reference data, errors
+  core/                      configuration, database, encryption
+  offline_synchronization/   local queue that holds readings until a connection exists
+  web/                       the dashboard, PWA files and bundled OCR
+android/                     Android app (WebView shell with native Bluetooth)
+tests/                       unit and integration tests
+docs/                        documentation
+```
 
-- Data model for **missions**, **astronauts**, **measuring devices** and **health measurements**.
-- Seven health indicators with units, "how to measure" instructions and "why it matters in spaceflight"
-  explanations: heart rate, systolic and diastolic blood pressure, blood glucose, body temperature,
-  sleep duration, mood score.
-- Input validation that rejects impossible values (for example a heart rate of 7000) and future timestamps.
-- REST API with automatic interactive documentation.
-- Offline-capable storage (SQLite, no internet needed).
-- **Health status rules** (normal, caution, critical) for every indicator, with documented sources.
-- **Personal baselines and trend detection**: a reading is also judged against the astronaut's own recent history,
-  so a slow drift is flagged even while values are still in the normal range.
-- **Guidance** for every out-of-range reading: explanation, likely causes, recommended actions, warning signs,
-  and a clear "contact the flight surgeon" trigger for critical readings.
-- **Offline queue and safe synchronization**: measurements taken without a connection are stored durably and sent
-  later; unique client references guarantee that retries never create duplicates.
+Tech stack: Python 3.12, FastAPI, SQLAlchemy 2, Pydantic v2, scikit-learn, pandas, NumPy, vanilla JavaScript.
+Details in [docs/architecture.md](docs/architecture.md).
 
 ## Quick start
 
@@ -83,88 +101,63 @@ pip install -e ".[development]"
 python -m astronaut_health_monitor
 ```
 
-### Try the demo (quickest)
+### Try the demo
 
-Demo mode creates simulated data and three accounts. **Never use demo mode with real data**: the password is public.
+Demo mode creates simulated data and three accounts. **Never use demo mode with real data: the password is public.**
 
 ```bash
-export ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true     # Windows PowerShell: $env:ASTRONAUT_HEALTH_MONITOR_DEMO_MODE="true"
+export ASTRONAUT_HEALTH_MONITOR_DEMO_MODE=true     # PowerShell: $env:ASTRONAUT_HEALTH_MONITOR_DEMO_MODE="true"
 python -m astronaut_health_monitor
 ```
 
 Open http://127.0.0.1:8000/ and sign in with password `Demo-Passphrase-2026!` as:
 
-| Username | Role | What you can do |
+| Username | Role | Can do |
 |---|---|---|
-| `astronaut.demo` | astronaut | see and add your own readings only |
+| `astronaut.demo` | astronaut | see and add their own readings |
 | `clinician.demo` | clinician | see and add readings for every crew member |
 | `control.demo` | mission control | everything, plus users, crew, sample data and the audit log |
 
-### The dashboard design
+Ready-made test files are in [docs/sample_data](docs/sample_data/README.md).
 
-A dark graphite and ivory design with sage (good), amber (watch) and coral (urgent) status colors, inspired by a
-mission-control layout. A left sidebar holds Mission overview, Body map, Health trends, Add reading, Spaceflight hazards
-and (mission control only) the Audit log. The overview shows a readiness ring (the share of today's readings that are
-inside the healthy range), the actions to take, and one card per reading. A Print report button prints the current
-screen. On a phone the sidebar becomes a row of tabs. The page still uses no external fonts, scripts or images.
+### Real accounts
 
-### If the page stays empty after signing in
+On the sign-in screen choose **Register** to create an astronaut account (password of at least 8 characters with upper
+case, lower case and a special character). Turn this off with `ASTRONAUT_HEALTH_MONITOR_ALLOW_SELF_REGISTRATION=false`.
 
-Phase 4 encrypts stored health data. A local database file created by an earlier phase (`astronaut_health_monitor.db`)
-holds unencrypted records that can no longer be read, and the page then says that your data could not be loaded.
-For test data, stop the app, delete that file, and start again. Never delete the file or the `.data_encryption_key` file
-of a database that holds data you need.
-
-### Creating your own account
-
-On the sign-in screen click **Register**. You choose a username and a password (at least 8 characters with an uppercase
-letter, a lowercase letter and a special character; a live meter shows weak, average or strong). The account is always an
-astronaut account that sees only its own data. After registering you are taken back to the sign-in screen to sign in.
-Switch this off with `ASTRONAUT_HEALTH_MONITOR_ALLOW_SELF_REGISTRATION=false`.
-
-### Real accounts (no demo mode)
-
-Create the first mission control account from the command line (the password is typed, not shown):
+Create the first mission control account from the command line:
 
 ```bash
 python -m astronaut_health_monitor.management create-user --username control.lead --role mission_control
 ```
 
-Then start the app normally, sign in, and create other users with `POST /users` (see http://127.0.0.1:8000/docs, which
-needs you to be signed in on the same browser). See [docs/security.md](docs/security.md) for the security design and its limits.
+## Use it on a phone
 
-## API overview
+- **Hosted web app and Android app:** see [docs/hosting.md](docs/hosting.md) (Render, PostgreSQL) and
+  [docs/mobile_app.md](docs/mobile_app.md) (install as an app, or build the Android APK from the `android/` folder).
+- **Bluetooth heart rate sensors** work in the Android app and in Chrome. It has not yet been tested on real sensor hardware.
+- Data entry options in detail: [docs/real_data_and_inputs.md](docs/real_data_and_inputs.md).
+
+## API
+
+Interactive documentation is served at `/docs` once the app is running.
 
 | Method and path | Purpose |
 |---|---|
 | `GET /health` | Application and database status |
-| `GET /health-indicators` | Explanation of every health indicator |
-| `POST /missions`, `GET /missions` | Create and list missions |
-| `POST /astronauts`, `GET /astronauts` | Register and list astronauts |
+| `GET /health-indicators` | Explanation of every indicator |
 | `POST /measurements` | Record one measurement |
-| `GET /measurements?astronaut_id=1` | List measurements, newest first (optional `indicator_type`, `limit`) |
-| `POST /measurements/batch` | Store up to 500 queued measurements; every item gets its own result |
-| `GET /measurements/{id}/assessment` | Judge one measurement: status, personal baseline, trend, guidance |
+| `POST /measurements/batch` | Store up to 500 queued measurements, each with its own result |
+| `GET /measurements/{id}/assessment` | Status, personal baseline, trend and guidance for one reading |
 | `GET /astronauts/{id}/health-summary` | Latest assessment of every indicator and an overall status |
 | `GET /health-status-rules` | The ranges, critical limits and sources used for judging |
 
-Example:
-
 ```bash
 curl -X POST http://127.0.0.1:8000/measurements -H "Content-Type: application/json" -d '{
-  "astronaut_id": 1,
-  "indicator_type": "heart_rate",
-  "measured_value": 64,
-  "measured_at": "2026-11-05T08:30:00+00:00"
+  "astronaut_id": 1, "indicator_type": "heart_rate",
+  "measured_value": 64, "measured_at": "2026-11-05T08:30:00+00:00"
 }'
 ```
-
-### Upgrading from an earlier phase
-
-Phases 2 and 4 changed the database tables, and Phase 4 encrypts stored data. There is no migration tool yet, so delete
-the old `astronaut_health_monitor.db` file (and any old offline queue file) once; it is recreated on the next start.
-Back up your encryption key (`.data_encryption_key`, or the value in `ASTRONAUT_HEALTH_MONITOR_ENCRYPTION_KEY`): without it
-the encrypted data cannot be read.
 
 ## Development
 
@@ -175,28 +168,39 @@ ruff format --check .  # formatting
 mypy src tests         # type check
 ```
 
-## Project structure
+Continuous integration runs these checks on every push. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-```
-src/astronaut_health_monitor/
-  api/            HTTP endpoints, request/response shapes
-  services/       business rules (validation, recording, reading)
-  repositories/   database access and table definitions
-  domain/         indicator vocabulary, reference data, errors
-  core/           configuration and database setup
-  offline_synchronization/   local queue that stores measurements until a connection exists
-tests/            unit and integration tests
-docs/             architecture documentation
-```
+## Documentation
 
-See [docs/architecture.md](docs/architecture.md), [docs/security.md](docs/security.md), [docs/health_status_rules.md](docs/health_status_rules.md), [docs/offline_synchronization.md](docs/offline_synchronization.md), [docs/resilience.md](docs/resilience.md), [docs/analytics.md](docs/analytics.md), [docs/spaceflight_context.md](docs/spaceflight_context.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+| Topic | File |
+|---|---|
+| Architecture | [docs/architecture.md](docs/architecture.md) |
+| Health status rules and sources | [docs/health_status_rules.md](docs/health_status_rules.md) |
+| Spaceflight hazards and context | [docs/spaceflight_context.md](docs/spaceflight_context.md) |
+| Analytics and machine learning | [docs/analytics.md](docs/analytics.md) |
+| Offline synchronisation | [docs/offline_synchronization.md](docs/offline_synchronization.md) |
+| Security | [docs/security.md](docs/security.md) |
+| Resilience | [docs/resilience.md](docs/resilience.md) |
+| Real data, radiation and data entry | [docs/real_data_and_inputs.md](docs/real_data_and_inputs.md) |
+| Hosting and mobile | [docs/hosting.md](docs/hosting.md), [docs/mobile_app.md](docs/mobile_app.md) |
+| Demo script, pitch, submission text | [docs/release](docs/release) |
+
+## Limitations
+
+- A prototype, not a medical device. Ranges are from published sources and have not been clinically validated.
+- No real NASA crew data is included. Readings are entered by the user or come from clearly labelled simulated data.
+- The app cannot sense radiation. Doses are typed in from a dosimeter or saved as a labelled estimate.
+- The tap counter and Bluetooth readings are only as accurate as the person or sensor producing them.
+- There is no migration tool yet. After a schema change, recreate the local database (and keep your encryption key).
 
 ## Acknowledgements
+
+Indicator selection follows the challenge brief and the five spaceflight hazards identified by NASA's Human Research
+Program: radiation, isolation and confinement, distance from Earth, gravity fields, and hostile closed environments.
 
 The anatomy illustration behind the body map (`src/astronaut_health_monitor/web/body_map.png`) was supplied by the
 project author. Confirm its licence and add the required attribution here before publishing or submitting.
 
+## Author
 
-Indicator selection follows the challenge brief and the five spaceflight hazards identified by NASA's
-Human Research Program: radiation, isolation and confinement, distance from Earth, gravity fields,
-and hostile closed environments.
+Zain, software engineering student, University of South Asia.
