@@ -97,3 +97,22 @@ def test_dashboard_has_tap_counter_and_radiation_estimate(api_client: TestClient
     page = api_client.get("/").text
     for text in ('id="tapBtn"', 'id="radEnv"', "Estimated from mission environment, not measured", "CAREER_LIMIT_MSV"):
         assert text in page
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
+def test_bluetooth_heart_rate_messages_are_decoded_and_summarised(api_client: TestClient) -> None:
+    code = _page_functions(api_client, ["parseHeartRateMeasurement", "bleSummary"])
+    script = f"""{code}
+const eight = new DataView(new ArrayBuffer(2)); eight.setUint8(1, 64);
+const sixteen = new DataView(new ArrayBuffer(3)); sixteen.setUint8(0, 1); sixteen.setUint16(1, 310, true);
+console.log(JSON.stringify([parseHeartRateMeasurement(eight), parseHeartRateMeasurement(sixteen),
+  parseHeartRateMeasurement(new DataView(new ArrayBuffer(1))), bleSummary([70, 71, 72, 73, 74, 72]), bleSummary([70, 0, 300])]));"""
+    decoded = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
+    assert decoded[:3] == [64, 310, None]
+    assert decoded[3] == {"ok": True, "bpm": 72} and decoded[4]["ok"] is False
+
+
+def test_dashboard_has_bluetooth_option(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for text in ('id="bleStart"', "requestDevice", "heart_rate_measurement", "wearable_device"):
+        assert text in page

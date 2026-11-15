@@ -383,7 +383,11 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <h3 style="margin-top:18px">No camera? Count your pulse by tapping</h3>
 <p class="hint">Find your pulse at the wrist or neck. Tap the button with each beat for about 15 to 20 seconds. The app works out beats per minute.</p>
 <div class="row" style="margin-top:10px"><button id="tapBtn" type="button" style="min-height:64px;min-width:220px;font-size:18px">Tap with each heartbeat</button><button class="quiet" id="tapDone" type="button" hidden>Finish</button></div>
-<p id="tapStatus" class="hint" role="status" style="margin-top:10px"></p></section>
+<p id="tapStatus" class="hint" role="status" style="margin-top:10px"></p>
+<h3 style="margin-top:18px">Bluetooth heart rate strap or watch</h3>
+<p class="hint">Put on a Bluetooth heart rate chest strap or a watch that can share its heart rate, then connect. The app reads it for 15 seconds and uses the middle value. Works in Chrome on Android and on computers, not in the installed Android app or on iPhone.</p>
+<div class="row" style="margin-top:10px"><button id="bleStart" type="button">Connect and read (15 s)</button><span id="bleLive" class="hint"></span></div>
+<p id="bleStatus" class="hint" role="status" style="margin-top:10px"></p></section>
 <section class="panel" style="margin-top:16px"><p class="eyebrow">RADIATION</p><h2>Radiation estimate and running total</h2>
 <p class="hint">This app cannot sense radiation. If you have no dosimeter reading, you can save an <b>estimate</b> for your mission environment. It is based on published NASA-related figures and is clearly marked as estimated, not measured. Your own dosimeter reading is always better.</p>
 <div class="row" style="margin-top:12px"><label for="radEnv" class="hint" style="margin:0">Environment</label><select id="radEnv"><option value="station">Space station</option><option value="transit">Deep-space transit</option><option value="rover">Pressurized rover</option><option value="moon">Lunar base</option><option value="mars">Mars base</option></select><button id="radSave" type="button">Save today&rsquo;s estimate</button></div>
@@ -520,7 +524,7 @@ function renderRegion(){
  if(!full){data.replaceChildren();return}
  box.append(el('p','hint','Why it matters in space: '+r.h));renderSafety();renderRegionData()}
 const SRC={manual_entry:'Entered by you',wearable_device:'Wearable sensor',medical_device:'Medical device',camera_analysis:'Camera analysis'};
-const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':(m.notes||'').startsWith('Estimated from')?'Estimated, not measured':m.notes==='Pulse counted by tapping'?'Counted by tapping':m.notes==='Imported from file'?'Imported from file':(SRC[m.measurement_source]||m.measurement_source);
+const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':m.notes==='Bluetooth heart rate sensor'?'Bluetooth sensor':(m.notes||'').startsWith('Estimated from')?'Estimated, not measured':m.notes==='Pulse counted by tapping'?'Counted by tapping':m.notes==='Imported from file'?'Imported from file':(SRC[m.measurement_source]||m.measurement_source);
 let regionToken=0;
 async function renderRegionData(){const box=$('#regionData'),mine=++regionToken,r=REGIONS[S.region];
  box.replaceChildren();if(!r.i.length){box.append(el('p','hint','No readings are tracked for this body part yet.'));return}
@@ -556,7 +560,7 @@ function showHelp(){const i=$('#formIndicator').value,r=S.ref[i];
  $('#unit').textContent='('+r.unit+')';$('#help').textContent='How to measure: '+r.how_to_measure+' Best conditions: '+S.rules[i].measurement_conditions}
 async function record(){const box=$('#result'),v=parseFloat($('#formValue').value);box.hidden=false;
  if(Number.isNaN(v)){box.style.setProperty('--c','var(--warn)');box.textContent='Please type the result as a number first.';return}
- try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:$('#formIndicator').value,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString(),...(S.camPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.camPulse?{measurement_source:'camera_analysis',notes:'Camera pulse estimate'}:{}),...(S.tapPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.tapPulse?{notes:'Pulse counted by tapping'}:{})});S.camPulse=null;S.tapPulse=null;
+ try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:$('#formIndicator').value,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString(),...(S.camPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.camPulse?{measurement_source:'camera_analysis',notes:'Camera pulse estimate'}:{}),...(S.tapPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.tapPulse?{notes:'Pulse counted by tapping'}:{}),...(S.blePulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.blePulse?{measurement_source:'wearable_device',notes:'Bluetooth heart rate sensor'}:{})});S.camPulse=null;S.tapPulse=null;S.blePulse=null;
   const a=await api('/measurements/'+m.id+'/assessment');box.style.setProperty('--c','var(--'+({normal:'ok',caution:'warn',critical:'bad'})[a.final_status]+')');
   box.textContent=tag(a)+'. '+a.headline+'. '+a.recommended_actions[0];$('#formValue').value='';await refresh()}
  catch(e){box.style.setProperty('--c','var(--bad)');box.textContent='Not saved: '+e.message}}
@@ -1121,6 +1125,37 @@ const _loadHistoryRad=loadHistory;loadHistory=async function(){const r=await _lo
 $('#tapBtn').addEventListener('click',tapBeat);$('#tapDone').addEventListener('click',()=>{if(tapTimes.length)tapFinish()});
 $('#radEnv').addEventListener('change',renderRadiation);$('#radSave').addEventListener('click',saveRadEstimate);
 (()=>{const sel=$('#radEnv');if(S.env&&RAD_EST[S.env])sel.value=S.env;renderRadiation()})();
+
+/* ---- Bluetooth heart rate strap or watch (Web Bluetooth, standard Heart Rate service) ---- */
+function parseHeartRateMeasurement(view){
+ if(!view||view.byteLength<2)return null;const flags=view.getUint8(0);
+ if(flags&1){return view.byteLength>=3?view.getUint16(1,true):null}return view.getUint8(1)}
+function bleSummary(samples){
+ const ok=(samples||[]).filter(v=>v>=30&&v<=220);if(ok.length<5)return{ok:false,why:'The sensor sent too few readings. Wear it snugly (moisten a chest strap) and try again.'};
+ const s=ok.slice().sort((a,b)=>a-b),bpm=s.length%2?s[(s.length-1)/2]:Math.round((s[s.length/2-1]+s[s.length/2])/2);
+ return{ok:true,bpm}}
+let bleBusy=false;
+async function readBluetoothPulse(){
+ const st=$('#bleStatus'),btn=$('#bleStart');if(bleBusy)return;
+ if(!navigator.bluetooth){st.textContent='This browser cannot use Bluetooth here. Use Chrome on Android or on a computer (it does not work in the installed Android app or on iPhone).';return}
+ bleBusy=true;btn.disabled=true;let server=null;
+ try{
+  st.textContent='Choose your heart rate sensor in the list that appears...';
+  const device=await navigator.bluetooth.requestDevice({filters:[{services:['heart_rate']}]});
+  st.textContent='Connecting to '+(device.name||'the sensor')+'...';
+  server=await device.gatt.connect();const service=await server.getPrimaryService('heart_rate'),ch=await service.getCharacteristic('heart_rate_measurement');
+  const samples=[];ch.addEventListener('characteristicvaluechanged',e=>{const v=parseHeartRateMeasurement(e.target.value);if(v!==null){samples.push(v);$('#bleLive').textContent='Live: '+v+' bpm'}});
+  await ch.startNotifications();const T=15000,start=performance.now();
+  await new Promise(done=>{const iv=setInterval(()=>{const left=Math.ceil((T-(performance.now()-start))/1000);st.textContent='Reading from the sensor... '+Math.max(0,left)+' s. Stay still.';if(left<=0){clearInterval(iv);done()}},250)});
+  try{await ch.stopNotifications()}catch(e){}
+  const res=bleSummary(samples);
+  if(!res.ok){st.textContent=res.why;return}
+  $('#formIndicator').value='heart_rate';showHelp();$('#formValue').value=res.bpm;S.blePulse=res.bpm;S.camPulse=null;S.tapPulse=null;
+  st.textContent='Sensor reading: about '+res.bpm+' beats per minute (middle value of '+samples.length+' readings). Press Save reading to keep it.'
+ }catch(e){st.textContent=(e&&e.name==='NotFoundError')?'No sensor was chosen.':'Bluetooth did not work: '+((e&&e.message)||e)}
+ finally{try{if(server&&server.connected)server.disconnect()}catch(e){}bleBusy=false;btn.disabled=false}}
+$('#bleStart').addEventListener('click',readBluetoothPulse);
+if(!navigator.bluetooth)$('#bleStatus').textContent='Bluetooth is not available in this browser. Use Chrome on Android or a computer to use a heart rate sensor.';
 </script>
 </body>
 </html>
