@@ -45,6 +45,8 @@ public class MainActivity extends Activity {
     private static final int REQ_CAMERA = 1, REQ_FILE = 2, REQ_BLE = 3;
     private WebView web;
     private SharedPreferences prefs;
+    private static final int MAX_RETRIES = 18;
+    private int retries = 0;
     private PermissionRequest pendingPermission;
     private ValueCallback<Uri[]> pendingChooser;
 
@@ -64,7 +66,25 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
-                if (r.isForMainFrame() && !v.getUrl().startsWith("file:")) v.loadUrl(START_PAGE + "?error=1");
+                if (!r.isForMainFrame()) return;
+                String current = v.getUrl();
+                if (current != null && current.startsWith("file:")) return;
+                final String target = r.getUrl().toString();
+                // A free hosted server sleeps when idle and needs up to a minute to wake: keep retrying quietly.
+                if (retries < MAX_RETRIES && target.startsWith("http")) {
+                    retries++;
+                    v.loadData("<html><body style='background:#0B1220;color:#E6ECF4;font-family:sans-serif;padding:32px'>"
+                            + "<h2>Astro Health</h2><p>Waking up the server, please wait...</p>"
+                            + "<p style='color:#B9C6D8'>Attempt " + retries + " of " + MAX_RETRIES + "</p></body></html>", "text/html", "utf-8");
+                    handler.postDelayed(() -> web.loadUrl(target), 5000);
+                    return;
+                }
+                v.loadUrl(START_PAGE + "?error=1");
+            }
+
+            @Override
+            public void onPageFinished(WebView v, String url) {
+                if (url != null && url.startsWith("http")) retries = 0;
             }
         });
         web.setWebChromeClient(new WebChromeClient() {
