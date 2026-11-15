@@ -15,6 +15,18 @@ Built for the **2026 NASA Space Apps Challenge**: *Create Health Monitoring Soft
 
 ![Mission overview](docs/screenshots/today.png)
 
+## Live demo
+
+| | Link |
+|---|---|
+| **Web app** | https://astro-health-8c7r.onrender.com |
+| **Android app (APK)** | https://github.com/ZainulAbideen647425/Health-Monitoring-Software-for-Astronauts-on-Space-Missions/releases/download/android-latest/astro-health.apk |
+
+- Choose **Register** to create your own account, then press **Start with sample data** to see the dashboard filled in.
+- The app runs on a free hosting plan, so the first page load after a quiet period can take up to a minute.
+- This is a public demo. Do not enter real personal or medical information.
+- Installing the APK: allow "install from unknown sources" when Android asks. See [docs/mobile_app.md](docs/mobile_app.md).
+
 ## The problem
 
 On a mission to the Moon or Mars, a message to Earth can take minutes each way, and a real-time call to a doctor may be
