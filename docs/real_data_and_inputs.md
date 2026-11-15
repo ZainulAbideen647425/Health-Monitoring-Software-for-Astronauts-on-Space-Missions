@@ -29,3 +29,8 @@ Add reading has a **Read a report from a photo** panel. Choose or take a photo o
 - **Nothing is saved automatically.** The found values are listed with checkboxes and editable numbers. The person confirms them, and they are saved with the source `camera_analysis`.
 - Accuracy depends on the photo. Printed text in good light works best; handwriting and seven-segment device displays are often misread. This is a convenience, not a medical measurement.
 - `docs/sample_data/simulated_report.png` is a made-up report for testing.
+
+## Alternatives when there is no camera or dosimeter
+- **Tap counter (pulse).** The person taps a button with each heartbeat for 15 to 20 seconds. The app needs at least 8 taps over 6 seconds, rejects uneven tapping and implausible rates, and fills in the heart rate for the person to save. It is saved as a manual entry noted "Pulse counted by tapping".
+- **Radiation estimate.** A person with no dosimeter reading can save an *estimated* daily dose for the chosen environment: about 1.84 mSv/day in transit and 0.64 mSv/day on the Mars surface (Curiosity RAD, reported by Space.com), about 0.5 mSv/day on the Moon or a rover (the NASA technical brief's surface figure, before shielding), and about 0.5 mSv/day on a station (an approximate figure that does not come from the NASA brief). It is saved with the note "Estimated from mission environment, not measured" and shown as "Estimated, not measured". It is a rough orientation figure, not a measurement.
+- **Running career total.** The dose for each day (the highest value that day) is added up and compared with NASA's 600 mSv career limit, with a progress bar and an estimate of the days left at the chosen environment's rate. Only the latest 1,000 readings are used.

@@ -53,3 +53,47 @@ def test_implausible_numbers_are_ignored(api_client: TestClient) -> None:
     script = f"{ranges.group(0)}{function.group(0)}\nconsole.log(JSON.stringify({call}));"
     found = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
     assert found == []
+
+
+def _page_functions(api_client: TestClient, names: list[str]) -> str:
+    page = api_client.get("/").text
+    pieces = []
+    for name in names:
+        found = re.search(
+            rf"function {name}\(.*?\n(?=function |let |const |async function |\$\(|/\*|\(\(\)|$)", page, re.S
+        )
+        assert found, name
+        pieces.append(found.group(0))
+    return "\n".join(pieces)
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
+def test_pulse_is_worked_out_from_taps(api_client: TestClient) -> None:
+    code = _page_functions(api_client, ["bpmFromTaps"])
+    steady = [round(i * 833.0) for i in range(14)]
+    uneven = [0, 300, 1500, 1700, 3200, 3300, 5200, 5300, 7600, 7700]
+    script = f"{code}\nconsole.log(JSON.stringify([bpmFromTaps({steady}),bpmFromTaps({uneven}),bpmFromTaps([1,2,3])]));"
+    steady_result, uneven_result, short_result = json.loads(
+        subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout
+    )
+    assert steady_result == {"ok": True, "bpm": 72}
+    assert uneven_result["ok"] is False and short_result["ok"] is False
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
+def test_career_radiation_total_counts_each_day_once(api_client: TestClient) -> None:
+    code = _page_functions(api_client, ["careerDose"])
+    rows = [
+        {"measured_at": "2026-11-01T08:00:00Z", "measured_value": 0.5},
+        {"measured_at": "2026-11-01T20:00:00Z", "measured_value": 0.7},
+        {"measured_at": "2026-11-02T08:00:00Z", "measured_value": 1.0},
+    ]
+    script = f"{code}\nconsole.log(JSON.stringify(careerDose({rows})));"
+    result = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
+    assert result == {"total": 1.7, "days": 2}
+
+
+def test_dashboard_has_tap_counter_and_radiation_estimate(api_client: TestClient) -> None:
+    page = api_client.get("/").text
+    for text in ('id="tapBtn"', 'id="radEnv"', "Estimated from mission environment, not measured", "CAREER_LIMIT_MSV"):
+        assert text in page

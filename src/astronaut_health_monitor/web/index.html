@@ -379,7 +379,17 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <p class="hint">Cover the camera lens (and flash, if there is one) with a fingertip and keep still for 15 seconds. The app reads the tiny colour changes with each heartbeat. It is a rough estimate, not a medical device, and it is saved as a camera reading.</p>
 <div class="row" style="margin-top:12px"><button id="camStart" type="button">Start 15-second pulse check</button></div>
 <video id="camVideo" muted playsinline style="width:1px;height:1px;opacity:0;position:absolute"></video>
-<p id="camStatus" class="hint" role="status" style="margin-top:12px"></p></section>
+<p id="camStatus" class="hint" role="status" style="margin-top:12px"></p>
+<h3 style="margin-top:18px">No camera? Count your pulse by tapping</h3>
+<p class="hint">Find your pulse at the wrist or neck. Tap the button with each beat for about 15 to 20 seconds. The app works out beats per minute.</p>
+<div class="row" style="margin-top:10px"><button id="tapBtn" type="button" style="min-height:64px;min-width:220px;font-size:18px">Tap with each heartbeat</button><button class="quiet" id="tapDone" type="button" hidden>Finish</button></div>
+<p id="tapStatus" class="hint" role="status" style="margin-top:10px"></p></section>
+<section class="panel" style="margin-top:16px"><p class="eyebrow">RADIATION</p><h2>Radiation estimate and running total</h2>
+<p class="hint">This app cannot sense radiation. If you have no dosimeter reading, you can save an <b>estimate</b> for your mission environment. It is based on published NASA-related figures and is clearly marked as estimated, not measured. Your own dosimeter reading is always better.</p>
+<div class="row" style="margin-top:12px"><label for="radEnv" class="hint" style="margin:0">Environment</label><select id="radEnv"><option value="station">Space station</option><option value="transit">Deep-space transit</option><option value="rover">Pressurized rover</option><option value="moon">Lunar base</option><option value="mars">Mars base</option></select><button id="radSave" type="button">Save today&rsquo;s estimate</button></div>
+<p id="radEstimate" class="hint" style="margin-top:12px"></p>
+<div id="radSummary" style="margin-top:12px"><div style="height:10px;border-radius:6px;background:var(--line);overflow:hidden"><div id="radFill" style="height:100%;width:0;background:var(--ok)"></div></div><p id="radTotal" style="margin:8px 0 0"></p><p id="radDays" class="hint" style="margin:6px 0 0"></p></div>
+<p id="radStatus" class="hint" role="status" style="margin-top:10px"></p></section>
 <section class="panel" style="margin-top:16px"><p class="eyebrow">PHOTO</p><h2>Read a report from a photo</h2>
 <p class="hint">Take or choose a photo of a printed or handwritten report or device screen. The text is read inside your browser (the photo is not uploaded), and known values such as heart rate, blood pressure, glucose, temperature, sleep and radiation dose are suggested. <b>Nothing is saved until you check the numbers and confirm.</b> Handwriting and blurry photos are often misread.</p>
 <div class="row" style="margin-top:12px"><label for="ocrFile" class="hint" style="margin:0">Choose a photo</label><input id="ocrFile" type="file" accept="image/*"></div>
@@ -510,7 +520,7 @@ function renderRegion(){
  if(!full){data.replaceChildren();return}
  box.append(el('p','hint','Why it matters in space: '+r.h));renderSafety();renderRegionData()}
 const SRC={manual_entry:'Entered by you',wearable_device:'Wearable sensor',medical_device:'Medical device',camera_analysis:'Camera analysis'};
-const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':m.notes==='Imported from file'?'Imported from file':(SRC[m.measurement_source]||m.measurement_source);
+const srcLabel=m=>m.notes==='Simulated sample data'?'Simulated sample data':(m.notes||'').startsWith('Estimated from')?'Estimated, not measured':m.notes==='Pulse counted by tapping'?'Counted by tapping':m.notes==='Imported from file'?'Imported from file':(SRC[m.measurement_source]||m.measurement_source);
 let regionToken=0;
 async function renderRegionData(){const box=$('#regionData'),mine=++regionToken,r=REGIONS[S.region];
  box.replaceChildren();if(!r.i.length){box.append(el('p','hint','No readings are tracked for this body part yet.'));return}
@@ -546,7 +556,7 @@ function showHelp(){const i=$('#formIndicator').value,r=S.ref[i];
  $('#unit').textContent='('+r.unit+')';$('#help').textContent='How to measure: '+r.how_to_measure+' Best conditions: '+S.rules[i].measurement_conditions}
 async function record(){const box=$('#result'),v=parseFloat($('#formValue').value);box.hidden=false;
  if(Number.isNaN(v)){box.style.setProperty('--c','var(--warn)');box.textContent='Please type the result as a number first.';return}
- try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:$('#formIndicator').value,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString(),...(S.camPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.camPulse?{measurement_source:'camera_analysis',notes:'Camera pulse estimate'}:{})});S.camPulse=null;
+ try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:$('#formIndicator').value,measured_value:v,measured_at:new Date(Date.now()-60000).toISOString(),...(S.camPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.camPulse?{measurement_source:'camera_analysis',notes:'Camera pulse estimate'}:{}),...(S.tapPulse&&$('#formIndicator').value==='heart_rate'&&Math.round(v)===S.tapPulse?{notes:'Pulse counted by tapping'}:{})});S.camPulse=null;S.tapPulse=null;
   const a=await api('/measurements/'+m.id+'/assessment');box.style.setProperty('--c','var(--'+({normal:'ok',caution:'warn',critical:'bad'})[a.final_status]+')');
   box.textContent=tag(a)+'. '+a.headline+'. '+a.recommended_actions[0];$('#formValue').value='';await refresh()}
  catch(e){box.style.setProperty('--c','var(--bad)');box.textContent='Not saved: '+e.message}}
@@ -1078,6 +1088,39 @@ async function saveReportReadings(){
   catch(e){st.textContent='Not saved: '+e.message;return}}
  st.textContent='Saved '+saved+' reading'+(saved===1?'':'s')+(flagged.length?'. Needs attention: '+flagged.join(', ')+'.':'.');$('#ocrFound').replaceChildren();await refresh()}
 $('#ocrFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)readReport(f).finally(()=>{e.target.value=''})});
+
+/* ---- tap-counted pulse, radiation estimate and running total ---- */
+function bpmFromTaps(times){
+ if(!times||times.length<8)return{ok:false,why:'Tap with at least 8 heartbeats.'};
+ const span=(times[times.length-1]-times[0])/1000;if(span<6)return{ok:false,why:'Keep tapping for at least 6 seconds.'};
+ const gaps=times.slice(1).map((t,i)=>(t-times[i])/1000),mean=span/gaps.length,sd=Math.sqrt(gaps.reduce((s,g)=>s+(g-mean)*(g-mean),0)/gaps.length);
+ if(sd/mean>0.35)return{ok:false,why:'The taps were too uneven. Try again and tap with each beat.'};
+ const bpm=Math.round(60/mean);if(bpm<30||bpm>220)return{ok:false,why:'That works out to '+bpm+' beats per minute, which is not believable. Try again.'};
+ return{ok:true,bpm}}
+let tapTimes=[],tapTimer=null;
+function tapFinish(){clearTimeout(tapTimer);tapTimer=null;const st=$('#tapStatus'),r=bpmFromTaps(tapTimes);$('#tapBtn').textContent='Tap with each heartbeat';
+ if(!r.ok){st.textContent=r.why;tapTimes=[];return}
+ $('#formIndicator').value='heart_rate';showHelp();$('#formValue').value=r.bpm;S.tapPulse=r.bpm;S.camPulse=null;
+ st.textContent='Counted about '+r.bpm+' beats per minute from '+tapTimes.length+' taps. Press Save reading to keep it.';tapTimes=[]}
+function tapBeat(){tapTimes.push(performance.now());const st=$('#tapStatus');
+ if(tapTimes.length===1){tapTimer=setTimeout(tapFinish,20000);$('#tapBtn').textContent='Keep tapping (20 s)...'}
+ st.textContent=tapTimes.length+' taps. Press Finish when you have 15 or more, or wait 20 seconds.';$('#tapDone').hidden=false}
+const RAD_EST={station:[0.5,'Low Earth orbit is partly shielded by the Earth’s magnetic field. This is an approximate figure, not from the NASA brief.'],transit:[1.84,'Curiosity RAD instrument measurement on the way to Mars (as reported by Space.com).'],rover:[0.5,'NASA technical brief: roughly 0.5 mSv/day on surfaces, before any vehicle shielding.'],moon:[0.5,'NASA technical brief: roughly 0.5 mSv/day on surfaces, before any habitat shielding.'],mars:[0.64,'Curiosity RAD instrument measurement on the Martian surface (as reported by Space.com).']};
+const CAREER_LIMIT_MSV=600;
+function careerDose(rows){const byDay={};(rows||[]).forEach(r=>{const d=String(r.measured_at).slice(0,10);byDay[d]=Math.max(byDay[d]||0,r.measured_value)});
+ const vals=Object.values(byDay);return{total:Math.round(vals.reduce((a,b)=>a+b,0)*100)/100,days:vals.length}}
+function renderRadiation(){const box=$('#radSummary');if(!box)return;const key=$('#radEnv').value,est=RAD_EST[key],c=careerDose(S.hist&&S.hist.radiation_dose),pct=Math.min(100,c.total/CAREER_LIMIT_MSV*100);
+ $('#radEstimate').textContent='Estimated about '+est[0]+' mSv per day. '+est[1];
+ $('#radFill').style.width=pct+'%';$('#radTotal').textContent=c.total+' mSv recorded over '+c.days+' day'+(c.days===1?'':'s')+' ('+(Math.round(pct*10)/10)+'% of the '+CAREER_LIMIT_MSV+' mSv career limit)';
+ $('#radDays').textContent=c.total>0&&est[0]>0?'At the estimated rate in this environment, the remaining allowance would last about '+Math.max(0,Math.round((CAREER_LIMIT_MSV-c.total)/est[0]))+' days.':''}
+async function saveRadEstimate(){const key=$('#radEnv').value,st=$('#radStatus');
+ try{const m=await post('/measurements',{astronaut_id:+cur(),indicator_type:'radiation_dose',measured_value:RAD_EST[key][0],measured_at:new Date(Date.now()-60000).toISOString(),notes:'Estimated from mission environment, not measured'});
+  const a=await api('/measurements/'+m.id+'/assessment');st.textContent='Saved the estimate as today’s dose. Status: '+a.final_status+'.';await refresh()}
+ catch(e){st.textContent='Not saved: '+e.message}}
+const _loadHistoryRad=loadHistory;loadHistory=async function(){const r=await _loadHistoryRad.apply(this,arguments);renderRadiation();return r};
+$('#tapBtn').addEventListener('click',tapBeat);$('#tapDone').addEventListener('click',()=>{if(tapTimes.length)tapFinish()});
+$('#radEnv').addEventListener('change',renderRadiation);$('#radSave').addEventListener('click',saveRadEstimate);
+(()=>{const sel=$('#radEnv');if(S.env&&RAD_EST[S.env])sel.value=S.env;renderRadiation()})();
 </script>
 </body>
 </html>
