@@ -259,9 +259,9 @@ textarea{font:inherit;color:var(--text);background:var(--inset);border:1px solid
 <div id="notices" role="status" aria-live="polite"></div>
 <section id="login" class="panel" hidden style="max-width:440px;margin:0 auto;width:100%">
 <h2>Sign in</h2><p class="hint">Use the account given to you by mission control. After 30 minutes without activity you are signed out.</p>
-<div class="steps" style="grid-template-columns:1fr"><div><label for="loginUser">Username</label><input id="loginUser" autocomplete="username" autocapitalize="none"></div>
-<div><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
-<button id="loginBtn" type="button">Sign in</button></div><p id="loginError" role="alert"></p>
+<form id="loginForm" class="steps" style="grid-template-columns:1fr"><div><label for="loginUser">Username</label><input id="loginUser" name="username" autocomplete="username" autocapitalize="none"></div>
+<div><label for="loginPassword">Password</label><input id="loginPassword" name="password" type="password" autocomplete="current-password"></div>
+<button id="loginBtn" type="submit">Sign in</button></form><p id="loginError" role="alert"></p>
 <p class="hint" id="registerPrompt">Don't have an account? <a href="#" id="showRegister">Register</a></p></section>
 <section id="register" class="panel" hidden style="max-width:440px;margin:0 auto;width:100%">
 <h2>Create your account</h2><p class="hint">This creates a crew member account that can see and record only your own health data. After creating it, you sign in.</p>
@@ -567,7 +567,7 @@ $('#formIndicator').addEventListener('change',showHelp);$('#record').addEventLis
 $('#formValue').addEventListener('keydown',e=>{if(e.key==='Enter')record()});
 const runDemo=()=>demo().catch(e=>alert('Could not add sample data: '+e.message+' (sample data needs demo mode).'));
 $('#demo').addEventListener('click',runDemo);$('#demoBig').addEventListener('click',runDemo);
-$('#loginBtn').addEventListener('click',signIn);$('#loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('#logout').addEventListener('click',signOut);
+$('#loginForm').addEventListener('submit',e=>{e.preventDefault();signIn()});$('#logout').addEventListener('click',signOut);
 $('#showRegister').addEventListener('click',e=>{e.preventDefault();showRegister()});$('#showLogin').addEventListener('click',e=>{e.preventDefault();showLogin('')});$('#registerBtn').addEventListener('click',register);$('#regPassword').addEventListener('input',updateStrength);$('#regPassword2').addEventListener('keydown',e=>{if(e.key==='Enter')register()});
 api('/auth/me').then(u=>{S.user=u;return afterSignIn()}).catch(()=>{if($('#login').hidden)showLogin('')});
 
